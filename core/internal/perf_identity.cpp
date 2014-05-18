@@ -44,9 +44,13 @@ perf_identity::perf_identity()
   {
   }
 
-void perf_identity::init(perf_config *c)
+void perf_identity::init(perf_config *c, const char *binding)
   {
   assert(c);
+  assert(binding);
+
+  m_binding.~perf_string();
+  new(&m_binding) perf_string(binding, c);
 
 #if defined(_WIN32)
   int CPUInfo[4] = {-1};
@@ -127,7 +131,8 @@ void perf_identity::appendIdentity(perf_string& id, const char* tab)
                   "%s{\n"
                   "%s  \"cpu\": \"%s\",\n"
                   "%s  \"cpuCount\": \"%llu\",\n"
-                  "%s  \"memoryBytes\": \"%llu\"\n"
+                  "%s  \"memoryBytes\": \"%llu\",\n"
+                  "%s  \"binding\": \"%s\"\n"
                   "%s}",
                   tab,
                   tab,
@@ -136,6 +141,8 @@ void perf_identity::appendIdentity(perf_string& id, const char* tab)
                   (uint64_t)m_cpuCount,
                   tab,
                   (uint64_t)m_memoryBytes,
+                  tab,
+                  m_binding.data(),
                   tab);
   id.resize(oldSize + printed);
   }

@@ -27,12 +27,12 @@ typedef int perf_error;
 /// \brief Create a performance testing config
 ///
 /// The config should be created before anything else in perf.
-PERF_EXPORT perf_config *perf_init_config(perf_alloc, perf_free);
+PERF_EXPORT perf_config *perf_init_config(perf_alloc, perf_free, const char *binding);
 
 /// \brief Create a default performance testing config
 ///
 /// This helper internally calls perf_init_config with malloc and free.
-PERF_EXPORT perf_config *perf_init_default_config();
+PERF_EXPORT perf_config *perf_init_default_config(const char *binding);
 
 /// \brief Terminate the performance testing config.
 PERF_EXPORT void perf_term_config(perf_config *ctx);
@@ -67,7 +67,7 @@ PERF_EXPORT perf_error perf_check_error(perf_context *ctx);
 /// \brief Init a performance testing context.
 ///
 /// A context should be created for each thread which will use perf.
-PERF_EXPORT perf_context *perf_init_context(perf_config *cfg);
+PERF_EXPORT perf_context *perf_init_context(perf_config *cfg, const char *name);
 
 /// \brief Terminate a performance testing context.
 PERF_EXPORT void perf_term_context(perf_context *ctx);

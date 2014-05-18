@@ -6,7 +6,7 @@
 
 struct perf_context
   {
-  static perf_context *init(perf_config *c);
+  static perf_context *init(perf_config *c, const char *name);
   static bool check(const perf_context *c);
   static void term(perf_context *c);
 
@@ -30,6 +30,7 @@ private:
   perf_config *m_config;
   perf_error m_error;
   perf_absolute_time m_start;
+  perf_string m_name;
 
   friend struct perf_config;
 
