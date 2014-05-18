@@ -28,7 +28,7 @@ class TestExpose < Test::Unit::TestCase
   def test_identity
     cfg = Perf::Config.new()
 
-    ctx = Perf::Context.new(cfg)
+    ctx = Perf::Context.new(cfg, "idenity")
     assert_equal :no_error, ctx.error
 
     id = cfg.identity
@@ -38,15 +38,16 @@ class TestExpose < Test::Unit::TestCase
     obj = JSON.parse(id.to_s)
     assert_not_nil obj
 
-    assert_equal 3, obj.length
+    assert_equal 4, obj.length
     assert_kind_of String, obj["cpu"]
     assert_kind_of String, obj["cpuCount"]
     assert_kind_of String, obj["memoryBytes"]
+    assert_kind_of String, obj["binding"]
   end
 
   def test_timing
     cfg = Perf::Config.new()
-    ctx = Perf::Context.new(cfg)
+    ctx = Perf::Context.new(cfg, "timing_test")
 
     test = ""
 

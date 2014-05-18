@@ -60,13 +60,13 @@ module Perf
     end
   end
   
-  attach_function :perf_init_default_config, [ ], :pointer
+  attach_function :perf_init_default_config, [ :string ], :pointer
   attach_function :perf_term_config, [ :pointer ], :void
 
   attach_function :perf_find_identity, [ :pointer ], :pointer
   attach_function :perf_identity_description, [ :pointer ], :string
 
-  attach_function :perf_init_context, [ :pointer ], :pointer
+  attach_function :perf_init_context, [ :pointer, :string ], :pointer
   attach_function :perf_term_context, [ :pointer ], :void
 
   attach_function :perf_add_event, [ :pointer, :string ], :void
@@ -94,7 +94,7 @@ module Perf
 
   class Config
     def initialize()
-      @ptr = LibConfig.new(Perf.perf_init_default_config())
+      @ptr = LibConfig.new(Perf.perf_init_default_config("ruby"))
     end
 
     attr_reader :ptr
@@ -105,8 +105,8 @@ module Perf
   end
 
   class Context
-    def initialize(ctx)
-      @ptr = LibContext.new(Perf.perf_init_context(ctx.ptr))
+    def initialize(config, name)
+      @ptr = LibContext.new(Perf.perf_init_context(config.ptr, name))
     end
 
     attr_reader :ptr
