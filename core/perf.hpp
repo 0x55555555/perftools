@@ -76,8 +76,70 @@ public:
     perf_term_context(m_ctx);
     }
 
+  void event(const char *name)
+    {
+    perf_add_event(m_ctx, name);
+    }
+
+  const char *dump()
+    {
+    return perf_dump_context(m_ctx);
+    }
+
+  void write(const char *name)
+    {
+    perf_write_context(m_ctx, name);
+    }
+
 private:
   perf_context *m_ctx;
+  };
+
+class PERF_EXPORT process
+  {
+public:
+  process(context *ctx, const char *name) : m_ctx(ctx)
+    {
+    if (!ctx)
+      {
+      throw std::runtime_error("invalid context passed");
+      }
+
+    const size_t len = strlen(name);
+    m_stub.reserve(len + 32);
+    m_stub = name;
+    m_stub += "::";
+
+    event("begin");
+    }
+
+  ~process()
+    {
+    event("end");
+    }
+
+  void event(const char *name)
+    {
+    size_t len = m_stub.size();
+    m_stub += name;
+
+    m_ctx->event(m_stub.data());
+
+    m_stub.resize(len);
+    }
+
+private:
+  std::string m_stub;
+  context *m_ctx;
+  };
+
+class block
+  {
+public:
+  block(context *ctx, const char *name) : m_process(ctx, name) { }
+
+private:
+  process m_process;
   };
 
 }
