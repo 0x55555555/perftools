@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <string>
 #include <cassert>
+#include "perf.h"
 
 struct perf_config;
 

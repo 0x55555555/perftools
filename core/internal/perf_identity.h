@@ -9,6 +9,7 @@ struct perf_identity
   perf_identity();
 
   void init(perf_config *);
+  void appendIdentity(perf_string& s, const char* tab);
   void calculateIdentity(perf_config *c);
 
   perf_string m_identity;

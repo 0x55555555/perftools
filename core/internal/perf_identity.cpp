@@ -109,21 +109,33 @@ void perf_identity::init(perf_config *c)
 
 void perf_identity::calculateIdentity(perf_config *c)
   {
-  const std::size_t size = 1024;
   m_identity.~perf_string();
   new(&m_identity) perf_string(c);
-  m_identity.resize(size);
+
+  appendIdentity(m_identity, "");
+  }
+
+void perf_identity::appendIdentity(perf_string& id, const char* tab)
+  {
+  const std::size_t size = 1024;
+  const std::size_t oldSize = id.size();
+  id.resize(oldSize + size);
 
   int printed = snprintf(
-                  &m_identity[0],
+                  &id[oldSize],
                   size/sizeof(char),
-                  "{\n"
-                  "  \"cpu\": \"%s\",\n"
-                  "  \"cpuCount\": \"%llu\",\n"
-                  "  \"memoryBytes\": \"%llu\"\n"
-                  "}\n",
+                  "%s{\n"
+                  "%s  \"cpu\": \"%s\",\n"
+                  "%s  \"cpuCount\": \"%llu\",\n"
+                  "%s  \"memoryBytes\": \"%llu\"\n"
+                  "%s}",
+                  tab,
+                  tab,
                   m_cpu.data(),
+                  tab,
                   (uint64_t)m_cpuCount,
-                  (uint64_t)m_memoryBytes);
-  m_identity.resize(printed);
+                  tab,
+                  (uint64_t)m_memoryBytes,
+                  tab);
+  id.resize(oldSize + printed);
   }
