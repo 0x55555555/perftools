@@ -47,6 +47,35 @@ class TestExpose < Test::Unit::TestCase
   def test_timing
     cfg = Perf::Config.new()
     ctx = Perf::Context.new(cfg)
+
+    test = ""
+
+    ctx.block("test_block_10") do
+      10.times do 
+        test += "*"
+      end
+    end
+
+    ctx.block("test_block_100") do
+      100.times do 
+        test += "*"
+      end
+    end
+
+    ctx.block("test_block_100") do
+      1000.times do 
+        test += "*"
+      end
+    end
+
+    ctx.block("test_block_100") do
+      10000.times do 
+        test += "*"
+      end
+    end
+
+    obj = JSON.parse(ctx.dump)
+    assert_not_nil obj
   end
 end
 

@@ -69,6 +69,11 @@ module Perf
   attach_function :perf_init_context, [ :pointer ], :pointer
   attach_function :perf_term_context, [ :pointer ], :void
 
+  attach_function :perf_add_event, [ :pointer, :string ], :void
+
+  attach_function :perf_dump_context, [ :pointer ], :string
+  attach_function :perf_write_context, [ :pointer, :string ], :void
+
   enum :error, [
     :no_error, 0,
     :error_in_error, 1,
@@ -108,6 +113,26 @@ module Perf
 
     def error
       return Perf.perf_check_error(@ptr)
+    end
+
+    def dump
+      return Perf.perf_dump_context(@ptr)
+    end
+
+    def write(f)
+      return Perf.perf_write_context(@ptr, f)
+    end
+
+    def event(name)
+      Perf.perf_add_event(@ptr, name)
+    end
+
+    def block(name)
+      b = "#{name}::begin"
+      e = "#{name}::end"
+      event(b)
+      yield
+      event(e)
     end
   end
 end
