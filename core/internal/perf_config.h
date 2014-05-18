@@ -10,7 +10,7 @@
 
 struct perf_config
   {
-  static perf_config *init(perf_alloc alloc, perf_free free);
+  static perf_config *init(perf_alloc alloc, perf_free free, const char *binding);
   static bool check(const perf_config *c);
   static void term(perf_config *c);
 

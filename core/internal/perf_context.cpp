@@ -1,9 +1,10 @@
 #include "perf_context.h"
 #include <cstdio>
 
-perf_context *perf_context::init(perf_config *c)
+perf_context *perf_context::init(perf_config *c, const char *name)
   {
   PERF_API_CHECK_PTR(c, return nullptr);
+  PERF_API_CHECK_PTR(name, return nullptr);
 
   auto a = c->create<perf_context>();
 
@@ -13,6 +14,9 @@ perf_context *perf_context::init(perf_config *c)
 
   a->m_results.~perf_string();
   new(&a->m_results) perf_string(c);
+
+  a->m_name.~perf_string();
+  new(&a->m_name) perf_string(name, c);
 
   return a;
   }
@@ -102,7 +106,11 @@ void perf_context::cacheResults()
   {
   m_results =
   "{\n"
-  "  \"identity\": ";
+  "  \"name\": \"";
+  m_results += m_name;
+
+  m_results += "\",\n"
+  "  \"machineIdentity\": ";
 
   m_config->m_identity.appendIdentity(m_results, "  ");
 

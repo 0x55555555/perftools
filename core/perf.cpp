@@ -6,14 +6,14 @@
 extern "C"
 {
 
-perf_config *perf_init_default_config()
+perf_config *perf_init_default_config(const char *binding)
   {
-  return perf_init_config(malloc, free);
+  return perf_init_config(malloc, free, binding);
   }
 
-perf_config *perf_init_config(perf_alloc alloc, perf_free free)
+perf_config *perf_init_config(perf_alloc alloc, perf_free free, const char *binding)
   {
-  return perf_config::init(alloc, free);
+  return perf_config::init(alloc, free, binding);
   }
 
 void perf_term_config(perf_config *cfg)
@@ -51,9 +51,9 @@ perf_error perf_check_error(perf_context *ctx)
   return ctx->error();
   }
 
-perf_context *perf_init_context(perf_config *cfg)
+perf_context *perf_init_context(perf_config *cfg, const char *name)
   {
-  return perf_context::init(cfg);
+  return perf_context::init(cfg, name);
   }
 
 void perf_term_context(perf_context *ctx)
