@@ -2,7 +2,7 @@
 
 perf_context *perf_context::init(perf_config *c)
   {
-  PERF_API_CHECK_PTR(c);
+  PERF_API_CHECK_PTR(c, return nullptr);
 
   auto a = c->create<perf_context>();
 

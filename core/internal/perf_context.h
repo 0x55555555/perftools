@@ -28,7 +28,7 @@ private:
     {
     Record(const char *id, perf_context *ctx, const perf_relative_time &t);
 
-    std::basic_string<char, std::char_traits<char>, perf_allocator<char> > m_name;
+    perf_string m_name;
     perf_relative_time m_time;
     };
 
