@@ -2,14 +2,16 @@
 #include "perf_context.h"
 #include <cassert>
 
-perf_config *perf_config::init(perf_alloc alloc, perf_free free)
+perf_config *perf_config::init(perf_alloc alloc, perf_free free, const char *binding)
   {
-  PERF_API_CHECK_PTR(alloc);
-  PERF_API_CHECK_PTR(free);
+  PERF_API_CHECK_PTR(alloc, return nullptr);
+  PERF_API_CHECK_PTR(free, return nullptr);
+  PERF_API_CHECK_PTR(binding, return nullptr);
 
   auto a = perf_config::create<perf_config>(alloc);
   a->m_alloc = alloc;
   a->m_free = free;
+  a->m_identity.init(a, binding);
   return a;
   }
 

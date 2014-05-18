@@ -15,9 +15,11 @@ typedef void *(*perf_alloc)(size_t size);
 typedef void (*perf_free)(void *size);
 
 typedef int perf_error;
-#define perf_no_error       0
-#define perf_error_in_error 1
-#define perf_invalid_config 2
+#define perf_no_error               0
+#define perf_error_in_error         1
+#define perf_invalid_config         2
+#define perf_recording_after_output 3
+#define perf_failed_to_write_file   4
 
 /// \name Config management
 /// @{
@@ -25,12 +27,12 @@ typedef int perf_error;
 /// \brief Create a performance testing config
 ///
 /// The config should be created before anything else in perf.
-PERF_EXPORT perf_config *perf_init_config(perf_alloc, perf_free);
+PERF_EXPORT perf_config *perf_init_config(perf_alloc, perf_free, const char *binding);
 
 /// \brief Create a default performance testing config
 ///
 /// This helper internally calls perf_init_config with malloc and free.
-PERF_EXPORT perf_config *perf_init_default_config();
+PERF_EXPORT perf_config *perf_init_default_config(const char *binding);
 
 /// \brief Terminate the performance testing config.
 PERF_EXPORT void perf_term_config(perf_config *ctx);
@@ -65,10 +67,29 @@ PERF_EXPORT perf_error perf_check_error(perf_context *ctx);
 /// \brief Init a performance testing context.
 ///
 /// A context should be created for each thread which will use perf.
-PERF_EXPORT perf_context *perf_init_context(perf_config *cfg);
+PERF_EXPORT perf_context *perf_init_context(perf_config *cfg, const char *name);
 
 /// \brief Terminate a performance testing context.
 PERF_EXPORT void perf_term_context(perf_context *ctx);
+
+/// @}
+
+/// \name Context output
+/// @{
+
+/// \brief Write the context to disk.
+PERF_EXPORT void perf_write_context(perf_context *ctx, const char *name);
+
+/// \brief Return the context as a string.
+PERF_EXPORT const char *perf_dump_context(perf_context *ctx);
+
+/// @}
+
+/// \name Recording events
+/// @{
+
+/// \brief create an event
+PERF_EXPORT void perf_add_event(perf_context *ctx, const char *name);
 
 /// @}
 

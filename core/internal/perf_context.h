@@ -6,9 +6,14 @@
 
 struct perf_context
   {
-  static perf_context *init(perf_config *c);
+  static perf_context *init(perf_config *c, const char *name);
   static bool check(const perf_context *c);
   static void term(perf_context *c);
+
+  static void add(perf_context *c, const char *n);
+
+  static void write(perf_context *c, const char *n);
+  static const char *dump(perf_context *c);
 
   perf_context();
 
@@ -18,9 +23,14 @@ struct perf_context
   perf_config *config() const { return m_config; }
 
 private:
+  void cacheResults();
+
+  perf_string m_results;
+
   perf_config *m_config;
   perf_error m_error;
   perf_absolute_time m_start;
+  perf_string m_name;
 
   friend struct perf_config;
 
@@ -28,9 +38,10 @@ private:
     {
     Record(const char *id, perf_context *ctx, const perf_relative_time &t);
 
-    std::basic_string<char, std::char_traits<char>, perf_allocator<char> > m_name;
+    perf_string m_name;
     perf_relative_time m_time;
     };
 
+  typedef std::vector<Record, perf_allocator<Record>> Records;
   std::vector<Record, perf_allocator<Record>> m_records;
   };

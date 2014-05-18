@@ -60,14 +60,19 @@ module Perf
     end
   end
   
-  attach_function :perf_init_default_config, [ ], :pointer
+  attach_function :perf_init_default_config, [ :string ], :pointer
   attach_function :perf_term_config, [ :pointer ], :void
 
   attach_function :perf_find_identity, [ :pointer ], :pointer
   attach_function :perf_identity_description, [ :pointer ], :string
 
-  attach_function :perf_init_context, [ :pointer ], :pointer
+  attach_function :perf_init_context, [ :pointer, :string ], :pointer
   attach_function :perf_term_context, [ :pointer ], :void
+
+  attach_function :perf_add_event, [ :pointer, :string ], :void
+
+  attach_function :perf_dump_context, [ :pointer ], :string
+  attach_function :perf_write_context, [ :pointer, :string ], :void
 
   enum :error, [
     :no_error, 0,
@@ -89,7 +94,7 @@ module Perf
 
   class Config
     def initialize()
-      @ptr = LibConfig.new(Perf.perf_init_default_config())
+      @ptr = LibConfig.new(Perf.perf_init_default_config("ruby"))
     end
 
     attr_reader :ptr
@@ -100,14 +105,34 @@ module Perf
   end
 
   class Context
-    def initialize(ctx)
-      @ptr = LibContext.new(Perf.perf_init_context(ctx.ptr))
+    def initialize(config, name)
+      @ptr = LibContext.new(Perf.perf_init_context(config.ptr, name))
     end
 
     attr_reader :ptr
 
     def error
       return Perf.perf_check_error(@ptr)
+    end
+
+    def dump
+      return Perf.perf_dump_context(@ptr)
+    end
+
+    def write(f)
+      return Perf.perf_write_context(@ptr, f)
+    end
+
+    def event(name)
+      Perf.perf_add_event(@ptr, name)
+    end
+
+    def block(name)
+      b = "#{name}::begin"
+      e = "#{name}::end"
+      event(b)
+      yield
+      event(e)
     end
   end
 end
