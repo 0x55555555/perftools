@@ -1,5 +1,6 @@
 #pragma once
-#include <string>
+#include "perf.h"
+#include "perf_allocator.h"
 
 struct perf_identity
   {
@@ -7,11 +8,13 @@ struct perf_identity
 
   perf_identity();
 
-  void calculateIdentity();
+  void init(perf_config *);
+  void appendIdentity(perf_string& s, const char* tab);
+  void calculateIdentity(perf_config *c);
 
-  std::string m_identity;
+  perf_string m_identity;
 
-  std::string m_cpu;
+  perf_string m_cpu;
   size_t m_cpuCount;
   size_t m_memoryBytes;
 

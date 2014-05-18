@@ -15,9 +15,11 @@ typedef void *(*perf_alloc)(size_t size);
 typedef void (*perf_free)(void *size);
 
 typedef int perf_error;
-#define perf_no_error       0
-#define perf_error_in_error 1
-#define perf_invalid_config 2
+#define perf_no_error               0
+#define perf_error_in_error         1
+#define perf_invalid_config         2
+#define perf_recording_after_output 3
+#define perf_failed_to_write_file   4
 
 /// \name Config management
 /// @{
@@ -69,6 +71,25 @@ PERF_EXPORT perf_context *perf_init_context(perf_config *cfg);
 
 /// \brief Terminate a performance testing context.
 PERF_EXPORT void perf_term_context(perf_context *ctx);
+
+/// @}
+
+/// \name Context output
+/// @{
+
+/// \brief Write the context to disk.
+PERF_EXPORT void perf_write_context(perf_context *ctx, const char *name);
+
+/// \brief Return the context as a string.
+PERF_EXPORT const char *perf_dump_context(perf_context *ctx);
+
+/// @}
+
+/// \name Recording events
+/// @{
+
+/// \brief create an event
+PERF_EXPORT void perf_add_event(perf_context *ctx, const char *name);
 
 /// @}
 

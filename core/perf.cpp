@@ -61,4 +61,18 @@ void perf_term_context(perf_context *ctx)
   return perf_context::term(ctx);
   }
 
+void perf_write_context(perf_context *ctx, const char *name)
+  {
+  return perf_context::write(ctx, name);
+  }
+
+const char *perf_dump_context(perf_context *ctx)
+  {
+  return perf_context::dump(ctx);
+  }
+
+void perf_add_event(perf_context *ctx, const char *name)
+  {
+  return perf_context::add(ctx, name);
+  }
 }

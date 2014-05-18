@@ -2,6 +2,7 @@
 #include "perf.h"
 #include "perf_global.h"
 #include "perf_identity.h"
+#include "perf_allocator.h"
 #include <stdint.h>
 #include <memory>
 #include <atomic>
@@ -47,36 +48,8 @@ struct perf_config
   perf_identity m_identity;
   };
 
-template <typename T> struct perf_allocator
+template <typename T> perf_allocator<T>::perf_allocator(perf_config *c)
+    : m_alloc(c ? c->m_alloc : nullptr),
+      m_free(c ? c->m_free : nullptr)
   {
-  typedef T value_type;
-  typedef std::size_t size_type;
-  typedef T *pointer;
-  typedef const T *const_pointer;
-
-  perf_allocator(perf_config *c=nullptr)
-      : m_config(c)
-    {
-    }
-
-  pointer allocate(size_type n, const void *hint = nullptr)
-    {
-    (void)hint;
-    assert(m_config);
-    return reinterpret_cast<pointer>(m_config->m_alloc(sizeof(T) * n));
-    }
-
-  void deallocate (pointer p, size_type n)
-    {
-    (void)n;
-    assert(m_config);
-    return m_config->m_free(p);
-    }
-
-  bool operator!=(const perf_allocator &a) const
-    {
-    return a.m_config != m_config;
-    }
-
-  perf_config *m_config;
-  };
+  }

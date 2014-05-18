@@ -1,12 +1,14 @@
 QT       -= core gui
 
+CONFIG += debug
+
 DESTDIR = build/bin
 OBJECTS_DIR = build/obj
 
 TARGET = perf
 TEMPLATE = lib
 
-DEFINES += CORE_LIBRARY
+DEFINES += PERF_BUILD
 
 SOURCES += perf.cpp \
     internal/perf_context.cpp \
@@ -19,7 +21,9 @@ HEADERS += perf.h \
     internal/perf_config.h \
     internal/perf_global.h \
     internal/perf_identity.h \
-    internal/perf_time.h
+    internal/perf_time.h \
+    internal/perf_allocator.h \
+    perf.hpp
 
 QMAKE_CXXFLAGS += -Wall
 
