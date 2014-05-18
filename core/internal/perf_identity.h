@@ -18,6 +18,8 @@ struct perf_identity
   size_t m_cpuCount;
   size_t m_memoryBytes;
   perf_string m_binding;
+  perf_string m_os;
+  perf_string m_osDetail;
 
 private:
   perf_identity(const perf_identity &);

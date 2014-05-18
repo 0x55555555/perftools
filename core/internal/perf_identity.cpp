@@ -52,7 +52,23 @@ void perf_identity::init(perf_config *c, const char *binding)
   m_binding.~perf_string();
   new(&m_binding) perf_string(binding, c);
 
+  m_os.~perf_string();
+  new(&m_os) perf_string(c);
+
+  m_cpu.~perf_string();
+  new(&m_cpu) perf_string(c);
+
+  m_osDetail.~perf_string();
+  new(&m_osDetail) perf_string(c);
+
 #if defined(_WIN32)
+#if defined(_WIN64)
+  m_os = "win32";
+#else
+  m_os = "win64";
+#endif
+  m_osDetail = "windows";
+
   int CPUInfo[4] = {-1};
   unsigned   nExIds, i =  0;
   char CPUBrandString[0x40];
@@ -83,28 +99,46 @@ void perf_identity::init(perf_config *c, const char *binding)
   GlobalMemoryStatusEx(&statex);
   m_memoryBytes = statex.ullTotalPhys;
 #elif defined(__APPLE__)
+  m_os = "osx";
 
   const std::size_t size = 1024;
-  m_cpu.~perf_string();
-  new(&m_cpu) perf_string(c);
   m_cpu.resize(size);
 
   uint64_t freq = get64BitInt("hw.cpufrequency");
   auto machine = getString(c, "hw.machine");
   auto model = getString(c, "hw.model");
+  auto arch = getString(c, "hw.machine_arch");
 
   int printed = snprintf(
                   &m_cpu[0],
                   size/sizeof(char),
-                  "%s, %s, %llu hz",
+                  "%s, %s, %s, %llu hz",
                   machine.data(),
                   model.data(),
+                  arch.data(),
                   (uint64_t)freq);
   m_cpu.resize(printed);
+
+  m_osDetail.resize(size);
+
+  auto osRelease = getString(c, "kern.osrelease");
+  auto osType = getString(c, "kern.ostype");
+
+  printed = snprintf(
+                  &m_osDetail[0],
+                  size/sizeof(char),
+                  "%s, %s",
+                  osRelease.data(),
+                  osType.data());
+  m_osDetail.resize(printed);
 
   m_cpuCount = get64BitInt("hw.physicalcpu");
   m_memoryBytes = get64BitInt("hw.memsize");
 #else
+  m_os = "undefined";
+  m_cpu = "unknown";
+  m_cpuCount = 0;
+  m_memoryBytes = 0;
 # error platform undefined
 #endif
 
@@ -129,6 +163,8 @@ void perf_identity::appendIdentity(perf_string& id, const char* tab)
                   &id[oldSize],
                   size/sizeof(char),
                   "%s{\n"
+                  "%s  \"os\": \"%s\",\n"
+                  "%s  \"osDetail\": \"%s\",\n"
                   "%s  \"cpu\": \"%s\",\n"
                   "%s  \"cpuCount\": \"%llu\",\n"
                   "%s  \"memoryBytes\": \"%llu\",\n"
@@ -137,6 +173,10 @@ void perf_identity::appendIdentity(perf_string& id, const char* tab)
                   tab,
                   tab,
                   m_cpu.data(),
+                  tab,
+                  m_os.data(),
+                  tab,
+                  m_osDetail.data(),
                   tab,
                   (uint64_t)m_cpuCount,
                   tab,

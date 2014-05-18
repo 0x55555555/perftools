@@ -38,11 +38,13 @@ class TestExpose < Test::Unit::TestCase
     obj = JSON.parse(id.to_s)
     assert_not_nil obj
 
-    assert_equal 4, obj.length
+    assert_equal 6, obj.length
     assert_kind_of String, obj["cpu"]
     assert_kind_of String, obj["cpuCount"]
     assert_kind_of String, obj["memoryBytes"]
     assert_kind_of String, obj["binding"]
+    assert_kind_of String, obj["os"]
+    assert_kind_of String, obj["osDetail"]
   end
 
   def test_timing
