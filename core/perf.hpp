@@ -35,9 +35,9 @@ protected:
 class PERF_EXPORT config
   {
 public:
-  config(perf_alloc a=std::malloc, perf_free f=std::free)
+  config(const char *binding="cpp", perf_alloc a=std::malloc, perf_free f=std::free)
     {
-    m_cfg = perf_init_config(a, f);
+    m_cfg = perf_init_config(a, f, binding);
     if (!m_cfg)
       {
       throw std::runtime_error("failed to initialise config");
@@ -62,9 +62,9 @@ private:
 class PERF_EXPORT context
   {
 public:
-  context(config *c)
+  context(config *c, const char *name)
     {
-    m_ctx = perf_init_context(c->m_cfg);
+    m_ctx = perf_init_context(c->m_cfg, name);
     if (!m_ctx)
       {
       throw std::runtime_error("failed to initialise context");
