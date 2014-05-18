@@ -8,3 +8,5 @@ RuntimeTest
 *.pro.user
 *.dll
 *.dylib
+test/cpp.json
+test/ruby.json

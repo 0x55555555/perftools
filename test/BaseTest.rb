@@ -77,6 +77,12 @@ class TestExpose < Test::Unit::TestCase
 
     obj = JSON.parse(ctx.dump)
     assert_not_nil obj
+
+    ctx.write("test/ruby.json")
+  end
+
+  def test_cppBinding
+    runProcess(File.dirname(__FILE__) + "/cppTest/build.sh")
   end
 end
 
