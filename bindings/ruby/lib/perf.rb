@@ -1,6 +1,6 @@
 require "ffi"
-
 require 'rbconfig'
+require 'json'
 
 module Perf
   extend FFI::Library
@@ -133,6 +133,32 @@ module Perf
       event(b)
       yield
       event(e)
+    end
+  end
+
+  class Package
+    def initialize(description, files)
+      @contexts = Dir.glob(files).reduce({}) do |a, f| 
+        a[f] = JSON.parse(File.read(f))
+        next a
+      end
+
+      @desc = description
+    end
+
+    def to_s()
+      outputContexts = { }
+
+      @contexts.each do |file, json|
+        name = json["name"]
+        json.delete("name")
+        outputContexts[name] = json
+      end
+
+      return JSON.pretty_generate({
+        :description => @desc,
+        :contexts => outputContexts,
+      })
     end
   end
 end

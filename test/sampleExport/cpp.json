@@ -1,0 +1,32 @@
+{
+  "name": "test",
+  "machineIdentity":   {
+    "cpu": "x86_64, MacBookPro11,3, 2600000000 hz",
+    "cpuCount": "4",
+    "memoryBytes": "17179869184",
+    "binding": "cpp"
+  },
+  "start": [ 1400436914, 1400436914 ],
+  "results": [
+    {
+      "name":"busyloop::begin",
+      "time":6
+    },
+    {
+      "name":"busyloop::end",
+      "time":8
+    },
+    {
+      "name":"process::begin",
+      "time":9
+    },
+    {
+      "name":"process::mid",
+      "time":10
+    },
+    {
+      "name":"process::end",
+      "time":10
+    }
+  ]
+}

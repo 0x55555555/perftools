@@ -86,5 +86,12 @@ class TestExpose < Test::Unit::TestCase
   def test_cppBinding
     runProcess(File.dirname(__FILE__) + "/cppTest/build.sh")
   end
+
+  def test_contextCollection
+    pkg = Perf::Package.new("wc", "test/sampleExport/*.json")
+
+    obj = pkg.to_s
+    assert_not_nil JSON.parse(obj)
+  end
 end
 
