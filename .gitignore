@@ -1,0 +1,10 @@
+
+*.o
+*.moc
+.qmake.stash
+Makefile
+runtime/build*
+RuntimeTest
+*.pro.user
+*.dll
+*.dylib
