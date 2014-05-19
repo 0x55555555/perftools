@@ -1,16 +1,16 @@
 #!/Applications/dart/dart-sdk/bin/dart
 import 'dart:io';
 import 'dart:convert';
+import 'dart:async';
 import 'package:http_server/http_server.dart';
+import 'package:crypto/crypto.dart' as Crypto;
 import 'package:args/args.dart' as Args;
 
 class PerfServer
 {
-  PerfServer(String db)
+  PerfServer(String this._db)
   {
     _ready = false;
-    
-    new Directory(db).create(recursive: true).then((db) => _db = db);
   }
   
   void bind(int port)
@@ -43,38 +43,54 @@ class PerfServer
           data = JSON.decode(str);
         }
  
-        var result = submitResults(data);
+        var result = submitResults(data, str);
         
-        req.response
-          ..headers.add('Access-Control-Allow-Origin', '*')
-          ..headers.add('Content-Type', 'text/plain')
-          ..statusCode = 201
-          ..write(result.toString())
-          ..close();
+        result.then((dynamic res)
+          {
+          req.response
+            ..headers.add('Access-Control-Allow-Origin', '*')
+            ..headers.add('Content-Type', 'text/plain')
+            ..statusCode = 201
+            ..write(res)
+            ..close();
+          }
+        );
       }
     );
   }
   
-  dynamic submitResults(dynamic data)
+  Future<dynamic> submitResults(dynamic data, String src)
   {
-    String desc = data['description'];
-    Map<String, dynamic> contexts = data['contexts'];
-    contexts.forEach((k, v)
-      {
-      print(k);
-      }
-    );
+    String desc = data['identity'];
     
-    new Directory("${_db.path}/${desc}").create().then((Directory d)
-      {
-      }
-    );
+    String id = hash(src);
     
-    return { 'result': 'success' };
+    return new Directory("${_db}/${desc}")
+      .create()
+      .then((Directory d)
+        {
+        new File("${_db}/${desc}/${id}.json").writeAsString(src);
+        
+        print("successfully created entry $id");
+        return { 'result': 'success', 'id': id };
+        }
+      );
+  }
+  
+  String hash(String src)
+  { 
+    var hash = new Crypto.SHA256();
+    hash.add(src.codeUnits);
+    List<int> output = hash.close();
+    
+    String out = "";
+    output.forEach((e) => out += e.toRadixString(16));
+    return out;
   }
 
-  Directory _db;
+  String _db;
   bool _ready;
+  StreamController _created = new StreamController();
 }
 
 main(List<String> args)

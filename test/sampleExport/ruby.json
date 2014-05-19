@@ -8,39 +8,39 @@
     "memoryBytes": "17179869184",
     "binding": "ruby"
   },
-  "start": [ 1400530697, 609842 ],
+  "start": [ 1400532383, 682813 ],
   "results": [
     {
       "name":"test_block_10::begin",
-      "time":28
+      "time":26
     },
     {
       "name":"test_block_10::end",
-      "time":38
+      "time":37
     },
     {
       "name":"test_block_100::begin",
-      "time":41
+      "time":39
     },
     {
       "name":"test_block_100::end",
-      "time":83
+      "time":85
     },
     {
       "name":"test_block_100::begin",
-      "time":84
+      "time":86
     },
     {
       "name":"test_block_100::end",
-      "time":749
+      "time":624
     },
     {
       "name":"test_block_100::begin",
-      "time":751
+      "time":625
     },
     {
       "name":"test_block_100::end",
-      "time":31655
+      "time":30718
     }
   ]
 }

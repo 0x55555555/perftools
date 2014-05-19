@@ -88,7 +88,7 @@ class TestExpose < Test::Unit::TestCase
   end
 
   def test_contextCollection
-    pkg = Perf::Package.new("wc", "test/sampleExport/*.json")
+    pkg = Perf::Package.new("af4343c", "testing some bits", "test/sampleExport/*.json")
 
     obj = pkg.to_s
     assert_not_nil JSON.parse(obj)
