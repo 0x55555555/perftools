@@ -40,7 +40,7 @@ void perf_absolute_time::appendTo(perf_string &str) const
   char high[32];
   snprintf(high, sizeof(high)/sizeof(char), "%llu", m_data[0]);
   char low[32];
-  snprintf(low, sizeof(low)/sizeof(char), "%llu", m_data[0]);
+  snprintf(low, sizeof(low)/sizeof(char), "%llu", m_data[1]);
 
   str += "[ ";
   str += high;
