@@ -93,7 +93,7 @@ class TestExpose < Test::Unit::TestCase
     obj = pkg.to_s
     assert_not_nil JSON.parse(obj)
 
-    pkg.submit('http://localhost:8888/submit')
+    pkg.submit('http://localhost:14663/submit')
   end
 end
 
