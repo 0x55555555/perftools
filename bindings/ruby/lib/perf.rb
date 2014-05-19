@@ -1,6 +1,7 @@
 require "ffi"
 require 'rbconfig'
 require 'json'
+require 'net/http'
 
 module Perf
   extend FFI::Library
@@ -159,6 +160,12 @@ module Perf
         :description => @desc,
         :contexts => outputContexts,
       })
+    end
+
+    def submit(addr)
+      postData = Net::HTTP.post_form(URI.parse(addr), { 'data' => to_s })
+
+      puts postData.body
     end
   end
 end
