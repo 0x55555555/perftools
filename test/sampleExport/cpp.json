@@ -1,20 +1,22 @@
 {
   "name": "test",
   "machineIdentity":   {
-    "cpu": "x86_64, MacBookPro11,3, 2600000000 hz",
+    "os": "osx",
+    "osDetail": "13.2.0, Darwin",
+    "cpu": "x86_64, MacBookPro11,3, , 2600000000 hz",
     "cpuCount": "4",
     "memoryBytes": "17179869184",
     "binding": "cpp"
   },
-  "start": [ 1400436914, 1400436914 ],
+  "start": [ 1400530697, 608135 ],
   "results": [
     {
       "name":"busyloop::begin",
-      "time":6
+      "time":5
     },
     {
       "name":"busyloop::end",
-      "time":8
+      "time":7
     },
     {
       "name":"process::begin",
@@ -22,11 +24,11 @@
     },
     {
       "name":"process::mid",
-      "time":10
+      "time":9
     },
     {
       "name":"process::end",
-      "time":10
+      "time":9
     }
   ]
 }
