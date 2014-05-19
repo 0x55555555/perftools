@@ -152,8 +152,11 @@ module Perf
 
       @contexts.each do |file, json|
         name = json["name"]
-        json.delete("name")
-        outputContexts[name] = json
+        raise "invalid name passed" unless name.length > 0
+
+        output = json.clone()
+        output.delete("name")
+        outputContexts[name] = output
       end
 
       return JSON.pretty_generate({
@@ -163,7 +166,8 @@ module Perf
     end
 
     def submit(addr)
-      postData = Net::HTTP.post_form(URI.parse(addr), { 'data' => to_s })
+      data = { 'data' => to_s }
+      postData = Net::HTTP.post_form(URI.parse(addr), data)
 
       puts postData.body
     end
