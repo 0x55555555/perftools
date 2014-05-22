@@ -55,8 +55,6 @@ class RecipeManager
     return dir.create(recursive: true).then((Directory d)
       {
       final String recipePrefix = '''
-import "dart:isolate";
-import "dart:convert";
 import "${_serverLocation}/result_processor.dart";
 
 class TheCooker extends Cooker {
