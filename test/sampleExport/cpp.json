@@ -8,7 +8,7 @@
     "memoryBytes": "17179869184",
     "binding": "cpp"
   },
-  "start": [ 1400532383, 681243 ],
+  "start": [ 1400619081, 892319 ],
   "results": [
     {
       "name":"busyloop::begin",
@@ -24,7 +24,7 @@
     },
     {
       "name":"process::mid",
-      "time":9
+      "time":10
     },
     {
       "name":"process::end",

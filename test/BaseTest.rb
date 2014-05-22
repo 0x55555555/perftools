@@ -65,13 +65,13 @@ class TestExpose < Test::Unit::TestCase
       end
     end
 
-    ctx.block("test_block_100") do
+    ctx.block("test_block_1000") do
       1000.times do 
         test += "*"
       end
     end
 
-    ctx.block("test_block_100") do
+    ctx.block("test_block_10000") do
       10000.times do 
         test += "*"
       end
@@ -88,7 +88,42 @@ class TestExpose < Test::Unit::TestCase
   end
 
   def test_contextCollection
-    pkg = Perf::Package.new("af4343c", "testing some bits", "test/sampleExport/*.json")
+    recipe = %{
+void cook(final ProcessorInput p, ProcessorResult r)
+{
+  Set<String> beginMatches = p.selectCaptures(new RegExp(r'::(.*)::begin$')).toSet();
+  Set<String> endMatches = p.selectCaptures(new RegExp(r'::(.*)::end$')).toSet();
+  
+  Set<String> ranges = beginMatches.intersection(endMatches);
+  
+  ranges.forEach((e)
+    {
+      Map<String, int> times = { };
+      p.select(new RegExp("$e::(.*)\\$"), (match, time)
+        {
+        times[match.group(1)] = time;
+        }
+      );
+      
+      int begin = times["begin"];
+      
+      Map<String, int> diffs = { };
+      times.forEach((k, v)
+        {
+          if (k == "begin")
+          {
+            return;
+          }
+          
+          diffs["begin -> $k"] = v - begin;
+        }
+      );
+      
+      r.addTimes(e, diffs);
+    }
+  );
+}}
+    pkg = Perf::Package.new("dev/TheGoodStuff", "af4343c", "testing some bits", "test/sampleExport/*.json", recipe)
 
     obj = pkg.to_s
     assert_not_nil JSON.parse(obj)

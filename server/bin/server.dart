@@ -1,16 +1,28 @@
 #!/Applications/dart/dart-sdk/bin/dart
+library perf_server;
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
+import 'dart:isolate';
+import 'dart:mirrors';
 import 'package:http_server/http_server.dart';
-import 'package:crypto/crypto.dart' as Crypto;
 import 'package:args/args.dart' as Args;
+import 'recipe.dart';
+import 'result_processor.dart';
+import 'utils.dart';
 
 class PerfServer
 {
-  PerfServer(String this._db)
+  PerfServer(String db)
   {
     _ready = false;
+    _db = Directory.current.absolute.path + "/" + db;
+    
+    MirrorSystem sys = currentMirrorSystem();
+    var lib = sys.findLibrary(MirrorSystem.getSymbol('perf_server'));
+    var serverLocation = new File(lib.uri.path).parent.absolute.path;
+    
+    _recipes = new RecipeManager(serverLocation, _db);
   }
   
   void bind(int port)
@@ -37,13 +49,14 @@ class PerfServer
     HttpBodyHandler.processRequest(req).then((HttpBody body) 
       {
         String str = body.body['data'];
+        String process = body.body['process'];
         var data = null;
         if (str != null)
         {
           data = JSON.decode(str);
         }
  
-        var result = submitResults(data, str);
+        var result = submitResults(data, str, process);
         
         result.then((dynamic res)
           {
@@ -59,36 +72,74 @@ class PerfServer
     );
   }
   
-  Future<dynamic> submitResults(dynamic data, String src)
+  Future<dynamic> submitResults(Map data, String src, String process)
   {
-    String desc = data['identity'];
+    String recipe = data['recipe'];
+    
+    return _recipes.find(recipe).then((Recipe r) => storeResults(r.uri, data, src));
+  }
+  
+  Future<dynamic> storeResults(Uri recipe, Map data, String src)
+  {
+    String branch = data['branch'];
+    String identity = data['identity'];
+    
+    String branchSafe = branch.replaceAll(new RegExp(r'[^A-Za-z0-9]'), '_');
     
     String id = hash(src);
     
-    return new Directory("${_db}/${desc}")
-      .create()
-      .then((Directory d)
-        {
-        new File("${_db}/${desc}/${id}.json").writeAsString(src);
-        
-        print("successfully created entry $id");
-        return { 'result': 'success', 'id': id };
-        }
-      );
-  }
-  
-  String hash(String src)
-  { 
-    var hash = new Crypto.SHA256();
-    hash.add(src.codeUnits);
-    List<int> output = hash.close();
+    String dir = "${_db}/branches/${branchSafe}/${identity}";
+    File file = new File("${dir}/${id}.json");
     
-    String out = "";
-    output.forEach((e) => out += e.toRadixString(16));
-    return out;
+    return file.exists().then((bool exists)
+      {
+        if (!exists)
+        {
+          var response = new ReceivePort();
+          return Isolate.spawnUri(
+              recipe,
+              [ src ],
+              response.sendPort)
+            .then(
+              (Isolate i) 
+              {
+                return new Directory(dir)
+                  .create(recursive: true)
+                  .then((Directory d)
+                    {
+                      response.listen((ProcessorResult r)
+                        {
+                          String out = r.toJson();
+                          print("output is: $out");
+                          new File("${dir}/${id}.json").writeAsString(out);
+                        }
+                      );
+                  
+                    print("successfully created entry $id");
+                    return { 'result': 'success', 'id': id };
+                    }
+                  );
+              }, 
+              onError: (e)
+              {
+                print("erorr adding result: $e");
+                return { 'result': 'error', 'error': e };
+              }
+            );
+          
+        }
+        else
+        {
+          print("skipped existing result $id");
+          return { 'result': 'exists', 'id': id };
+        }
+      }
+    );
   }
 
+  RecipeManager _recipes;
   String _db;
+  String _serverLocation;
   bool _ready;
   StreamController _created = new StreamController();
 }
