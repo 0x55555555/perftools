@@ -1,4 +1,6 @@
 name: server
-description: A sample command-line application
+description: Serves a perfstack server to store and serve results
 dependencies:
+  args: any
+  crypto: any
   http_server: any

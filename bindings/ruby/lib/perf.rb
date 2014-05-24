@@ -138,13 +138,16 @@ module Perf
   end
 
   class Package
-    def initialize(description, files)
+    def initialize(branch, identity, description, files, recipe=nil)
       @contexts = Dir.glob(files).reduce({}) do |a, f| 
         a[f] = JSON.parse(File.read(f))
         next a
       end
 
-      @desc = description
+      @branch = branch
+      @identity = identity
+      @description = description
+      @recipe = recipe
     end
 
     def to_s()
@@ -160,8 +163,11 @@ module Perf
       end
 
       return JSON.pretty_generate({
-        :description => @desc,
-        :contexts => outputContexts,
+        :branch => @branch,
+        :identity => @identity,
+        :description => @description,
+        :recipe => @recipe,
+        :contexts => outputContexts
       })
     end
 

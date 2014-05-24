@@ -65,13 +65,13 @@ class TestExpose < Test::Unit::TestCase
       end
     end
 
-    ctx.block("test_block_100") do
+    ctx.block("test_block_1000") do
       1000.times do 
         test += "*"
       end
     end
 
-    ctx.block("test_block_100") do
+    ctx.block("test_block_10000") do
       10000.times do 
         test += "*"
       end
@@ -88,12 +88,12 @@ class TestExpose < Test::Unit::TestCase
   end
 
   def test_contextCollection
-    pkg = Perf::Package.new("wc", "test/sampleExport/*.json")
+    pkg = Perf::Package.new("dev/TheGoodStuff", "af4343c", "testing some bits", "test/sampleExport/*.json", nil)
 
     obj = pkg.to_s
     assert_not_nil JSON.parse(obj)
 
-    pkg.submit('http://localhost:8888/submit')
+    pkg.submit('http://localhost:14663/submit')
   end
 end
 
