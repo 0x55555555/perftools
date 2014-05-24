@@ -23,6 +23,12 @@ class PerfServer
     var serverLocation = new File(lib.uri.path).parent.absolute.path;
     
     _recipes = new RecipeManager(serverLocation, _db);
+
+    print(serverLocation + "/../web/");
+    _web = new VirtualDirectory(serverLocation + "/../web/");
+    _web.jailRoot = true;
+    _web.allowDirectoryListing = true;
+    _web.directoryHandler = (Directory d, HttpRequest r) => _web.serveFile(new File(d.path + "/index.html"), r);
   }
   
   void bind(int port)
@@ -37,10 +43,18 @@ class PerfServer
             {
               onResultsSubmitted(req);
             }
+            else
+            {
+              _web.serveRequest(req);
+            }
           }
         );
       }
     );
+  }
+  
+  void onServe(HttpRequest req)
+  {
   }
 
   void onResultsSubmitted(HttpRequest req) {
@@ -142,6 +156,7 @@ class PerfServer
   String _serverLocation;
   bool _ready;
   StreamController _created = new StreamController();
+  VirtualDirectory _web;
 }
 
 main(List<String> args)
@@ -150,7 +165,7 @@ main(List<String> args)
   Args.ArgParser command = parser.addCommand('serve');
   parser.addCommand('help');
 
-  command.addOption('port', abbr: 'p', help: 'port to serve on', defaultsTo: '14663');
+  command.addOption('port', abbr: 'p', help: 'port to serve on', defaultsTo: '8080');
   command.addOption('db', help: 'location to store results', defaultsTo: '~/perfstack_db');
   
   Args.ArgResults res = parser.parse(args);
