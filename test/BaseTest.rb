@@ -88,42 +88,7 @@ class TestExpose < Test::Unit::TestCase
   end
 
   def test_contextCollection
-    recipe = %{
-void cook(final ProcessorInput p, ProcessorResult r)
-{
-  Set<String> beginMatches = p.selectCaptures(new RegExp(r'::(.*)::begin$')).toSet();
-  Set<String> endMatches = p.selectCaptures(new RegExp(r'::(.*)::end$')).toSet();
-  
-  Set<String> ranges = beginMatches.intersection(endMatches);
-  
-  ranges.forEach((e)
-    {
-      Map<String, int> times = { };
-      p.select(new RegExp("$e::(.*)\\$"), (match, time)
-        {
-        times[match.group(1)] = time;
-        }
-      );
-      
-      int begin = times["begin"];
-      
-      Map<String, int> diffs = { };
-      times.forEach((k, v)
-        {
-          if (k == "begin")
-          {
-            return;
-          }
-          
-          diffs["begin -> $k"] = v - begin;
-        }
-      );
-      
-      r.addTimes(e, diffs);
-    }
-  );
-}}
-    pkg = Perf::Package.new("dev/TheGoodStuff", "af4343c", "testing some bits", "test/sampleExport/*.json", recipe)
+    pkg = Perf::Package.new("dev/TheGoodStuff", "af4343c", "testing some bits", "test/sampleExport/*.json", nil)
 
     obj = pkg.to_s
     assert_not_nil JSON.parse(obj)

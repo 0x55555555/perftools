@@ -6,14 +6,16 @@ import 'dart:io';
 
 class Recipe
 {
-  Recipe(String path, bool this._existing)
+  Recipe(String path, String this._container, bool this._existing)
   {
     _uri = Uri.parse(path);  
   }
-  
+
+  String get container => _container;
   bool get existing => _existing;
   Uri get uri => _uri;
   
+  String _container;
   bool _existing;
   Uri _uri;
 }
@@ -26,17 +28,26 @@ class RecipeManager
   
   Future<Recipe> find(String recipe)
   {
-     if (recipe == null && recipe.length > 0)
-     {
-       return _loadRecipe('default_recipe');
-     }
-     else
-     {
-       String recipeHash = hash(recipe);
+    if (recipe == null || recipe.length > 0)
+    {
+      Completer c = new Completer();
        
-       Directory location = new Directory(recipePath(recipeHash));
+      String path = recipePath('default');
+      new Directory(path).create(recursive: true).then((Directory d)
+        {
+          c.complete(new Recipe('default_recipe.dart', path, true));
+        }
+      );
        
-       return location.exists()
+      return c.future;
+    }
+    else
+    {
+      String recipeHash = hash(recipe);
+       
+      Directory location = new Directory(recipePath(recipeHash));
+       
+      return location.exists()
         .then((bool exists)
           {
           if (!exists)
@@ -45,9 +56,9 @@ class RecipeManager
             }
           
           return _loadRecipe(recipeHash);
-          }
-        );
-     }
+        }
+      );
+    }
   }
   
   Future<Recipe> _createRecipe(String hash, Directory dir, String recipe)
@@ -83,7 +94,7 @@ void main(args, replyTo) => Processor.start(args, replyTo, new TheCooker());''';
     
     String recipe = recipePath(hash);
     
-    c.complete(new Recipe(recipeDartPath(hash), existing));
+    c.complete(new Recipe(recipeDartPath(hash), recipe, existing));
     
     return c.future;
   }

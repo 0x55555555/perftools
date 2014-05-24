@@ -3,15 +3,18 @@ import 'dart:core';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:isolate';
+import 'utils.dart';
 
 abstract class Cooker
 {
+  String get name;
+  String get description => "";
   void cook(final ProcessorInput p, ProcessorResult r);
 }
 
 class ProcessorResult
 {
-  ProcessorResult(data)
+  ProcessorResult(data, String name, String description)
   {
     _times = { };
     _output = {
@@ -27,12 +30,22 @@ class ProcessorResult
     _times[title] = times; 
   }
   
+  String hashTimeNames()
+  {
+    String input = "";
+    _times.keys.forEach((String k) => input += k);
+    
+    return hash(input);
+  }
+  
   String toJson()
   {
     JsonEncoder e = new JsonEncoder.withIndent('  ');
     return e.convert(_output);
   }
 
+  var _name;
+  var _description;
   var _output;
   var _times;
 }
@@ -86,7 +99,7 @@ class Processor
     _setupPackage(pkg, data);
     ProcessorInput input = new ProcessorInput(pkg);
     
-    ProcessorResult output = new ProcessorResult(data);
+    ProcessorResult output = new ProcessorResult(data, r.name, r.description);
     Completer c = new Completer();
     r.cook(input, output);
     
