@@ -45,7 +45,6 @@ class PerfServer
         print('listening...');
         server.listen((HttpRequest req) 
           {
-            print(req.uri.path);
             if (req.uri.path == '/submit' && req.method == 'POST') 
             {
               onResultsSubmitted(req);
@@ -75,6 +74,79 @@ class PerfServer
             ..close();
         }
       );
+    }
+    else
+    {
+      var recipesPath = _db + "/recipes/";
+      String path = recipesPath + req.uri.path.substring(perfIndexUrl.length);
+
+      Directory d = new Directory(recipesPath);
+      String normD = normalize(d.path);
+      File f = new File(path);
+      
+      Directory ancestor = f.parent;
+      while (true)
+      {
+        if (normalize(ancestor.path) == normD)
+        {
+          break;
+        }
+        
+        Directory parent = ancestor.parent;
+        if (parent == ancestor)
+        {
+          return;
+        }
+        ancestor = parent;
+      }
+      
+      if (path.endsWith('.json'))
+      {
+        _web.serveFile(f, req);
+      }
+      else
+      {
+        Future<List<String>> commits = listDirectories(path);
+        
+        commits.then((List<String> commits)
+          {
+            List<Future> comps = [];
+            for (String c in commits)
+            {
+              Completer comp = new Completer();
+              comps.add(comp.future);
+              List<String> files = [];
+              Directory d = new Directory("$path/$c");
+              d.list().listen((FileSystemEntity f)
+                {
+                  if (f.path.endsWith('.json'))
+                  {
+                    files.add("${req.uri.path}/$c/${basename(f.path)}");
+                  }
+                },
+                onDone: ()
+                {
+                  comp.complete(files);
+                }
+              );
+            }
+            return comps;
+          }
+        ).then((List<Future> files)
+          {
+            Future.wait(files).then((List<List<String>> dirs)
+              {
+              List result = [];
+              dirs.forEach((e) => result.addAll(e));
+
+              req.response
+                ..write(JSON.encode(result))
+                ..close();
+              }
+            );
+          }
+        );
+      }
     }
   }
   
@@ -119,7 +191,6 @@ class PerfServer
                 ));
               }
               
-              print(futures);
               return Future.wait(futures);
             }
           ));
