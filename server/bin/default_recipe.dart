@@ -37,7 +37,14 @@ class TheCooker extends Cooker
       }
     );
 
-    _name = r.hashTimeNames();
+    if (p.recipeDescription != null)
+    {
+      _name = p.recipeDescription;
+    }
+    else
+    {
+      _name = r.hashTimeNames();
+    }
   }
   
   String get name => _name;

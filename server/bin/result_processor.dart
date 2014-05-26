@@ -14,11 +14,12 @@ abstract class Cooker
 
 class ProcessorResult
 {
-  ProcessorResult(data, String name, String description)
+  ProcessorResult(data, String description)
   {
     _times = { };
     _output = {
-      "times": _times,
+      "data": _times,
+      "time": new DateTime.now().toIso8601String(),
       "branch": data['branch'],
       "description": data['description'],
       "identity": data['identity'] 
@@ -44,6 +45,9 @@ class ProcessorResult
     return e.convert(_output);
   }
 
+  String get name => _name;
+  set name (String n) => _name = n;
+  
   var _name;
   var _description;
   var _output;
@@ -52,7 +56,9 @@ class ProcessorResult
 
 class ProcessorInput
 {
-  ProcessorInput(this._data);
+  ProcessorInput(String this._recipeDescription, this._data);
+  
+  String get recipeDescription => _recipeDescription;
   
   void select(RegExp r, void func(match, time))
   {
@@ -79,6 +85,7 @@ class ProcessorInput
     return out;
   }
 
+  String _recipeDescription;
   var _data;
 }
 
@@ -97,11 +104,13 @@ class Processor
   {
     Map pkg = { };
     _setupPackage(pkg, data);
-    ProcessorInput input = new ProcessorInput(pkg);
+    ProcessorInput input = new ProcessorInput(data['recipeDescription'], pkg);
     
-    ProcessorResult output = new ProcessorResult(data, r.name, r.description);
+    ProcessorResult output = new ProcessorResult(data, r.description);
     Completer c = new Completer();
     r.cook(input, output);
+    
+    output.name = r.name;
     
     c.complete(output);
     

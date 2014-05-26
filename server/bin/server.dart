@@ -7,9 +7,12 @@ import 'dart:isolate';
 import 'dart:mirrors';
 import 'package:http_server/http_server.dart';
 import 'package:args/args.dart' as Args;
+import 'package:path/path.dart';
 import 'recipe.dart';
 import 'result_processor.dart';
 import 'utils.dart';
+
+final String perfIndexUrl = '/perfindex';
 
 class PerfServer
 {
@@ -24,11 +27,14 @@ class PerfServer
     
     _recipes = new RecipeManager(serverLocation, _db);
 
-    print(serverLocation + "/../web/");
     _web = new VirtualDirectory(serverLocation + "/../web/");
-    _web.jailRoot = true;
+    _web.jailRoot = false;
+    _web.followLinks = true;
     _web.allowDirectoryListing = true;
-    _web.directoryHandler = (Directory d, HttpRequest r) => _web.serveFile(new File(d.path + "/index.html"), r);
+    _web.directoryHandler = (Directory d, HttpRequest r)
+      {
+        _web.serveFile(new File(d.path + "/index.html"), r);
+      };
   }
   
   void bind(int port)
@@ -39,9 +45,14 @@ class PerfServer
         print('listening...');
         server.listen((HttpRequest req) 
           {
+            print(req.uri.path);
             if (req.uri.path == '/submit' && req.method == 'POST') 
             {
               onResultsSubmitted(req);
+            }
+            else if(req.uri.path.startsWith(perfIndexUrl))
+            {
+              onServeResults(req);
             }
             else
             {
@@ -53,8 +64,101 @@ class PerfServer
     );
   }
   
-  void onServe(HttpRequest req)
+  void onServeResults(HttpRequest req)
   {
+    if (req.uri.path == perfIndexUrl)
+    {
+      findResults().then((Map m)
+        {
+          req.response
+            ..write(JSON.encode(m))
+            ..close();
+        }
+      );
+    }
+  }
+  
+  Future<Map> findResults()
+  {
+    Completer c = new Completer();
+
+    Map m = { };
+    
+    
+    var recipesPath = _db + "/recipes/";
+
+    listDirectories(recipesPath).then((List<String> recipes)
+      {
+        var futures = [];
+      
+        for (var recipe in recipes)
+        {
+          var recipePath = "$recipesPath/$recipe";
+          var fut = listDirectories(recipePath);
+
+          Map recipeNames = { };
+          m[recipe] = recipeNames;
+        
+          futures.add(fut.then((List<String> recipeOutputs)
+            {
+              var futures = [];
+              for (var recipeName in recipeOutputs)
+              {
+                Map branchNames = { };
+                recipeNames[recipeName] = branchNames;
+                
+                var fut = listDirectories("$recipePath/$recipeName/branches/");
+                
+                futures.add(fut.then((List<String> branches)
+                  {
+                    for (var branch in branches)
+                    {
+                      branchNames[branch] = pathForBranch(recipe, recipeName, branch);
+                    }
+                  }
+                ));
+              }
+              
+              print(futures);
+              return Future.wait(futures);
+            }
+          ));
+        }
+        
+        return Future.wait(futures);
+      }
+    ).then((f)
+      {
+      c.complete(m);
+      }
+    );
+    
+    return c.future;
+  }
+  
+  Future<List<String>> listDirectories(String path)
+  {
+    Completer c = new Completer();
+    
+    List result = [];
+    
+    new Directory(path).list().listen((FileSystemEntity f)
+      {
+        String branch = basename(f.path);
+        if (branch.startsWith(".") || f is! Directory)
+        {
+          return;
+        }
+        
+        result.add(branch);
+      },
+      onDone: ()
+      {
+        c.complete(result);
+      }
+    );
+    
+    return c.future;
   }
 
   void onResultsSubmitted(HttpRequest req) {
@@ -90,10 +194,10 @@ class PerfServer
   {
     String recipe = data['recipe'];
     
-    return _recipes.find(recipe).then((Recipe r) => storeResults(r.uri, data, src));
+    return _recipes.find(recipe).then((Recipe r) => storeResults(r, data, src));
   }
   
-  Future<dynamic> storeResults(Uri recipe, Map data, String src)
+  Future<dynamic> storeResults(Recipe recipe, Map data, String src)
   {
     String branch = data['branch'];
     String identity = data['identity'];
@@ -101,54 +205,60 @@ class PerfServer
     String branchSafe = branch.replaceAll(new RegExp(r'[^A-Za-z0-9]'), '_');
     
     String id = hash(src);
-    
-    String dir = "${_db}/branches/${branchSafe}/${identity}";
-    File file = new File("${dir}/${id}.json");
-    
-    return file.exists().then((bool exists)
-      {
-        if (!exists)
+
+    var response = new ReceivePort();
+    return Isolate.spawnUri(
+        recipe.sourceUri,
+        [ src ],
+        response.sendPort)
+      .then(
+        (Isolate i) 
         {
-          var response = new ReceivePort();
-          return Isolate.spawnUri(
-              recipe,
-              [ src ],
-              response.sendPort)
-            .then(
-              (Isolate i) 
-              {
-                return new Directory(dir)
-                  .create(recursive: true)
-                  .then((Directory d)
-                    {
-                      response.listen((ProcessorResult r)
-                        {
-                          String out = r.toJson();
-                          print("output is: $out");
-                          new File("${dir}/${id}.json").writeAsString(out);
-                        }
-                      );
+          Completer c = new Completer();
+          response.listen((ProcessorResult r)
+            {
+              String name = r.name;
+              String dir = "${recipe.container}/${name}/branches/${branchSafe}/${identity}";
+              File file = new File("${dir}/${id}.json");
+
+              return file.exists().then((bool exists)
+                {
+                  if (exists)
+                  {
+                    print("skipped existing entry $id");
+                    c.complete({ 'result': 'existing', 'path': pathForBranch(recipe.name, name, branchSafe) });
+                    return;
+                  }
                   
-                    print("successfully created entry $id");
-                    return { 'result': 'success', 'id': id };
-                    }
-                  );
-              }, 
-              onError: (e)
-              {
-                print("erorr adding result: $e");
-                return { 'result': 'error', 'error': e };
-              }
-            );
+                  new Directory(dir)
+                    .create(recursive: true)
+                    .then((Directory d)
+                      {
+                        String out = r.toJson();
+                        new File("${dir}/${id}.json").writeAsString(out);
+                      }
+                    );
+
+                  print("successfully created entry $id");
+                  c.complete({ 'result': 'success', 'path': pathForBranch(recipe.name, name, branchSafe) });
+                }
+              );
+            }
+          );
           
-        }
-        else
+          return c.future;
+        }, 
+        onError: (e)
         {
-          print("skipped existing result $id");
-          return { 'result': 'exists', 'id': id };
+          print("erorr adding result: $e");
+          return { 'result': 'error', 'error': e };
         }
-      }
     );
+  }
+  
+  String pathForBranch(String recipe, String recipeName, String branch)
+  {
+    return "$perfIndexUrl/$recipe/$recipeName/branches/$branch";
   }
 
   RecipeManager _recipes;

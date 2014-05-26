@@ -138,12 +138,13 @@ module Perf
   end
 
   class Package
-    def initialize(branch, identity, description, files, recipe=nil)
+    def initialize(branch, identity, description, files, recipe=nil, recipeDescription=nil)
       @contexts = Dir.glob(files).reduce({}) do |a, f| 
         a[f] = JSON.parse(File.read(f))
         next a
       end
 
+      @recipeDescription = recipeDescription
       @branch = branch
       @identity = identity
       @description = description
@@ -167,6 +168,7 @@ module Perf
         :identity => @identity,
         :description => @description,
         :recipe => @recipe,
+        :recipeDescription => @recipeDescription,
         :contexts => outputContexts
       })
     end
