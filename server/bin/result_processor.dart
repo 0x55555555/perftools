@@ -14,7 +14,7 @@ abstract class Cooker
 
 class ProcessorResult
 {
-  ProcessorResult(data, String description)
+  ProcessorResult(data, List machineIdentities, String description)
   {
     _times = { };
     _output = {
@@ -22,6 +22,7 @@ class ProcessorResult
       "time": new DateTime.now().toIso8601String(),
       "branch": data['branch'],
       "description": data['description'],
+      "machineIdentity": machineIdentities,
       "identity": data['identity'] 
     };
   }
@@ -103,10 +104,11 @@ class Processor
   Future<ProcessorResult> process(data, Cooker r)
   {
     Map pkg = { };
-    _setupPackage(pkg, data);
+    List identities = [ ];
+    _setupPackage(identities, pkg, data);
     ProcessorInput input = new ProcessorInput(data['recipeDescription'], pkg);
     
-    ProcessorResult output = new ProcessorResult(data, r.description);
+    ProcessorResult output = new ProcessorResult(data, identities, r.description);
     Completer c = new Completer();
     r.cook(input, output);
     
@@ -118,17 +120,18 @@ class Processor
   }
   
   
-  _setupPackage(Map out, Map data)
+  _setupPackage(List identities, Map out, Map data)
   {
     Map contexts = data['contexts'];
     contexts.forEach((k, v)
     {
-      _setupContext(out, "::$k", v);
+      _setupContext(identities, out, "::$k", v);
     });
   }
   
-  _setupContext(Map out, var prefix, var context)
+  _setupContext(List identitys, Map out, var prefix, var context)
   {
+    identitys.add(context['machineIdentity']);
     var results = context['results'];
     var start = _processAbsoluteTime(context['start']);
     
