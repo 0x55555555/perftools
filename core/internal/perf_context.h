@@ -15,15 +15,15 @@ struct perf_context
   static void write(perf_context *c, const char *n);
   static const char *dump(perf_context *c);
 
-  perf_context();
+  perf_context(const char *name, perf_config *config);
 
-  void record(const char *id);
+  void create_record(const char *id);
 
   perf_error error() const { return m_error; }
   perf_config *config() const { return m_config; }
 
 private:
-  void cacheResults();
+  void cache_results();
 
   perf_string m_results;
 
@@ -34,14 +34,14 @@ private:
 
   friend struct perf_config;
 
-  struct Record
+  struct record
     {
-    Record(const char *id, perf_context *ctx, const perf_relative_time &t);
+    record(const char *id, perf_context *ctx, const perf_relative_time &t);
 
     perf_string m_name;
     perf_relative_time m_time;
     };
 
-  typedef std::vector<Record, perf_allocator<Record>> Records;
-  std::vector<Record, perf_allocator<Record>> m_records;
+  typedef std::vector<record, perf_allocator<record>> records;
+  records m_records;
   };

@@ -22,7 +22,7 @@ template <typename T> struct perf_allocator
     return reinterpret_cast<pointer>(m_alloc(sizeof(T) * n));
     }
 
-  void deallocate (pointer p, size_type n)
+  void deallocate(pointer p, size_type n)
     {
     (void)n;
     assert(m_free);

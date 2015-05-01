@@ -6,17 +6,9 @@ perf_context *perf_context::init(perf_config *c, const char *name)
   PERF_API_CHECK_PTR(c, return nullptr);
   PERF_API_CHECK_PTR(name, return nullptr);
 
-  auto a = c->create<perf_context>();
+  auto a = c->create<perf_context>(name, c);
 
-  a->m_records.~Records();
-  new(&a->m_records) Records(c);
-  c->addContext(a);
-
-  a->m_results.~perf_string();
-  new(&a->m_results) perf_string(c);
-
-  a->m_name.~perf_string();
-  new(&a->m_name) perf_string(name, c);
+  c->add_context(a);
 
   return a;
   }
@@ -38,7 +30,7 @@ void perf_context::add(perf_context *c, const char *n)
     return;
     }
 
-  c->record(n);
+  c->create_record(n);
   }
 
 void perf_context::write(perf_context *c, const char *n)
@@ -48,7 +40,7 @@ void perf_context::write(perf_context *c, const char *n)
     return;
     }
 
-  c->cacheResults();
+  c->cache_results();
 
   auto file = fopen(n, "w");
   if (!file)
@@ -73,23 +65,26 @@ const char *perf_context::dump(perf_context *c)
     return nullptr;
     }
 
-  c->cacheResults();
+  c->cache_results();
   return c->m_results.data();
   }
 
-perf_context::perf_context()
-    : m_config(nullptr),
-      m_error(perf_no_error)
+perf_context::perf_context(const char *name, perf_config *config)
+    : m_results(config),
+      m_config(config),
+      m_error(perf_no_error),
+      m_name(name, config),
+      m_records(config)
   {
   }
 
-perf_context::Record::Record(const char *c, perf_context *ctx, const perf_relative_time &t)
+perf_context::record::record(const char *c, perf_context *ctx, const perf_relative_time &t)
     : m_name(c, ctx->config()),
       m_time(t)
   {
   }
 
-void perf_context::record(const char *id)
+void perf_context::create_record(const char *id)
   {
   if (m_results.size())
     {
@@ -97,12 +92,12 @@ void perf_context::record(const char *id)
     return;
     }
 
-  perf_relative_time rel = perf_absolute_time().relativeTo(m_start);
+  perf_relative_time rel = perf_absolute_time().relative_to(m_start);
 
   m_records.emplace_back(id, this, rel);
   }
 
-void perf_context::cacheResults()
+void perf_context::cache_results()
   {
   m_results =
   "{\n"
@@ -112,17 +107,17 @@ void perf_context::cacheResults()
   m_results += "\",\n"
   "  \"machineIdentity\": ";
 
-  m_config->m_identity.appendIdentity(m_results, "  ");
+  m_config->m_identity.append_identity(m_results, "  ");
 
   m_results += ",\n"
   "  \"start\": ";
-  m_start.appendTo(m_results);
+  m_start.append_to(m_results);
 
   m_results += ",\n"
   "  \"results\": [\n";
 
   bool started = false;
-  for(const Record &r : m_records)
+  for(const auto &r : m_records)
     {
     if (started)
       {
@@ -135,7 +130,7 @@ void perf_context::cacheResults()
 
     m_results += "\",\n"
     "      \"time\":";
-    r.m_time.appendTo(m_results);
+    r.m_time.append_to(m_results);
     m_results += "\n";
 
     m_results += "    }";

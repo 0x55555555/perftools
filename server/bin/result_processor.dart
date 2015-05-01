@@ -14,13 +14,15 @@ abstract class Cooker
 
 class ProcessorResult
 {
-  ProcessorResult(data, String name, String description)
+  ProcessorResult(data, List machineIdentities, String description)
   {
     _times = { };
     _output = {
-      "times": _times,
+      "data": _times,
+      "time": new DateTime.now().toIso8601String(),
       "branch": data['branch'],
       "description": data['description'],
+      "machineIdentity": machineIdentities,
       "identity": data['identity'] 
     };
   }
@@ -44,6 +46,9 @@ class ProcessorResult
     return e.convert(_output);
   }
 
+  String get name => _name;
+  set name (String n) => _name = n;
+  
   var _name;
   var _description;
   var _output;
@@ -52,7 +57,9 @@ class ProcessorResult
 
 class ProcessorInput
 {
-  ProcessorInput(this._data);
+  ProcessorInput(String this._recipeDescription, this._data);
+  
+  String get recipeDescription => _recipeDescription;
   
   void select(RegExp r, void func(match, time))
   {
@@ -79,6 +86,7 @@ class ProcessorInput
     return out;
   }
 
+  String _recipeDescription;
   var _data;
 }
 
@@ -96,12 +104,15 @@ class Processor
   Future<ProcessorResult> process(data, Cooker r)
   {
     Map pkg = { };
-    _setupPackage(pkg, data);
-    ProcessorInput input = new ProcessorInput(pkg);
+    List identities = [ ];
+    _setupPackage(identities, pkg, data);
+    ProcessorInput input = new ProcessorInput(data['recipeDescription'], pkg);
     
-    ProcessorResult output = new ProcessorResult(data, r.name, r.description);
+    ProcessorResult output = new ProcessorResult(data, identities, r.description);
     Completer c = new Completer();
     r.cook(input, output);
+    
+    output.name = r.name;
     
     c.complete(output);
     
@@ -109,17 +120,18 @@ class Processor
   }
   
   
-  _setupPackage(Map out, Map data)
+  _setupPackage(List identities, Map out, Map data)
   {
     Map contexts = data['contexts'];
     contexts.forEach((k, v)
     {
-      _setupContext(out, "::$k", v);
+      _setupContext(identities, out, "::$k", v);
     });
   }
   
-  _setupContext(Map out, var prefix, var context)
+  _setupContext(List identitys, Map out, var prefix, var context)
   {
+    identitys.add(context['machineIdentity']);
     var results = context['results'];
     var start = _processAbsoluteTime(context['start']);
     

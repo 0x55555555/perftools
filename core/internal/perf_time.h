@@ -5,7 +5,7 @@
 struct perf_relative_time
   {
 public:
-  void appendTo(perf_string &str) const;
+  void append_to(perf_string &str) const;
 
 private:
   int64_t m_data;
@@ -18,9 +18,9 @@ struct perf_absolute_time
   perf_absolute_time();
 
   /// Find the difference (this - t)
-  perf_relative_time relativeTo(const perf_absolute_time &t) const;
+  perf_relative_time relative_to(const perf_absolute_time &t) const;
 
-  void appendTo(perf_string &str) const;
+  void append_to(perf_string &str) const;
 
 private:
   perf_absolute_time(const perf_absolute_time &);

@@ -6,18 +6,20 @@ import 'dart:io';
 
 class Recipe
 {
-  Recipe(String path, String this._container, bool this._existing)
+  Recipe(String this._name, String path, String this._container, bool this._existing)
   {
-    _uri = Uri.parse(path);  
+    _sourceUri = Uri.parse(path);  
   }
 
+  String get name => _name;
   String get container => _container;
   bool get existing => _existing;
-  Uri get uri => _uri;
+  Uri get sourceUri => _sourceUri;
   
+  String _name;
   String _container;
   bool _existing;
-  Uri _uri;
+  Uri _sourceUri;
 }
 
 class RecipeManager
@@ -35,7 +37,7 @@ class RecipeManager
       String path = recipePath('default');
       new Directory(path).create(recursive: true).then((Directory d)
         {
-          c.complete(new Recipe('default_recipe.dart', path, true));
+          c.complete(new Recipe('default', 'default_recipe.dart', path, true));
         }
       );
        
@@ -94,7 +96,7 @@ void main(args, replyTo) => Processor.start(args, replyTo, new TheCooker());''';
     
     String recipe = recipePath(hash);
     
-    c.complete(new Recipe(recipeDartPath(hash), recipe, existing));
+    c.complete(new Recipe(hash, recipeDartPath(hash), recipe, existing));
     
     return c.future;
   }

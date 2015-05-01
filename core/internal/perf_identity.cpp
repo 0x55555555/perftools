@@ -3,17 +3,17 @@
 #include <cstdlib>
 #include <memory>
 
-bool perf_identity::check(const perf_identity *i)
-  {
-  return i != 0;
-  }
-
 #if defined(_WIN32)
 # include <Windows.h>
 #elif defined(__APPLE__)
 # include <sys/sysctl.h>
 
-uint64_t get64BitInt(const char *id)
+bool perf_identity::check(const perf_identity *i)
+  {
+  return i != 0;
+  }
+
+uint64_t get_64_bit_int(const char *id)
   {
   uint64_t val = 0;
   size_t size = sizeof(val);
@@ -22,7 +22,7 @@ uint64_t get64BitInt(const char *id)
   return val;
   }
 
-perf_string getString(perf_config *c, const char *id)
+perf_string get_string(perf_config *c, const char *id)
   {
   std::size_t len = 0;
   sysctlbyname(id, NULL, &len, NULL, 0);
@@ -40,34 +40,26 @@ perf_string getString(perf_config *c, const char *id)
 
 #endif
 
-perf_identity::perf_identity()
-  {
-  }
-
-void perf_identity::init(perf_config *c, const char *binding)
+perf_identity::perf_identity(const char *binding, perf_config *c)
+  : m_cpu(c),
+    m_binding(binding, c),
+    m_os(c),
+    m_os_detail(c),
+    m_config(c)
   {
   assert(c);
   assert(binding);
+  }
 
-  m_binding.~perf_string();
-  new(&m_binding) perf_string(binding, c);
-
-  m_os.~perf_string();
-  new(&m_os) perf_string(c);
-
-  m_cpu.~perf_string();
-  new(&m_cpu) perf_string(c);
-
-  m_osDetail.~perf_string();
-  new(&m_osDetail) perf_string(c);
-
+void perf_identity::init()
+  {
 #if defined(_WIN32)
 #if defined(_WIN64)
   m_os = "win32";
 #else
   m_os = "win64";
 #endif
-  m_osDetail = "windows";
+  m_os_detail = "windows";
 
   int CPUInfo[4] = {-1};
   unsigned   nExIds, i =  0;
@@ -92,22 +84,22 @@ void perf_identity::init(perf_config *c, const char *binding)
 
   SYSTEM_INFO sysInfo;
   GetSystemInfo(&sysInfo);
-  m_cpuCount = sysInfo.dwNumberOfProcessors;
+  m_cpu_count = sysInfo.dwNumberOfProcessors;
 
   MEMORYSTATUSEX statex;
   statex.dwLength = sizeof (statex);
   GlobalMemoryStatusEx(&statex);
-  m_memoryBytes = statex.ullTotalPhys;
+  m_memory_bytes = statex.ullTotalPhys;
 #elif defined(__APPLE__)
   m_os = "osx";
 
   const std::size_t size = 1024;
   m_cpu.resize(size);
 
-  uint64_t freq = get64BitInt("hw.cpufrequency");
-  auto machine = getString(c, "hw.machine");
-  auto model = getString(c, "hw.model");
-  auto arch = getString(c, "hw.machine_arch");
+  uint64_t freq = get_64_bit_int("hw.cpufrequency");
+  auto machine = get_string(m_config, "hw.machine");
+  auto model = get_string(m_config, "hw.model");
+  auto arch = get_string(m_config, "hw.machine_arch");
 
   int printed = snprintf(
                   &m_cpu[0],
@@ -119,21 +111,21 @@ void perf_identity::init(perf_config *c, const char *binding)
                   (uint64_t)freq);
   m_cpu.resize(printed);
 
-  m_osDetail.resize(size);
+  m_os_detail.resize(size);
 
-  auto osRelease = getString(c, "kern.osrelease");
-  auto osType = getString(c, "kern.ostype");
+  auto osRelease = get_string(m_config, "kern.osrelease");
+  auto osType = get_string(m_config, "kern.ostype");
 
   printed = snprintf(
-                  &m_osDetail[0],
+                  &m_os_detail[0],
                   size/sizeof(char),
                   "%s, %s",
                   osRelease.data(),
                   osType.data());
-  m_osDetail.resize(printed);
+  m_os_detail.resize(printed);
 
-  m_cpuCount = get64BitInt("hw.physicalcpu");
-  m_memoryBytes = get64BitInt("hw.memsize");
+  m_cpu_count = get_64_bit_int("hw.physicalcpu");
+  m_memory_bytes = get_64_bit_int("hw.memsize");
 #else
   m_os = "undefined";
   m_cpu = "unknown";
@@ -142,18 +134,18 @@ void perf_identity::init(perf_config *c, const char *binding)
 # error platform undefined
 #endif
 
-  calculateIdentity(c);
+  calculate_identity(m_config);
   }
 
-void perf_identity::calculateIdentity(perf_config *c)
+void perf_identity::calculate_identity(perf_config *c)
   {
   m_identity.~perf_string();
   new(&m_identity) perf_string(c);
 
-  appendIdentity(m_identity, "");
+  append_identity(m_identity, "");
   }
 
-void perf_identity::appendIdentity(perf_string& id, const char* tab)
+void perf_identity::append_identity(perf_string& id, const char* tab)
   {
   const std::size_t size = 1024;
   const std::size_t oldSize = id.size();
@@ -174,13 +166,13 @@ void perf_identity::appendIdentity(perf_string& id, const char* tab)
                   tab,
                   m_os.data(),
                   tab,
-                  m_osDetail.data(),
+                  m_os_detail.data(),
                   tab,
                   m_cpu.data(),
                   tab,
-                  (uint64_t)m_cpuCount,
+                  (uint64_t)m_cpu_count,
                   tab,
-                  (uint64_t)m_memoryBytes,
+                  (uint64_t)m_memory_bytes,
                   tab,
                   m_binding.data(),
                   tab);

@@ -87,13 +87,15 @@ class TestExpose < Test::Unit::TestCase
     runProcess(File.dirname(__FILE__) + "/cppTest/build.sh")
   end
 
+=begin
   def test_contextCollection
-    pkg = Perf::Package.new("dev/TheGoodStuff", "af4343c", "testing some bits", "test/sampleExport/*.json", nil)
+    pkg = Perf::Package.new("master", "af4343c", "testing some bits", "test/*.json", nil, "ruby-cpp-test")
 
     obj = pkg.to_s
     assert_not_nil JSON.parse(obj)
 
-    pkg.submit('http://localhost:14663/submit')
+    pkg.submit('http://localhost:8080/submit')
   end
+=end
 end
 
