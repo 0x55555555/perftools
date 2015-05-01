@@ -1,6 +1,7 @@
 require "ffi"
-
 require 'rbconfig'
+require 'json'
+require 'net/http'
 
 module Perf
   extend FFI::Library
@@ -133,6 +134,50 @@ module Perf
       event(b)
       yield
       event(e)
+    end
+  end
+
+  class Package
+    def initialize(branch, identity, description, files, recipe=nil, recipeDescription=nil)
+      @contexts = Dir.glob(files).reduce({}) do |a, f| 
+        a[f] = JSON.parse(File.read(f))
+        next a
+      end
+
+      @recipeDescription = recipeDescription
+      @branch = branch
+      @identity = identity
+      @description = description
+      @recipe = recipe
+    end
+
+    def to_s()
+      outputContexts = { }
+
+      @contexts.each do |file, json|
+        name = json["name"]
+        raise "invalid name passed" unless name.length > 0
+
+        output = json.clone()
+        output.delete("name")
+        outputContexts[name] = output
+      end
+
+      return JSON.pretty_generate({
+        :branch => @branch,
+        :identity => @identity,
+        :description => @description,
+        :recipe => @recipe,
+        :recipeDescription => @recipeDescription,
+        :contexts => outputContexts
+      })
+    end
+
+    def submit(addr)
+      data = { 'data' => to_s }
+      postData = Net::HTTP.post_form(URI.parse(addr), data)
+
+      puts postData.body
     end
   end
 end

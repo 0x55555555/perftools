@@ -1,0 +1,46 @@
+{
+  "name": "timing_test",
+  "machineIdentity":   {
+    "os": "osx",
+    "osDetail": "13.2.0, Darwin",
+    "cpu": "x86_64, MacBookPro11,3, , 2600000000 hz",
+    "cpuCount": "4",
+    "memoryBytes": "17179869184",
+    "binding": "ruby"
+  },
+  "start": [ 1400619081, 893839 ],
+  "results": [
+    {
+      "name":"test_block_10::begin",
+      "time":16
+    },
+    {
+      "name":"test_block_10::end",
+      "time":27
+    },
+    {
+      "name":"test_block_100::begin",
+      "time":30
+    },
+    {
+      "name":"test_block_100::end",
+      "time":69
+    },
+    {
+      "name":"test_block_1000::begin",
+      "time":70
+    },
+    {
+      "name":"test_block_1000::end",
+      "time":640
+    },
+    {
+      "name":"test_block_10000::begin",
+      "time":641
+    },
+    {
+      "name":"test_block_10000::end",
+      "time":31590
+    }
+  ]
+}

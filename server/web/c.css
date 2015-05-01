@@ -1,0 +1,83 @@
+/* Perf Stack css */
+
+#sidebar {
+  width: 20%;
+  display: block;
+  position: absolute;
+  left: 0%;
+  top: 0px;
+  margin-top:  10px;
+  margin-left: 15px;
+}
+
+#sidebar > .header {
+  color: rgb(87, 87, 87);
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+#contents {
+  width: 80%;
+  height:  100%;
+  display: block;
+  position: absolute;
+  left: 20%;
+  top:  0px;
+}
+
+#contents > .header {
+    color: rgb(87, 87, 87);
+    font-family: sans-serif;
+    font-weight: bold;
+    float: right;
+    margin-right: 50px;
+}
+
+#chart_view {
+  position: relative;
+  left: 5%;
+  top: 5%;
+}
+
+#perf_index > div.recipe {
+    margin-left: 15px;
+}
+
+#perf_index > div.recipe > .title {
+  font-family: sans-serif;
+  font-size: smaller;
+  margin-left: 5px;
+  margin-bottom: 0px;
+  display: inline;
+}
+
+#perf_index > div.recipe > p.expand {
+  color: rgb(143, 143, 143);
+  font-family: sans-serif;
+  font-size: smaller;
+  font-weight:  bold;
+  /* margin-left: 5px; */
+  /* margin-bottom: 0px; */
+  display: inline;
+}
+
+.branch {
+  font-family: sans-serif;
+  font-size: smaller;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 15px
+}
+
+.hidden {
+  display: none
+}
+
+.no-selection {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

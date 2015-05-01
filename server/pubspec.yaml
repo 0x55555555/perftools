@@ -1,0 +1,8 @@
+name: server
+description: Serves a perfstack server to store and serve results
+dependencies:
+  args: any
+  browser: any
+  crypto: any
+  http_server: any
+  path: any
