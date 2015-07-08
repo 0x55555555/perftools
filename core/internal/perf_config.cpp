@@ -1,5 +1,5 @@
-#include "perf_config.h"
-#include "perf_context.h"
+#include "perf_config.hpp"
+#include "perf_context.hpp"
 #include <cassert>
 
 perf_config *perf_config::init(perf_alloc alloc, perf_free free, const char *binding)

@@ -1,7 +1,7 @@
 #pragma once
-#include "perf_global.h"
-#include "perf_config.h"
-#include "perf_time.h"
+#include "perf_global.hpp"
+#include "perf_config.hpp"
+#include "perf_time.hpp"
 #include <vector>
 
 struct perf_context

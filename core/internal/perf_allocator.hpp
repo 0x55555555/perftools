@@ -1,8 +1,8 @@
 #pragma once
+#include "perf.h"
 #include <cstddef>
 #include <string>
 #include <cassert>
-#include "perf.h"
 
 struct perf_config;
 

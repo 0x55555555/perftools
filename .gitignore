@@ -1,12 +1,6 @@
 
 *.o
 *.moc
-.qmake.stash
-Makefile
-runtime/build*
-RuntimeTest
-*.pro.user
-*.dll
-*.dylib
-test/cpp.json
-test/ruby.json
+build/
+test/data/
+node_server/node_modules/

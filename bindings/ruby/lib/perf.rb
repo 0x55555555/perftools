@@ -27,7 +27,7 @@ module Perf
     end
 
     def self.path()
-      base = File.dirname(__FILE__) + "/../../../core/build/bin/libperf"
+      base = File.dirname(__FILE__) + "/../../../build/lib/libperf"
       case os
         when :macosx
           return base + ".dylib"
@@ -151,7 +151,7 @@ module Perf
       @recipe = recipe
     end
 
-    def to_s()
+    def as_json()
       outputContexts = { }
 
       @contexts.each do |file, json|
@@ -163,21 +163,22 @@ module Perf
         outputContexts[name] = output
       end
 
-      return JSON.pretty_generate({
+      return {
         :branch => @branch,
         :identity => @identity,
         :description => @description,
         :recipe => @recipe,
         :recipeDescription => @recipeDescription,
         :contexts => outputContexts
-      })
+      }
+    end
+
+    def to_s()
+      return JSON.generate(as_json())
     end
 
     def submit(addr)
-      data = { 'data' => to_s }
-      postData = Net::HTTP.post_form(URI.parse(addr), data)
-
-      puts postData.body
+      postData = Net::HTTP.post_form(URI.parse(addr), { "data" => to_s() })
     end
   end
 end

@@ -1,4 +1,4 @@
-#include "perf_context.h"
+#include "perf_context.hpp"
 #include <cstdio>
 
 perf_context *perf_context::init(perf_config *c, const char *name)

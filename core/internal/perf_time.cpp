@@ -1,4 +1,4 @@
-#include "perf_time.h"
+#include "perf_time.hpp"
 
 #if defined(__APPLE__)
 # include <sys/time.h>

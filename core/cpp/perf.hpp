@@ -1,6 +1,9 @@
 #pragma once
 #include "perf.h"
+#include <cstdlib>
+#include <cstring>
 #include <stdexcept>
+#include <string>
 
 namespace perf
 {

@@ -1,10 +1,7 @@
 #include "perf.h"
-#include "perf_config.h"
-#include "perf_context.h"
+#include "perf_config.hpp"
+#include "perf_context.hpp"
 #include <cstdlib>
-
-extern "C"
-{
 
 perf_config *perf_init_default_config(const char *binding)
   {
@@ -75,4 +72,3 @@ void perf_add_event(perf_context *ctx, const char *name)
   {
   return perf_context::add(ctx, name);
   }
-}

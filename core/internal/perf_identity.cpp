@@ -1,5 +1,5 @@
-#include "perf_identity.h"
-#include "perf_config.h"
+#include "perf_identity.hpp"
+#include "perf_config.hpp"
 #include <cstdlib>
 #include <memory>
 

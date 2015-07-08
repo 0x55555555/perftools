@@ -1,9 +1,9 @@
 #pragma once
 #include "perf.h"
-#include "perf_global.h"
-#include "perf_identity.h"
-#include "perf_allocator.h"
-#include <stdint.h>
+#include "perf_global.hpp"
+#include "perf_identity.hpp"
+#include "perf_allocator.hpp"
+#include <cstdint>
 #include <memory>
 #include <atomic>
 #include <cassert>
