@@ -1,51 +1,35 @@
 #include "perf_time.hpp"
 
-#if defined(__APPLE__)
-# include <sys/time.h>
-# define TIME_VAL(t) (reinterpret_cast<timeval*>((t)->m_data))
-# define CONST_TIME_VAL(t) (reinterpret_cast<const timeval*>((t)->m_data))
-#endif
 
 void perf_relative_time::append_to(perf_string &str) const
   {
   char data[32];
-  snprintf(data, sizeof(data)/sizeof(char), "%llu", m_data);
+  snprintf(data, sizeof(data)/sizeof(char), "%llu", (std::uint64_t)m_data.count());
   str += data;
   }
 
-perf_absolute_time::perf_absolute_time()
+perf_absolute_time perf_absolute_time::now()
   {
-#if defined(__APPLE__)
-  static_assert(sizeof(timeval) <= sizeof(m_data), "timeval is too big!");
+  perf_absolute_time ret;
 
-  gettimeofday(TIME_VAL(this), nullptr);
-#endif
+  ret.m_data = std::chrono::high_resolution_clock::now();
+
+  return ret;
   }
 
 perf_relative_time perf_absolute_time::relative_to(const perf_absolute_time &t) const
   {
-  const timeval *ths = CONST_TIME_VAL(this);
-  const timeval *relTo = CONST_TIME_VAL(&t);
-
   perf_relative_time rel;
 
-  rel.m_data = (ths->tv_sec - relTo->tv_sec) * 1000000;
-  rel.m_data += (ths->tv_usec - relTo->tv_usec);
+  rel.m_data = m_data - t.m_data;
 
   return rel;
   }
 
 void perf_absolute_time::append_to(perf_string &str) const
-  {
-  char high[32];
-  snprintf(high, sizeof(high)/sizeof(char), "%llu", m_data[0]);
-  char low[32];
-  snprintf(low, sizeof(low)/sizeof(char), "%llu", m_data[1]);
-
-  str += "[ ";
-  str += high;
-  str += ", ";
-  str += low;
-  str += " ]";
+{
+  char data[32];
+  snprintf(data, sizeof(data)/sizeof(char), "%llu", (std::uint64_t)m_data.time_since_epoch().count());
+  str += data;
   }
 

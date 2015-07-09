@@ -1,5 +1,4 @@
 #include "perf_context.hpp"
-#include <cstdio>
 
 perf_context *perf_context::init(perf_config *c, const char *name)
   {
@@ -73,6 +72,7 @@ perf_context::perf_context(const char *name, perf_config *config)
     : m_results(config),
       m_config(config),
       m_error(perf_no_error),
+      m_start(perf_absolute_time::now()),
       m_name(name, config),
       m_records(config)
   {
@@ -92,7 +92,7 @@ void perf_context::create_record(const char *id)
     return;
     }
 
-  perf_relative_time rel = perf_absolute_time().relative_to(m_start);
+  perf_relative_time rel = perf_absolute_time::now().relative_to(m_start);
 
   m_records.emplace_back(id, this, rel);
   }

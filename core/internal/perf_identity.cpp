@@ -1,7 +1,7 @@
 #include "perf_identity.hpp"
 #include "perf_config.hpp"
 #include <cstdlib>
-#include <memory>
+#include <iostream>
 
 #if defined(_WIN32)
 # include <Windows.h>
@@ -22,20 +22,19 @@ uint64_t get_64_bit_int(const char *id)
   return val;
   }
 
-perf_string get_string(perf_config *c, const char *id)
+void append_string(perf_string &str, const char *id)
   {
   std::size_t len = 0;
   sysctlbyname(id, NULL, &len, NULL, 0);
   if (!len)
     {
-    return perf_string(c);
+    return;
     }
 
-  std::unique_ptr<char, void(*)(void*)> data((char*)c->m_alloc(len*sizeof(char)), c->m_free);
-  sysctlbyname(id, data.get(), &len, NULL, 0);
-
-  assert(c);
-  return perf_string(data.get(), c);
+  std::size_t old_size = str.size();
+  str.resize(old_size + len);
+  sysctlbyname(id, &str[0] + old_size, &len, NULL, 0);
+  str.resize(old_size + len - 1);
   }
 
 #endif
@@ -93,36 +92,17 @@ void perf_identity::init()
 #elif defined(__APPLE__)
   m_os = "osx";
 
-  const std::size_t size = 1024;
-  m_cpu.resize(size);
-
   uint64_t freq = get_64_bit_int("hw.cpufrequency");
-  auto machine = get_string(m_config, "hw.machine");
-  auto model = get_string(m_config, "hw.model");
-  auto arch = get_string(m_config, "hw.machine_arch");
+  append_string(m_cpu, "hw.machine");
+  append(m_cpu, ", ");
+  append_string(m_cpu, "hw.model");
+  append(m_cpu, ", ");
+  append_string(m_cpu, "hw.machine_arch");
+  append(m_cpu, ", ", freq, " hz");
 
-  int printed = snprintf(
-                  &m_cpu[0],
-                  size/sizeof(char),
-                  "%s, %s, %s, %llu hz",
-                  machine.data(),
-                  model.data(),
-                  arch.data(),
-                  (uint64_t)freq);
-  m_cpu.resize(printed);
-
-  m_os_detail.resize(size);
-
-  auto osRelease = get_string(m_config, "kern.osrelease");
-  auto osType = get_string(m_config, "kern.ostype");
-
-  printed = snprintf(
-                  &m_os_detail[0],
-                  size/sizeof(char),
-                  "%s, %s",
-                  osRelease.data(),
-                  osType.data());
-  m_os_detail.resize(printed);
+  append_string(m_os_detail, "kern.osrelease");
+  append(m_os_detail, ", ");
+  append_string(m_os_detail, "kern.ostype");
 
   m_cpu_count = get_64_bit_int("hw.physicalcpu");
   m_memory_bytes = get_64_bit_int("hw.memsize");
@@ -147,34 +127,12 @@ void perf_identity::calculate_identity(perf_config *c)
 
 void perf_identity::append_identity(perf_string& id, const char* tab)
   {
-  const std::size_t size = 1024;
-  const std::size_t oldSize = id.size();
-  id.resize(oldSize + size);
-
-  int printed = snprintf(
-                  &id[oldSize],
-                  size/sizeof(char),
-                  "%s{\n"
-                  "%s  \"os\": \"%s\",\n"
-                  "%s  \"osDetail\": \"%s\",\n"
-                  "%s  \"cpu\": \"%s\",\n"
-                  "%s  \"cpuCount\": \"%llu\",\n"
-                  "%s  \"memoryBytes\": \"%llu\",\n"
-                  "%s  \"binding\": \"%s\"\n"
-                  "%s}",
-                  tab,
-                  tab,
-                  m_os.data(),
-                  tab,
-                  m_os_detail.data(),
-                  tab,
-                  m_cpu.data(),
-                  tab,
-                  (uint64_t)m_cpu_count,
-                  tab,
-                  (uint64_t)m_memory_bytes,
-                  tab,
-                  m_binding.data(),
-                  tab);
-  id.resize(oldSize + printed);
+  append(id, tab, "{\n");
+  append(id, tab, "  \"os\": \"", m_os, "\",\n");
+  append(id, tab, "  \"os_detail\": \"", m_os_detail, "\",\n");
+  append(id, tab, "  \"cpu\": \"", m_cpu, "\",\n");
+  append(id, tab, "  \"cpu_count\": \"", m_cpu_count, "\",\n");
+  append(id, tab, "  \"memory_bytes\": \"", m_memory_bytes, "\",\n");
+  append(id, tab, "  \"binding\": \"", m_binding, "\"\n");
+  append(id, tab, "}");
   }

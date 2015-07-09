@@ -25,11 +25,11 @@ class TestExpose < Test::Unit::TestCase
 
     assert_equal 6, obj.length
     assert_kind_of String, obj["cpu"]
-    assert_kind_of String, obj["cpuCount"]
-    assert_kind_of String, obj["memoryBytes"]
+    assert_kind_of String, obj["cpu_count"]
+    assert_kind_of String, obj["memory_bytes"]
     assert_kind_of String, obj["binding"]
     assert_kind_of String, obj["os"]
-    assert_kind_of String, obj["osDetail"]
+    assert_kind_of String, obj["os_detail"]
   end
 
   def test_timing
@@ -62,6 +62,7 @@ class TestExpose < Test::Unit::TestCase
       end
     end
 
+    puts ctx.dump
     obj = JSON.parse(ctx.dump)
     assert_not_nil obj
 

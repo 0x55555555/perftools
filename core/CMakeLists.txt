@@ -18,6 +18,7 @@ add_library(perf SHARED
   internal/perf_context.cpp
   internal/perf_identity.hpp
   internal/perf_identity.cpp
+  internal/perf_string.hpp
   internal/perf_time.hpp
   internal/perf_time.cpp
 )

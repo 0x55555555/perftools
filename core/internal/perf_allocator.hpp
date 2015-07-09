@@ -37,5 +37,3 @@ template <typename T> struct perf_allocator
   perf_alloc m_alloc;
   perf_free m_free;
   };
-
-typedef std::basic_string<char, std::char_traits<char>, perf_allocator<char> > perf_string;
