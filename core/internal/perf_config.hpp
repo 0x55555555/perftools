@@ -24,8 +24,11 @@ struct perf_config
       const char *binding,
       perf_alloc alloc,
       perf_free free);
+  ~perf_config();
 
+  /// Register a new context managed by the config
   void add_context(perf_context *c);
+  /// Unregister a context from the config
   void remove_context(perf_context *c);
 
   /// Create a n object of [T] using the owned allocator.

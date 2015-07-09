@@ -20,12 +20,20 @@ perf_config *perf_init_default_config(const char *binding)
 
 perf_config *perf_init_config(perf_alloc alloc, perf_free free, const char *binding)
   {
-  return perf_config::init(alloc, free, binding);
+  API_CHECK([&]()
+    {
+    return perf_config::init(alloc, free, binding);
+    });
+
+  return nullptr;
   }
 
 void perf_term_config(perf_config *cfg)
   {
-  perf_config::term(cfg);
+  API_CHECK([&]()
+    {
+    perf_config::term(cfg);
+    });
   }
 
 const perf_identity *perf_find_identity(perf_config *cfg)

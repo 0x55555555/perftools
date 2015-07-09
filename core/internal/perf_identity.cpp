@@ -37,9 +37,8 @@ void append_string(perf_string &str, const char *id)
 
 bool perf_identity::check(const perf_identity *i)
   {
-  return i != 0;
   }
-  
+
 perf_identity::perf_identity(const char *binding, perf_config *c)
   : m_cpu(c)
   , m_binding(binding, c)
@@ -51,8 +50,10 @@ perf_identity::perf_identity(const char *binding, perf_config *c)
   assert(binding);
   }
 
+
 void perf_identity::init()
   {
+  // todo: tidy up,this is a bit messy, and not really the good information?
 #if defined(_WIN32)
 #if defined(_WIN64)
   m_os = "win32";

@@ -5,6 +5,7 @@
 #include <vector>
 
 /// A perf context describes a profiling session
+/// \todo recursive records, statistics, records with length? etc?
 struct perf_context
   {
   static perf_context *init(perf_config *c, const char *name);

@@ -18,7 +18,6 @@ perf_config *perf_config::init(perf_alloc alloc, perf_free free, const char *bin
 
 bool perf_config::check(const perf_config *c)
   {
-  return c != 0;
   }
 
 void perf_config::term(perf_config *c)
@@ -36,6 +35,11 @@ perf_config::perf_config(
   , m_identity(binding, this)
   {
   m_identity.init();
+  }
+
+perf_config::~perf_config()
+  {
+  perf_check(m_context_count == 0);
   }
 
 void perf_config::add_context(perf_context *c)

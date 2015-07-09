@@ -10,10 +10,10 @@ struct perf_config;
 /// allocating and returning all api and internal objects
 template <typename T> struct perf_allocator
   {
-  typedef T value_type;
-  typedef std::size_t size_type;
-  typedef T *pointer;
-  typedef const T *const_pointer;
+  using value_type = T;
+  using size_type = std::size_t;
+  using pointer = T *;
+  using const_pointer = const T *;
 
   perf_allocator(perf_config *c=nullptr);
 

@@ -14,7 +14,6 @@ perf_context *perf_context::init(perf_config *c, const char *name)
 
 bool perf_context::check(const perf_context *c)
   {
-  return c != 0;
   }
 
 void perf_context::term(perf_context *c)
