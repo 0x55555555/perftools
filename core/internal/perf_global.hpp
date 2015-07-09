@@ -1,4 +1,17 @@
 #pragma once
 
-#define PERF_API_CHECK_PTR(ptr, err) if (ptr == nullptr) { err; }
+template <typename T> void perf_ptr_check(T *t)
+  {
+  if (!t)
+    {
+    throw;
+    }
+  }
 
+template <typename T> void perf_check(T *t)
+  {
+  if (!T::check(t))
+    {
+    throw;
+    }
+  }

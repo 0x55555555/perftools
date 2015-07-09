@@ -3,6 +3,16 @@
 #include "perf_context.hpp"
 #include <cstdlib>
 
+namespace 
+{
+void perf_handle_api_error()
+  {
+
+  }
+}
+
+#define API_CHECK(fn) try { return fn(); } catch(...) { perf_handle_api_error(); }
+
 perf_config *perf_init_default_config(const char *binding)
   {
   return perf_init_config(malloc, free, binding);
@@ -20,55 +30,80 @@ void perf_term_config(perf_config *cfg)
 
 const perf_identity *perf_find_identity(perf_config *cfg)
   {
-  if (!perf_config::check(cfg))
+  API_CHECK([&]()
     {
-    return nullptr;
-    }
+    perf_check(cfg);
 
-  return &cfg->m_identity;
+    return &cfg->m_identity;
+    });
+
+  return nullptr;
   }
 
 const char *perf_identity_description(const perf_identity *id)
   {
-  if (!perf_identity::check(id))
+  API_CHECK([&]()
     {
-    return "";
-    }
+    perf_check(id);
 
-  return id->m_identity.c_str();
+    return id->m_identity.c_str();
+    });
+
+  return nullptr;
   }
 
 perf_error perf_check_error(perf_context *ctx)
   {
-  if (!perf_context::check(ctx))
+  API_CHECK([&]()
     {
-    return perf_error_in_error;
-    }
+    perf_check(ctx);
 
-  return ctx->error();
+    return ctx->error();
+    });
+
+  return perf_error_in_error;
   }
 
 perf_context *perf_init_context(perf_config *cfg, const char *name)
   {
-  return perf_context::init(cfg, name);
+  API_CHECK([&]()
+    {
+    return perf_context::init(cfg, name);
+    });
+
+  return nullptr;
   }
 
 void perf_term_context(perf_context *ctx)
   {
-  return perf_context::term(ctx);
+  API_CHECK([&]()
+    {
+    perf_context::term(ctx);
+    });
   }
 
 void perf_write_context(perf_context *ctx, const char *name)
   {
-  return perf_context::write(ctx, name);
+  API_CHECK([&]()
+    {
+    perf_context::write(ctx, name);
+    });
   }
 
 const char *perf_dump_context(perf_context *ctx)
   {
-  return perf_context::dump(ctx);
+  API_CHECK([&]()
+    {
+    return perf_context::dump(ctx);
+    });
+
+  return nullptr;
   }
 
 void perf_add_event(perf_context *ctx, const char *name)
   {
-  return perf_context::add(ctx, name);
+  API_CHECK([&]()
+    {
+    perf_context::add(ctx, name);
+    });
   }

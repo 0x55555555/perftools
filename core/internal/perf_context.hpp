@@ -4,6 +4,7 @@
 #include "perf_time.hpp"
 #include <vector>
 
+/// A perf context describes a profiling session
 struct perf_context
   {
   static perf_context *init(perf_config *c, const char *name);

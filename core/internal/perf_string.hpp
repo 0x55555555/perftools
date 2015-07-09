@@ -3,6 +3,7 @@
 
 using perf_string = std::basic_string<char, std::char_traits<char>, perf_allocator<char>>;
 
+/// Append [t] to [str], with the string format [format]
 template <typename T> void appendf(perf_string &str, const T &t, const char *format)
   {
   auto old_size = str.size();
@@ -28,12 +29,12 @@ inline void append(perf_string &str, const perf_string &t)
 
 inline void append(perf_string &str, unsigned long long t)
   {
-  appendf(str, t, "%ull");
+  appendf(str, t, "%llu");
   }
 
 inline void append(perf_string &str, unsigned long t)
   {
-  appendf(str, t, "%ul");
+  appendf(str, t, "%lu");
   }
 
 template <typename... Args, typename T> void append(perf_string &str, const T &t, Args &&...args)

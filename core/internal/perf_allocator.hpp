@@ -6,6 +6,8 @@
 
 struct perf_config;
 
+/// Implementation of std::allocator used for
+/// allocating and returning all api and internal objects
 template <typename T> struct perf_allocator
   {
   typedef T value_type;

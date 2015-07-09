@@ -2,8 +2,8 @@
 
 perf_context *perf_context::init(perf_config *c, const char *name)
   {
-  PERF_API_CHECK_PTR(c, return nullptr);
-  PERF_API_CHECK_PTR(name, return nullptr);
+  perf_check(c);
+  perf_ptr_check(name);
 
   auto a = c->create<perf_context>(name, c);
 
@@ -69,12 +69,12 @@ const char *perf_context::dump(perf_context *c)
   }
 
 perf_context::perf_context(const char *name, perf_config *config)
-    : m_results(config),
-      m_config(config),
-      m_error(perf_no_error),
-      m_start(perf_absolute_time::now()),
-      m_name(name, config),
-      m_records(config)
+  : m_results(config)
+  , m_config(config)
+  , m_error(perf_no_error)
+  , m_start(perf_absolute_time::now())
+  , m_name(name, config)
+  , m_records(config)
   {
   }
 

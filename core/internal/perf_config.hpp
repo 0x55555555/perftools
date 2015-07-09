@@ -8,6 +8,9 @@
 #include <atomic>
 #include <cassert>
 
+/// First structure to be created by the api
+/// contains const data defined by the system and
+/// user, such as allocation strategy, and machine spacs.
 struct perf_config
   {
   static perf_config *init(
@@ -25,16 +28,21 @@ struct perf_config
   void add_context(perf_context *c);
   void remove_context(perf_context *c);
 
+  /// Create a n object of [T] using the owned allocator.
+  /// Should be deleted using [destroy]
   template <typename T, typename... Args> T *create(Args &&...args)
     {
     return create<T, Args...>(m_alloc, std::forward<Args>(args)...);
     }
 
+  /// Destroy [t]
+  /// Should have been allocated using [create]
   template <typename T> void destroy(T *t)
     {
     return destroy<T>(m_free, t);
     }
 
+  /// Allocate a [T] using the passed allocator.
   template <typename T, typename... Args> static T *create(
       perf_alloc alloc,
       Args &&...args)
@@ -46,6 +54,7 @@ struct perf_config
     return conf;
     }
 
+  /// Destroy a T using the passed destructor.
   template <typename T> static void destroy(perf_free free, T *t)
     {
     t->~T();

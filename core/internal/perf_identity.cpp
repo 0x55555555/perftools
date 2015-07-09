@@ -8,10 +8,6 @@
 #elif defined(__APPLE__)
 # include <sys/sysctl.h>
 
-bool perf_identity::check(const perf_identity *i)
-  {
-  return i != 0;
-  }
 
 uint64_t get_64_bit_int(const char *id)
   {
@@ -39,12 +35,17 @@ void append_string(perf_string &str, const char *id)
 
 #endif
 
+bool perf_identity::check(const perf_identity *i)
+  {
+  return i != 0;
+  }
+  
 perf_identity::perf_identity(const char *binding, perf_config *c)
-  : m_cpu(c),
-    m_binding(binding, c),
-    m_os(c),
-    m_os_detail(c),
-    m_config(c)
+  : m_cpu(c)
+  , m_binding(binding, c)
+  , m_os(c)
+  , m_os_detail(c)
+  , m_config(c)
   {
   assert(c);
   assert(binding);

@@ -2,14 +2,22 @@
 #include "perf.h"
 #include "perf_string.hpp"
 
+/// Describes a machine which profiling runs on.
 struct perf_identity
   {
+  /// Check this identity is valid, used in api check functions
   static bool check(const perf_identity *c);
 
-  perf_identity(const char *name, perf_config *);
+  /// Create an identiy given a binding name, and a config to allocate with
+  perf_identity(const char *binding, perf_config *);
+  
+  perf_identity(const perf_identity &) = delete;
 
+  /// Initialise the identity from the current machine specs
   void init();
+  /// Append a description of this identity to [s].
   void append_identity(perf_string& s, const char* tab);
+  /// Calculate m_identity which can be returned to callers through api.
   void calculate_identity(perf_config *c);
 
   perf_string m_identity;
@@ -22,7 +30,4 @@ struct perf_identity
   perf_string m_os_detail;
 
   perf_config *m_config;
-
-private:
-  perf_identity(const perf_identity &);
   };

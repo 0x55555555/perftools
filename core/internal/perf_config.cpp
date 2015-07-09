@@ -4,9 +4,9 @@
 
 perf_config *perf_config::init(perf_alloc alloc, perf_free free, const char *binding)
   {
-  PERF_API_CHECK_PTR(alloc, return nullptr);
-  PERF_API_CHECK_PTR(free, return nullptr);
-  PERF_API_CHECK_PTR(binding, return nullptr);
+  perf_ptr_check(alloc);
+  perf_ptr_check(free);
+  perf_ptr_check(binding);
 
   auto a = perf_config::create<perf_config>(
     alloc,
@@ -30,10 +30,10 @@ perf_config::perf_config(
     const char *binding,
     perf_alloc alloc,
     perf_free free)
-    : m_context_count(0),
-      m_alloc(alloc),
-      m_free(free),
-      m_identity(binding, this)
+  : m_context_count(0)
+  , m_alloc(alloc)
+  , m_free(free)
+  , m_identity(binding, this)
   {
   m_identity.init();
   }

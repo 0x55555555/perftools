@@ -7,6 +7,8 @@ int main(int argc, char* argv[]) { return bandit::run(argc, argv); }
 go_bandit([](){
   describe("time points", [](){
 
+    // todo: error checking
+    
     it("generates time points", [&](){
       perf::config cfg;
       perf::context ctx(&cfg, "test");

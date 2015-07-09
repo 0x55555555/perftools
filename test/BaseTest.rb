@@ -62,7 +62,6 @@ class TestExpose < Test::Unit::TestCase
       end
     end
 
-    puts ctx.dump
     obj = JSON.parse(ctx.dump)
     assert_not_nil obj
 
