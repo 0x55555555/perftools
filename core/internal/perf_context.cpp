@@ -14,6 +14,7 @@ perf_context *perf_context::init(perf_config *c, const char *name)
 
 bool perf_context::check(const perf_context *c)
   {
+  return true;
   }
 
 void perf_context::term(perf_context *c)
@@ -75,6 +76,11 @@ perf_context::perf_context(const char *name, perf_config *config)
   , m_name(name, config)
   , m_records(config)
   {
+  }
+
+perf_context::~perf_context()
+  {
+  m_config->remove_context(this);
   }
 
 perf_context::record::record(const char *c, perf_context *ctx, const perf_relative_time &t)

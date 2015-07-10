@@ -54,7 +54,7 @@ const char *perf_identity_description(const perf_identity *id)
     {
     perf_check(id);
 
-    return id->m_identity.c_str();
+    return id->get_identity().c_str();
     });
 
   return nullptr;

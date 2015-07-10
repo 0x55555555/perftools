@@ -23,13 +23,17 @@ class TestExpose < Test::Unit::TestCase
     obj = JSON.parse(id.to_s)
     assert_not_nil obj
 
-    assert_equal 6, obj.length
+    puts obj
+    assert_equal 9, obj.length
     assert_kind_of String, obj["cpu"]
-    assert_kind_of String, obj["cpu_count"]
-    assert_kind_of String, obj["memory_bytes"]
+    assert_kind_of Fixnum, obj["cpu_speed"]
+    assert_kind_of Fixnum, obj["cpu_count"]
+    assert_kind_of Fixnum, obj["thread_count"]
+    assert_kind_of Fixnum, obj["memory_bytes"]
     assert_kind_of String, obj["binding"]
     assert_kind_of String, obj["os"]
-    assert_kind_of String, obj["os_detail"]
+    assert_kind_of String, obj["arch"]
+    assert_kind_of String, obj["extra"]
   end
 
   def test_timing
@@ -75,7 +79,7 @@ begin
     obj = pkg.to_s
     assert_not_nil JSON.parse(obj)
 
-    pkg.submit('http://localhost:3000/submit')
+    #pkg.submit('http://localhost:3000/submit')
   end
 end
 end

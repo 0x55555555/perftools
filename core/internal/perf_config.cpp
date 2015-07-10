@@ -18,6 +18,7 @@ perf_config *perf_config::init(perf_alloc alloc, perf_free free, const char *bin
 
 bool perf_config::check(const perf_config *c)
   {
+  return true;
   }
 
 void perf_config::term(perf_config *c)

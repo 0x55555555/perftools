@@ -33,6 +33,7 @@ target_include_directories(perf
 target_compile_definitions(perf
   PRIVATE
     PERF_BUILD
+    PERF_X64 # todo: this isnt always the case...
 )
 
 ###############################################################################

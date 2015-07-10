@@ -18,6 +18,7 @@ struct perf_context
   static const char *dump(perf_context *c);
 
   perf_context(const char *name, perf_config *config);
+  ~perf_context();
 
   void create_record(const char *id);
 
