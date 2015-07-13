@@ -1,3 +1,6 @@
 [submodule "external/bandit"]
 	path = external/bandit
 	url = https://github.com/joakimkarlsson/bandit
+[submodule "external/Catch"]
+	path = external/Catch
+	url = https://github.com/philsquared/Catch.git

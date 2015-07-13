@@ -10,6 +10,7 @@ target_include_directories(perf_cpp_test
 target_include_directories(perf_cpp_test SYSTEM
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../external/bandit
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../external/Catch/include
 )
 
 target_link_libraries(perf_cpp_test

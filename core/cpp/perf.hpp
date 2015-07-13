@@ -10,6 +10,7 @@ namespace perf
 
 class PERF_EXPORT identity
   {
+public:
   const char *description()
     {
     const char *desc = perf_identity_description(m_id);
@@ -67,11 +68,21 @@ class PERF_EXPORT context
 public:
   context(config *c, const char *name)
     {
+    if (!c || !name)
+      {
+      throw std::invalid_argument("Invalid argument to context");
+      }
+
     m_ctx = perf_init_context(c->m_cfg, name);
     if (!m_ctx)
       {
       throw std::runtime_error("failed to initialise context");
       }
+    }
+
+  context(config &c, const char *name)
+    : context(&c, name)
+    {
     }
 
   ~context()
@@ -98,51 +109,70 @@ private:
   perf_context *m_ctx;
   };
 
-class PERF_EXPORT process
+class PERF_EXPORT meta_event
   {
 public:
-  process(context *ctx, const char *name) : m_ctx(ctx)
+  meta_event(context *ctx, const char *name);
+  meta_event(context &ctx, const char *name) : meta_event(&ctx, name)
     {
-    if (!ctx)
-      {
-      throw std::runtime_error("invalid context passed");
-      }
-
-    const size_t len = strlen(name);
-    m_stub.reserve(len + 32);
-    m_stub = name;
-    m_stub += "::";
-
-    event("begin");
     }
 
-  ~process()
+  meta_event(meta_event *ev, const char *name);
+  meta_event(meta_event &ev, const char *name) : meta_event(&ev, name)
     {
-    event("end");
     }
 
-  void event(const char *name)
-    {
-    size_t len = m_stub.size();
-    m_stub += name;
+  void begin();
+  void end();
 
-    m_ctx->event(m_stub.data());
-
-    m_stub.resize(len);
-    }
-
-private:
-  std::string m_stub;
-  context *m_ctx;
+  void fire();
   };
 
-class block
+class PERF_EXPORT event
   {
 public:
-  block(context *ctx, const char *name) : m_process(ctx, name) { }
+  event(meta_event *meta);
+  event(meta_event &meta) : event(&meta)
+    {
+    m_meta->begin();
+    }
+
+  event()
+    {
+    m_meta->end();
+    }
+
+  meta_event *meta() { return m_meta; }
+  const meta_event *meta() const { return m_meta; }
 
 private:
-  process m_process;
+  meta_event *m_meta;
+  };
+
+class PERF_EXPORT single_fire_event : public meta_event, public event
+  {
+public:
+  single_fire_event(context *ctx, const char *name) : meta_event(ctx, name), event(this)
+    {
+    }
+
+  single_fire_event(context &ctx, const char *name) : single_fire_event(&ctx, name)
+    {
+    }
+
+  single_fire_event(event *evt, const char *name) : meta_event(evt->meta(), name), event(this)
+    {
+    }
+
+  single_fire_event(event &evt, const char *name) : single_fire_event(&evt, name)
+    {
+    }
+
+  void fire(const char *name)
+    {
+    perf::meta_event temp(this, name);
+    temp.fire();
+    }
   };
 
 }

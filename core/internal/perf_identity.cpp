@@ -10,6 +10,7 @@
 # include <sys/sysctl.h>
 # include <cpuid.h>
 
+// osx sysctlbyname integer
 uint64_t get_64_bit_int(const char *id)
   {
   uint64_t val = 0;
@@ -19,6 +20,7 @@ uint64_t get_64_bit_int(const char *id)
   return val;
   }
 
+// osx sysctlbyname string
 void append_string(perf_short_string &str, const char *id)
   {
   std::size_t len = 0;
@@ -35,18 +37,8 @@ void append_string(perf_short_string &str, const char *id)
 
 #endif
 
-bool perf_identity::check(const perf_identity *i)
-  {
-  return true;
-  }
-
-perf_identity::perf_identity(const char *binding, perf_config *c)
-  : m_config(c)
-  {
-  assert(c);
-  assert(binding);
-  }
-
+/// x86 and x64 cpuid instructions
+#if defined(PERF_X86) || defined(PERF_X64)
 int cpuid_max()
   {
 #ifdef _WIN32
@@ -66,6 +58,19 @@ void cpuid(unsigned int i, unsigned int *out)
 #else
   __get_cpuid(i, out, out+1, out+2, out+3);
 #endif
+  }
+#endif
+
+bool perf_identity::check(const perf_identity *i)
+  {
+  return true;
+  }
+
+perf_identity::perf_identity(const char *binding, perf_config *c)
+  : m_config(c)
+  {
+  assert(c);
+  assert(binding);
   }
 
 void perf_identity::init()

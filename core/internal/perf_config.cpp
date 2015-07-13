@@ -13,6 +13,7 @@ perf_config *perf_config::init(perf_alloc alloc, perf_free free, const char *bin
     binding,
     alloc,
     free);
+
   return a;
   }
 
