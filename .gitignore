@@ -1,6 +1,8 @@
 
 *.o
 *.moc
-build/
+*build/
+data/
 test/data/
+test/dbTest/
 node_server/node_modules/

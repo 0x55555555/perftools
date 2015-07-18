@@ -1,4 +1,5 @@
 #include "perf.hpp"
+#include "perf_io.hpp"
 
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
@@ -8,8 +9,14 @@ TEST_CASE( "config", "[config]" ) {
   SECTION("construction") {
     perf::config cfg1;
     perf::config cfg2;
+    
+    perf::string desc1(cfg1.allocator());
+    perf::string desc2(cfg1.allocator());
+    
+    cfg1.identity().json_description(desc1);
+    cfg2.identity().json_description(desc2);
 
-    REQUIRE(std::string(cfg1.identity().description()) == std::string(cfg2.identity().description()));
+    REQUIRE(desc1 == desc2);
   }
 }
 
@@ -26,8 +33,10 @@ TEST_CASE("context", "[context]") {
     perf::config cfg;
     perf::context ctx(cfg, "name");
 
+    perf::json_writer writer;
+    
     // This is tested more aggressively by other bindings.
-    std::string dumped(ctx.dump());
+    auto dumped = writer.dump(ctx);
     REQUIRE(dumped.size() > 100);
   }
 }
@@ -65,7 +74,9 @@ TEST_CASE("time points", "[timing]") {
       }
     }
 
-    ctx.write("data/cpp.json");
+    perf::json_writer writer;
+    
+    writer.write(ctx, "data/cpp1.json");
   }
 
   SECTION("generates time points") {
@@ -102,7 +113,9 @@ TEST_CASE("time points", "[timing]") {
       {
       }
     }
-
-    ctx.write("data/cpp.json");
+    
+    perf::json_writer writer;
+    
+    writer.write(ctx, "data/cpp2.json");
   }
 }

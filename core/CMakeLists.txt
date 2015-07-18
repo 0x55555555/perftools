@@ -6,21 +6,19 @@ add_library(perf SHARED
 
   # Public API's
   perf.h
-  cpp/perf.hpp
+  perf.hpp
+
+  perf_config.hpp
+  src/perf_config.cpp
+  src/perf_identity.cpp
 
   # Implementation
-  internal/perf.cpp
+  # internal/perf.cpp
   internal/perf_global.hpp
   internal/perf_allocator.hpp
-  internal/perf_config.hpp
-  internal/perf_config.cpp
   internal/perf_context.hpp
-  internal/perf_context.cpp
-  internal/perf_identity.hpp
-  internal/perf_identity.cpp
+  # internal/perf_context.cpp
   internal/perf_string.hpp
-  internal/perf_time.hpp
-  internal/perf_time.cpp
 )
 
 target_include_directories(perf
@@ -36,6 +34,18 @@ target_compile_definitions(perf
     PERF_X64 # todo: this isnt always the case...
 )
 
+# Enable all warnings
+if(MSVC)
+  # Force to always compile with W4
+  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+  endif()
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
+endif()
+
 ###############################################################################
 # Cpp library
 ###############################################################################
@@ -43,9 +53,9 @@ target_compile_definitions(perf
 add_library(perf_cpp INTERFACE
 )
 
-target_sources(perf_cpp 
+target_sources(perf_cpp
   INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/perf.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/perf.hpp
 )
 
 

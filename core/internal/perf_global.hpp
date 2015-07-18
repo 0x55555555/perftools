@@ -1,7 +1,10 @@
 #pragma once
 #include <stdexcept>
 
-template <typename T> void perf_ptr_check(T *t)
+namespace perf
+{
+
+template <typename T> void ptr_check(T *t)
   {
   if (!t)
     {
@@ -9,20 +12,22 @@ template <typename T> void perf_ptr_check(T *t)
     }
   }
 
-template <typename T> void perf_check(T *t)
+template <typename T> void check(T *t)
   {
   perf_ptr_check(t);
-  
+
   if (!T::check(t))
     {
     throw std::runtime_error("");
     }
   }
 
-inline void perf_check(bool b)
+inline void check(bool b)
   {
   if (!b)
     {
     throw std::runtime_error("");
     }
   }
+
+}

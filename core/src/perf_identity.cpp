@@ -1,7 +1,4 @@
-#include "perf_identity.hpp"
-#include "perf_config.hpp"
-#include <cstdlib>
-#include <iostream>
+#include "perf.hpp"
 #include <thread>
 
 #if defined(_WIN32)
@@ -9,6 +6,9 @@
 #elif defined(__APPLE__)
 # include <sys/sysctl.h>
 # include <cpuid.h>
+
+namespace
+{
 
 // osx sysctlbyname integer
 uint64_t get_64_bit_int(const char *id)
@@ -21,7 +21,7 @@ uint64_t get_64_bit_int(const char *id)
   }
 
 // osx sysctlbyname string
-void append_string(perf_short_string &str, const char *id)
+  void append_string(perf::short_string &str, const char *id)
   {
   std::size_t len = 0;
   sysctlbyname(id, NULL, &len, NULL, 0);
@@ -35,7 +35,12 @@ void append_string(perf_short_string &str, const char *id)
   sysctlbyname(id, &str[0] + old_size, &len, NULL, 0);
   }
 
+}
+
 #endif
+
+namespace
+{
 
 /// x86 and x64 cpuid instructions
 #if defined(PERF_X86) || defined(PERF_X64)
@@ -61,20 +66,18 @@ void cpuid(unsigned int i, unsigned int *out)
   }
 #endif
 
-bool perf_identity::check(const perf_identity *i)
-  {
-  return true;
-  }
+}
 
-perf_identity::perf_identity(const char *binding, perf_config *c)
-  : m_config(c)
-  {
-  assert(c);
-  assert(binding);
-  }
+namespace perf
+{
 
-void perf_identity::init()
+identity identity::this_machine(const char *binding)
   {
+  identity id;
+
+  ptr_check(binding);
+  append(id.m_binding, binding);
+
   // todo: tidy up,this is a bit messy, and not really the good information?
 #if defined(_WIN32)
 #if defined(_WIN64)
@@ -92,19 +95,19 @@ void perf_identity::init()
   m_memory_bytes = statex.ullTotalPhys;
 
 #elif defined(__APPLE__)
-  m_cpu_hz = get_64_bit_int("hw.cpufrequency");
+  id.m_cpu_hz = get_64_bit_int("hw.cpufrequency");
 
-  append_string(m_os, "kern.ostype");
-  append(m_os, " ");
-  append_string(m_os, "kern.osrelease");
+  append_string(id.m_os, "kern.ostype");
+  append(id.m_os, " ");
+  append_string(id.m_os, "kern.osrelease");
 
-  m_cpu_count = get_64_bit_int("hw.physicalcpu");
-  m_memory_bytes = get_64_bit_int("hw.memsize");
-  m_thread_count = std::thread::hardware_concurrency();
+  id.m_cpu_count = get_64_bit_int("hw.physicalcpu");
+  id.m_memory_bytes = get_64_bit_int("hw.memsize");
+  id.m_thread_count = std::thread::hardware_concurrency();
 
-  append_string(m_arch, "hw.machine");
-  append_string(m_arch, "hw.machine_arch");
-  append_string(m_extra, "hw.model");
+  append_string(id.m_arch, "hw.machine");
+  append_string(id.m_arch, "hw.machine_arch");
+  append_string(id.m_extra, "hw.model");
 
 #else
   set(m_os, "undefined");
@@ -124,39 +127,31 @@ void perf_identity::init()
     {
     for (std::size_t i = 0; i <= required; ++i)
       {
-      cpuid(base + i, reinterpret_cast<unsigned int *>(m_cpu.data() + (i * 16)));
+      cpuid(base + i, reinterpret_cast<unsigned int *>(id.m_cpu.data() + (i * 16)));
       }
     }
-  m_cpu.resize(48);
+  id.m_cpu.resize(48);
 #else
-  
+
   append(m_cpu, "unknown");
 #endif
+  
+  return id;
   }
 
-void perf_identity::append_identity(perf_string& id, const char* tab) const
+void identity::json_description(string& id, const char* line_start) const
   {
-  append(id, tab, "{\n");
-  append(id, tab, "  \"arch\": \"", m_arch, "\",\n");
-  append(id, tab, "  \"os\": \"", m_os, "\",\n");
-  append(id, tab, "  \"cpu\": \"", m_cpu, "\",\n");
-  append(id, tab, "  \"cpu_count\": ", m_cpu_count, ",\n");
-  append(id, tab, "  \"thread_count\": ", m_thread_count, ",\n");
-  append(id, tab, "  \"cpu_speed\": ", m_cpu_hz, ",\n");
-  append(id, tab, "  \"extra\": \"", m_extra, "\",\n");
-  append(id, tab, "  \"memory_bytes\": ", m_memory_bytes, ",\n");
-  append(id, tab, "  \"binding\": \"", m_binding, "\"\n");
-  append(id, tab, "}");
+  append(id, line_start, "{\n");
+  append(id, line_start, "  \"arch\": \"", m_arch, "\",\n");
+  append(id, line_start, "  \"os\": \"", m_os, "\",\n");
+  append(id, line_start, "  \"cpu\": \"", m_cpu, "\",\n");
+  append(id, line_start, "  \"cpu_count\": ", m_cpu_count, ",\n");
+  append(id, line_start, "  \"thread_count\": ", m_thread_count, ",\n");
+  append(id, line_start, "  \"cpu_speed\": ", m_cpu_hz, ",\n");
+  append(id, line_start, "  \"extra\": \"", m_extra, "\",\n");
+  append(id, line_start, "  \"memory_bytes\": ", m_memory_bytes, ",\n");
+  append(id, line_start, "  \"binding\": \"", m_binding, "\"\n");
+  append(id, line_start, "}");
   }
 
-const perf_string &perf_identity::get_identity() const
-  {
-  if (!m_identity)
-    {
-    m_identity = perf_string(m_config);
-
-    append_identity(*m_identity, "");
-    }
-
-  return *m_identity;
-  }
+}

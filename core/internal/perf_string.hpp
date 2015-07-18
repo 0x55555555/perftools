@@ -1,15 +1,18 @@
 #pragma once
 #include "perf_allocator.hpp"
 
-using perf_string = std::basic_string<char, std::char_traits<char>, perf_allocator<char>>;
-template <std::size_t Size> class basic_perf_short_string;
+namespace perf
+{
 
-inline std::size_t max_resize_size(perf_string &)
+using string = std::basic_string<char, std::char_traits<char>, allocator<char>>;
+template <std::size_t Size> class basic_short_string;
+
+inline std::size_t max_resize_size(string &)
   {
   return std::numeric_limits<std::size_t>::max();
   }
 
-template <std::size_t Size> std::size_t max_resize_size(basic_perf_short_string<Size> &)
+template <std::size_t Size> std::size_t max_resize_size(basic_short_string<Size> &)
   {
   return Size-1;
   }
@@ -22,14 +25,14 @@ template <typename StringType, typename T> void appendf(StringType &str, const T
   auto tmp_size = std::min(str.size() + likely_required_size, max_resize_size(str));
   str.resize(tmp_size);
   auto used = snprintf(&str[0] + old_size, tmp_size - old_size, format, t);
-  
+
   str.resize(old_size + used);
   }
 
-template <std::size_t Size> class basic_perf_short_string
+template <std::size_t Size> class basic_short_string
   {
 public:
-  basic_perf_short_string()
+  basic_short_string()
     : m_data { '\0' }
     {
     }
@@ -43,26 +46,26 @@ public:
 
   void resize(std::size_t new_size)
     {
-    assert(new_size < Size);
+    check(new_size < Size);
     m_data[new_size] = '\0';
     }
 
-  basic_perf_short_string &operator+=(const char *t)
+  basic_short_string &operator+=(const char *t)
     {
     appendf(*this, t, "%s");
     return *this;
     }
-  
-  basic_perf_short_string &operator+=(const basic_perf_short_string &t)
+
+  basic_short_string &operator+=(const basic_short_string &t)
     {
     appendf(*this, t.data(), "%s");
     return *this;
     }
-  
+
 private:
   char m_data[Size];
   };
-using perf_short_string = basic_perf_short_string<64>;
+using short_string = basic_short_string<64>;
 
 template <typename StringType> void append(StringType &str, const char *t)
   {
@@ -89,4 +92,5 @@ template <typename StringType, typename... Args, typename T> void append(StringT
   append(str, t);
   append(str, std::forward<Args>(args)...);
   }
-  
+
+}
