@@ -1,8 +1,10 @@
 #pragma once
 #include <chrono>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <experimental/optional>
+#include <vector>
 
 #include "internal/perf_string.hpp"
 
@@ -67,6 +69,20 @@ private:
   std::atomic<std::size_t> m_context_count;
   };
 
+class time
+  {
+public:
+  static time now()
+    {
+    time t;
+    t.m_time = std::chrono::high_resolution_clock::now();
+    return t;
+    }
+
+private:
+  std::chrono::high_resolution_clock::time_point m_time;
+  };
+
 class PERF_EXPORT context
   {
 public:
@@ -75,8 +91,7 @@ public:
     : context(&c, name)
     {
     }
-
-  void event(const char *name);
+  ~context();
 
   /// Find the config for this context.
   const perf::config *config() const
@@ -84,8 +99,26 @@ public:
     return m_config;
     }
 
+  class event_reference
+    {
+    std::size_t index;
+    friend class context;
+    };
+  event_reference add_event(const char *name);
+
 private:
-  const perf::config *m_config;
+  struct event
+    {
+    event(const char *name);
+
+    short_string name;
+    };
+  perf::config *m_config;
+  short_string m_name;
+  time m_start;
+
+  std::mutex m_events_mutex;
+  std::vector<event, allocator<event>> m_events;
   };
 
 class PERF_EXPORT meta_event
@@ -103,18 +136,17 @@ public:
 
   /// Fire the Event with a given [start] and [end] point.
   void fire(
-    const std::chrono::high_resolution_clock::time_point &start,
-    const std::chrono::high_resolution_clock::time_point &end);
+    const time &start,
+    const time &end);
   /// Fire the event at a specific point in time, with zero duration.
-  void fire(const std::chrono::high_resolution_clock::time_point &point
-              = std::chrono::high_resolution_clock::now());
+  void fire(const time &point = time::now());
   };
 
 class PERF_EXPORT event
   {
 public:
   event(meta_event *meta)
-    : start(std::chrono::high_resolution_clock::now())
+    : start(time::now())
     {
     }
 
@@ -125,7 +157,7 @@ public:
 
   ~event()
     {
-    m_meta->fire(start, std::chrono::high_resolution_clock::now());
+    m_meta->fire(start, time::now());
     }
 
   meta_event *meta() { return m_meta; }
@@ -133,7 +165,7 @@ public:
 
 private:
   meta_event *m_meta;
-  std::chrono::high_resolution_clock::time_point start;
+  time start;
   };
 
 class PERF_EXPORT single_fire_event : public meta_event, public event

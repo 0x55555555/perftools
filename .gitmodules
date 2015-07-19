@@ -4,3 +4,6 @@
 [submodule "external/Catch"]
 	path = external/Catch
 	url = https://github.com/philsquared/Catch.git
+[submodule "external/jsoncons"]
+	path = external/jsoncons
+	url = https://github.com/danielaparker/jsoncons.git

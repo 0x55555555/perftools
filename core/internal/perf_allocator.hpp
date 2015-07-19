@@ -30,8 +30,9 @@ template <typename T> struct allocator final : public allocator_base
   using pointer = T *;
   using const_pointer = const T *;
 
-  allocator(const allocator_base &);
-  allocator(alloc a, free f);
+  allocator(const allocator_base &a) : allocator_base(a)
+    {
+    }
 
   pointer allocate(size_type n, const void *hint = nullptr)
     {

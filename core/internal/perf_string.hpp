@@ -37,6 +37,12 @@ public:
     {
     }
 
+  basic_short_string(const char *data)
+    : basic_short_string()
+    {
+    *this += data;
+    }
+
   std::size_t capacity() const { return Size; }
   std::size_t size() const { return strlen(m_data); }
   char *data() { return m_data; }

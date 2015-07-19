@@ -8,16 +8,14 @@ add_library(perf SHARED
   perf.h
   perf.hpp
 
-  perf_config.hpp
   src/perf_config.cpp
   src/perf_identity.cpp
+  src/perf_context.cpp
 
   # Implementation
   # internal/perf.cpp
   internal/perf_global.hpp
   internal/perf_allocator.hpp
-  internal/perf_context.hpp
-  # internal/perf_context.cpp
   internal/perf_string.hpp
 )
 

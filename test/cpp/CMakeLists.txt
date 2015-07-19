@@ -9,7 +9,7 @@ target_include_directories(perf_cpp_test
 
 target_include_directories(perf_cpp_test SYSTEM
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../external/bandit
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../external/jsoncons/src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../external/Catch/include
 )
 
