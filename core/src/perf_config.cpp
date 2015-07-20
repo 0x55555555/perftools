@@ -12,13 +12,13 @@ config::config(const char *binding, const allocator_base &alloc)
   
 void config::register_context(context &c)
   {
-  check(c.config() == this);
+  check(c.get_config() == this);
   ++m_context_count;
   }
 
 void config::unregister_context(context &c)
   {
-  check(c.config() == nullptr);
+  check(c.get_config() == this);
   --m_context_count;
   }
 

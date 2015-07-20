@@ -1,6 +1,8 @@
 #include "perf.hpp"
 #include "perf_io.hpp"
 
+#include <jsoncons/json.hpp>
+
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
@@ -13,8 +15,8 @@ TEST_CASE( "config", "[config]" ) {
     perf::string desc1(cfg1.allocator());
     perf::string desc2(cfg1.allocator());
     
-    cfg1.identity().json_description(desc1);
-    cfg2.identity().json_description(desc2);
+    cfg1.get_identity().json_description(desc1);
+    cfg2.get_identity().json_description(desc2);
 
     REQUIRE(desc1 == desc2);
   }
@@ -24,9 +26,9 @@ TEST_CASE("context", "[context]") {
 
   SECTION("expects valid input") {
     perf::config cfg;
-    REQUIRE_THROWS_AS(perf::context ctx(nullptr, nullptr), std::invalid_argument);
-    REQUIRE_THROWS_AS(perf::context ctx(&cfg, nullptr), std::invalid_argument);
-    REQUIRE_THROWS_AS(perf::context ctx(nullptr, "test"), std::invalid_argument);
+    REQUIRE_THROWS_AS(perf::context ctx(nullptr, nullptr), std::runtime_error);
+    REQUIRE_THROWS_AS(perf::context ctx(&cfg, nullptr), std::runtime_error);
+    REQUIRE_THROWS_AS(perf::context ctx(nullptr, "test"), std::runtime_error);
   }
 
   SECTION("can dump contents") {
@@ -42,10 +44,11 @@ TEST_CASE("context", "[context]") {
 }
 
 TEST_CASE("time points", "[timing]") {
-    // todo: error checking
-
+  // todo: error checking
+  
+  perf::config cfg;
+  
   SECTION("generates quick time points") {
-    perf::config cfg;
     perf::context ctx(&cfg, "test");
 
     {
@@ -73,14 +76,9 @@ TEST_CASE("time points", "[timing]") {
       {
       }
     }
-
-    perf::json_writer writer;
-    
-    writer.write(ctx, "data/cpp1.json");
   }
 
   SECTION("generates time points") {
-    perf::config cfg;
     perf::context ctx(&cfg, "test");
 
     perf::meta_event blk_m(ctx, "busyloop");
@@ -114,8 +112,29 @@ TEST_CASE("time points", "[timing]") {
       }
     }
     
-    perf::json_writer writer;
+  }
+  
+}
+
+TEST_CASE("json output", "[json]") {
+  
+  SECTION("parsable output") {
+    perf::config cfg;
+    perf::string output(cfg.allocator());
+  
+    {
+      perf::context ctx(cfg, "test");
+      perf::json_writer writer;
+      output = writer.dump(ctx);
+    }
+  
+  
+    std::cout << output << std::endl;
+    auto obj = jsoncons::json::parse_string(output.data());
     
-    writer.write(ctx, "data/cpp2.json");
+    REQUIRE(obj.is_object());
+    REQUIRE(obj["name"].to_string() == "test");
+    REQUIRE(obj["machine_identity"].is_object());
+    REQUIRE(obj["results"].is_array());
   }
 }

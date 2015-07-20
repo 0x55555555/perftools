@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <cstdlib>
 #include <string>
 #include "perf_global.hpp"
 
@@ -9,7 +10,19 @@ struct allocator_base
   {
   using alloc = void *(*)(size_t size);
   using free = void (*)(void *size);
-
+  
+  allocator_base()
+  : allocator_base(std::malloc, std::free)
+    {
+    }
+  
+  allocator_base(alloc a, free f)
+  : m_alloc(a)
+  , m_free(f)
+    {
+    ptr_check(m_alloc);
+    ptr_check(m_free);
+    }
 
   bool operator!=(const allocator_base &a) const
     {

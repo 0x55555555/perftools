@@ -9,8 +9,10 @@ add_library(perf SHARED
   perf.hpp
 
   src/perf_config.cpp
-  src/perf_identity.cpp
   src/perf_context.cpp
+  src/perf_identity.cpp
+  src/perf_json_writer.cpp
+  src/perf_meta_event.cpp
 
   # Implementation
   # internal/perf.cpp
