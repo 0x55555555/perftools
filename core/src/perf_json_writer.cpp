@@ -22,6 +22,20 @@ void json_writer::write(const context &c, const char *filename)
 
   fclose(file);
   }
+  
+void json_writer::dump(const context::event &e, string &out, const char *tab)
+  {
+  out += "    {\n"
+  "      \"name\":\"";
+  out += e.name.data();
+  
+  out += "\",\n"
+  "      \"time\":";
+  r.m_time.append_to(out);
+  out += "\n";
+  
+  out += "    }";
+  }
 
 string json_writer::dump(const context &c)
   {
@@ -41,26 +55,18 @@ string json_writer::dump(const context &c)
   results += ",\n"
   "  \"results\": [\n";
 
-  /*
+  
   bool started = false;
-  for(const auto &r : c.records())
+  for(const auto &e : c.events())
     {
     if (started)
       {
       results += ",\n";
       }
     started = true;
-    results += "    {\n"
-    "      \"name\":\"";
-    results += r.m_name;
-
-    results += "\",\n"
-    "      \"time\":";
-    r.m_time.append_to(results);
-    results += "\n";
-
-    results += "    }";
-    }*/
+    
+    dump(e, results, "    ");
+    }
 
   results += "\n";
 

@@ -10,13 +10,13 @@ config::config(const char *binding, const allocator_base &alloc)
   {
   }
   
-void config::register_context(context &c)
+void config::register_context(context &c, const detail::private_dummy &)
   {
   check(c.get_config() == this);
   ++m_context_count;
   }
 
-void config::unregister_context(context &c)
+void config::unregister_context(context &c, const detail::private_dummy &)
   {
   check(c.get_config() == this);
   --m_context_count;

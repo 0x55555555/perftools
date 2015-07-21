@@ -2,7 +2,7 @@
 
 namespace perf
 {
-  
+
 namespace
 {
 const allocator_base &check_allocator(perf::config *c)
@@ -20,12 +20,12 @@ context::context(perf::config *c, const char *name)
   ptr_check(name);
 
   m_name += name;
-  m_config->register_context(*this);
+  m_config->register_context(*this, detail::private_dummy());
   }
 
 context::~context()
   {
-  m_config->unregister_context(*this);
+  m_config->unregister_context(*this, detail::private_dummy());
   m_config = nullptr;
   }
 
@@ -49,16 +49,16 @@ void context::fire_event(
   ++ev.fire_count;
 
   const std::uint64_t new_time = (begin - end).count();
-  
+
   ev.total_time += new_time;
   ev.total_time_sq += new_time * new_time;
-  
+
   // Update max time
     {
     std::uint64_t prev_value = ev.max_time;
     while(prev_value < new_time && !ev.max_time.compare_exchange_weak(prev_value, new_time)) ;
     }
-  
+
   // Update min time
     {
     std::uint64_t prev_value = ev.min_time;
@@ -73,7 +73,7 @@ void context::fire_event(
   fire_event(event, point, point);
   }
 
-void context::finish_event(detail::event_reference &parent)
+void context::finish_event(detail::event_reference &event)
   {
   }
 
