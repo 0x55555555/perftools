@@ -6,7 +6,7 @@
 #include <experimental/optional>
 #include <vector>
 
-#include "internal/perf_string.hpp"
+#include "perf_string.hpp"
 
 namespace perf
 {
@@ -18,7 +18,7 @@ class context;
 
 namespace detail
 {
-  
+
 class private_dummy
   {
 private:
@@ -27,10 +27,17 @@ private:
   private_dummy &operator=(const private_dummy &) = delete;
   friend class perf::context;
   };
-  
+
 class event_reference
   {
-  std::size_t index;
+public:
+  bool operator!=(const event_reference &ev) const
+    {
+    return index != ev.index;
+    }
+  
+private:
+  std::size_t index = std::numeric_limits<std::size_t>::max();
   friend class perf::context;
   };
 }
@@ -84,7 +91,7 @@ public:
     {
     return m_allocator;
     }
-  
+
   /// When a context is constructed this is called internally.
   /// \private
   void register_context(context &, const detail::private_dummy &);
@@ -135,7 +142,7 @@ public:
     : meta_event(&ctx, name)
     {
     }
-  
+
   /// Create an event under [parent], with identifier [name]
   meta_event(meta_event *parent, const char *name)
     : meta_event(parent, parent->m_context, name)
@@ -146,11 +153,11 @@ public:
     : meta_event(&parent, name)
     {
     }
-  
+
   /// Create an event under [parent], in context [ctx] with identifier [name].
   /// \note [parent] can be nullptr
   meta_event(meta_event *parent, context *ctx, const char *name);
-  
+
   meta_event(const meta_event &) = delete;
   meta_event &operator=(const meta_event &) = delete;
   ~meta_event();
@@ -191,7 +198,7 @@ public:
     , m_start(time::now())
     {
     }
-  
+
   /// Start an event for a meta_event
   event(meta_event &meta)
     : event(&meta)
@@ -225,17 +232,17 @@ public:
   single_fire_event(perf::context *ctx, const char *name) : meta_event(ctx, name), event(this)
     {
     }
-  
+
   /// Fire a new event under [ctx], called [name]
   single_fire_event(perf::context &ctx, const char *name) : single_fire_event(&ctx, name)
     {
     }
-  
+
   /// Fire a new event under [evt], called [name]
   single_fire_event(perf::event *evt, const char *name) : meta_event(evt->get_meta_event(), name), event(this)
     {
     }
-  
+
   /// Fire a new event under [evt], called [name]
   single_fire_event(perf::event &evt, const char *name) : single_fire_event(&evt, name)
     {
@@ -252,69 +259,7 @@ public:
     }
   };
 
-/// A context stores and maintains a group of events.
-class PERF_EXPORT context
-  {
-public:
-  context(config *c, const char *name);
-  context(config &c, const char *name)
-    : context(&c, name)
-    {
-    }
-  context(const context &) = delete;
-  context &operator=(const context &) = delete;
-  ~context();
-
-  /// Find the config for this context.
-  const config *get_config() const
-    {
-    return m_config;
-    }
-
-  /// Find the name for the context
-  const short_string &name() const { return m_name; }
-
-  /// Create a new event in the context
-  detail::event_reference add_event(const char *name, detail::event_reference *parent = nullptr);
-  /// Fire [event] with a [begin] and [end]
-  void fire_event(
-    detail::event_reference &event,
-    const time &begin,
-    const time &end);
-  /// Fire [event] at [point]
-  void fire_event(
-    detail::event_reference &event,
-    const time &point);
-  /// Finish [event]
-  void finish_event(detail::event_reference &event);
-  
-  /// Internal storage for an event, containing aggregated data about the firings.
-  struct event
-    {
-    event(const char *name, detail::event_reference *parent);
-    event(event &&ev);
-    event &operator=(event &&ev);
-  
-    std::size_t parent;
-    short_string name;
-  
-    std::atomic<std::size_t> fire_count;
-    std::atomic<std::uint64_t> min_time;
-    std::atomic<std::uint64_t> max_time;
-    std::atomic<std::uint64_t> total_time;
-    std::atomic<std::uint64_t> total_time_sq;
-    };
-  
-  /// Find all events contained in the context
-  const std::vector<event, allocator<event>> &events() const { return m_events; }
-  
-private:
-  std::mutex m_events_mutex;
-  config *m_config;
-  std::vector<event, allocator<event>> m_events;
-
-  short_string m_name;
-  single_fire_event m_root;
-  };
-
 }
+
+#include "perf_context.hpp"
+#include "perf_json_writer.hpp"

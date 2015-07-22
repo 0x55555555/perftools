@@ -1,5 +1,4 @@
 #include "perf.hpp"
-#include "perf_io.hpp"
 
 #include <jsoncons/json.hpp>
 

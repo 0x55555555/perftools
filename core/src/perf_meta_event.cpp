@@ -2,10 +2,10 @@
 
 namespace perf
 {
-meta_event::meta_event(meta_event *ev, context *ctx, const char *name)
+meta_event::meta_event(meta_event *parent, context *ctx, const char *name)
   : m_context(ctx)
-  , m_event(ctx->add_event(name, ev ? &ev->m_event : nullptr))
   {
+  m_event = ctx->add_event(name, parent ? &parent->m_event : nullptr);
   }
 
 meta_event::~meta_event()

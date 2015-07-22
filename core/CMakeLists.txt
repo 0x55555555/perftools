@@ -7,6 +7,7 @@ add_library(perf SHARED
   # Public API's
   perf.h
   perf.hpp
+  perf_json_writer.hpp
 
   src/perf_config.cpp
   src/perf_context.cpp
@@ -16,9 +17,10 @@ add_library(perf SHARED
 
   # Implementation
   # internal/perf.cpp
-  internal/perf_global.hpp
-  internal/perf_allocator.hpp
-  internal/perf_string.hpp
+  perf_context.hpp
+  perf_global.hpp
+  perf_allocator.hpp
+  perf_string.hpp
 )
 
 target_include_directories(perf

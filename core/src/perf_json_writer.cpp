@@ -1,4 +1,4 @@
-#include "perf_io.hpp"
+#include "perf_json_writer.hpp"
 #include <cstdio>
 #include <stdexcept>
 
@@ -22,19 +22,22 @@ void json_writer::write(const context &c, const char *filename)
 
   fclose(file);
   }
-  
-void json_writer::dump(const context::event &e, string &out, const char *tab)
+
+void json_writer::dump(const context::event &e, const context &ctx, string &out, const char *tab)
   {
-  out += "    {\n"
-  "      \"name\":\"";
-  out += e.name.data();
-  
-  out += "\",\n"
-  "      \"time\":";
-  r.m_time.append_to(out);
-  out += "\n";
-  
-  out += "    }";
+  append(out, tab, "{\n");
+  append(out, tab, "  \"name\": \"", e.name, "\",\n");
+  if (e.parent != detail::event_reference())
+    {
+    append(out, tab, "  \"parent\": \"", ctx.event_for(e.parent).name, "\",\n");
+    }
+
+  append(out, tab, "  \"fire_count\": ", e.fire_count, ",\n");
+  append(out, tab, "  \"min_time\": ", e.min_time, ",\n");
+  append(out, tab, "  \"max_time\": ", e.max_time, ",\n");
+  append(out, tab, "  \"total_time\": ", e.total_time, ",\n");
+  append(out, tab, "  \"total_time_sq\": ", e.total_time_sq, "\n");
+  append(out, tab, "}");
   }
 
 string json_writer::dump(const context &c)
@@ -55,7 +58,7 @@ string json_writer::dump(const context &c)
   results += ",\n"
   "  \"results\": [\n";
 
-  
+
   bool started = false;
   for(const auto &e : c.events())
     {
@@ -64,8 +67,8 @@ string json_writer::dump(const context &c)
       results += ",\n";
       }
     started = true;
-    
-    dump(e, results, "    ");
+
+    dump(e, c, results, "    ");
     }
 
   results += "\n";

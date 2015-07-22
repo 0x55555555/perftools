@@ -35,7 +35,7 @@ detail::event_reference context::add_event(const char *name, detail::event_refer
 
   detail::event_reference ref;
   ref.index = m_events.size();
-  m_events.emplace_back(name, parent ? parent : &m_root.get_event_reference());
+  m_events.emplace_back(name, parent ? *parent : m_root.get_event_reference());
 
   return ref;
   }
@@ -48,7 +48,7 @@ void context::fire_event(
   auto &ev = m_events[event.index];
   ++ev.fire_count;
 
-  const std::uint64_t new_time = (begin - end).count();
+  const std::uint64_t new_time = (end - begin).count();
 
   ev.total_time += new_time;
   ev.total_time_sq += new_time * new_time;
@@ -77,8 +77,8 @@ void context::finish_event(detail::event_reference &event)
   {
   }
 
-context::event::event(const char *name, detail::event_reference *parent)
-  : parent(parent->index)
+context::event::event(const char *name, const detail::event_reference &parent)
+  : parent(parent)
   , name(name)
   , fire_count(0)
   , min_time(std::numeric_limits<decltype(max_time.load())>::max())
