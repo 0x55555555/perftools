@@ -1,6 +1,8 @@
 #pragma once
 #include <stdexcept>
 
+#define PERF_EXPORT
+
 namespace perf
 {
 

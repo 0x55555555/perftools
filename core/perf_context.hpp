@@ -1,9 +1,5 @@
 #pragma once
-#include <chrono>
 #include <mutex>
-#include <stdexcept>
-#include <string>
-#include <experimental/optional>
 #include <vector>
 
 #include "perf_string.hpp"
@@ -33,6 +29,8 @@ public:
   /// Find the name for the context
   const short_string &name() const { return m_name; }
 
+  const time &start_time() const;
+
   /// Create a new event in the context
   detail::event_reference add_event(const char *name, detail::event_reference *parent = nullptr);
   /// Fire [event] with a [begin] and [end]
@@ -47,6 +45,20 @@ public:
   /// Finish [event]
   void finish_event(detail::event_reference &event);
 
+  struct time_group
+    {
+    time_group();
+    time_group(time_group &&);
+    time_group &operator=(time_group &&ev);
+
+    void append(std::uint64_t duration);
+
+    std::atomic<std::uint64_t> min_time;
+    std::atomic<std::uint64_t> max_time;
+    std::atomic<std::uint64_t> total_time;
+    std::atomic<std::uint64_t> total_time_sq;
+    };
+
   /// Internal storage for an event, containing aggregated data about the firings.
   struct event
     {
@@ -58,15 +70,12 @@ public:
     short_string name;
 
     std::atomic<std::size_t> fire_count;
-    std::atomic<std::uint64_t> min_time;
-    std::atomic<std::uint64_t> max_time;
-    std::atomic<std::uint64_t> total_time;
-    std::atomic<std::uint64_t> total_time_sq;
+    time_group duration;
     };
-  
+
   /// Find all events contained in the context
   const std::vector<event, allocator<event>> &events() const { return m_events; }
-  
+
   /// Find an event by reference
   const event &event_for(const detail::event_reference &ev) const { return m_events[ev.index]; }
 

@@ -7,7 +7,6 @@ add_library(perf SHARED
   # Public API's
   perf.h
   perf.hpp
-  perf_json_writer.hpp
 
   src/perf_config.cpp
   src/perf_context.cpp
@@ -15,12 +14,18 @@ add_library(perf SHARED
   src/perf_json_writer.cpp
   src/perf_meta_event.cpp
 
-  # Implementation
-  # internal/perf.cpp
-  perf_context.hpp
-  perf_global.hpp
   perf_allocator.hpp
+  perf_config.hpp
+  perf_context.hpp
+  perf_event.hpp
+  perf_global.hpp
+  perf_identity.hpp
+  perf_json_writer.hpp
+  perf_meta_event.hpp
+  perf_single_fire_event.hpp
   perf_string.hpp
+  perf_time.hpp
+  perf_util.hpp
 )
 
 target_include_directories(perf

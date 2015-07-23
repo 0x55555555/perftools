@@ -26,18 +26,29 @@ void json_writer::write(const context &c, const char *filename)
 void json_writer::dump(const context::event &e, const context &ctx, string &out, const char *tab)
   {
   append(out, tab, "{\n");
-  append(out, tab, "  \"name\": \"", e.name, "\",\n");
+  append(out, tab, "  \"name\": \"", e.name, "\"");
+
   if (e.parent != detail::event_reference())
     {
-    append(out, tab, "  \"parent\": \"", ctx.event_for(e.parent).name, "\",\n");
+    append(out, ",\n");
+    append(out, tab, "  \"parent\": \"", ctx.event_for(e.parent).name, "\"");
     }
 
-  append(out, tab, "  \"fire_count\": ", e.fire_count, ",\n");
-  append(out, tab, "  \"min_time\": ", e.min_time, ",\n");
-  append(out, tab, "  \"max_time\": ", e.max_time, ",\n");
-  append(out, tab, "  \"total_time\": ", e.total_time, ",\n");
-  append(out, tab, "  \"total_time_sq\": ", e.total_time_sq, "\n");
-  append(out, tab, "}");
+  if (e.fire_count)
+    {
+    append(out, ",\n");
+    append(out, tab, "  \"fire_count\": ", e.fire_count);
+
+    if (e.duration.total_time > 0)
+      {
+      append(out, ",\n");
+      append(out, tab, "  \"min_time\": ", e.duration.min_time, ",\n");
+      append(out, tab, "  \"max_time\": ", e.duration.max_time, ",\n");
+      append(out, tab, "  \"total_time\": ", e.duration.total_time, ",\n");
+      append(out, tab, "  \"total_time_sq\": ", e.duration.total_time_sq);
+      }
+    }
+  append(out, "\n", tab, "}");
   }
 
 string json_writer::dump(const context &c)
@@ -45,18 +56,16 @@ string json_writer::dump(const context &c)
   auto conf = c.get_config();
   string results(conf->allocator());
 
-  results =
-  "{\n"
-  "  \"name\": \"";
-  results += c.name().data();
-
-  results += "\",\n"
-  "  \"machine_identity\": ";
+  append(results,
+    "{\n"
+    "  \"name\": \"", c.name(), "\",\n"
+    "  \"machine_identity\": ");
 
   conf->get_identity().json_description(results, "  ");
 
-  results += ",\n"
-  "  \"results\": [\n";
+  append(results, ",\n"
+    "  \"start\": ", c.start_time().count(), ",\n"
+    "  \"results\": [\n");
 
 
   bool started = false;
@@ -71,11 +80,9 @@ string json_writer::dump(const context &c)
     dump(e, c, results, "    ");
     }
 
-  results += "\n";
-
-  results += "  ]\n";
-
-  results += "}\n";
+  append(results, "\n"
+    "  ]\n"
+    "}\n");
   return results;
   }
 

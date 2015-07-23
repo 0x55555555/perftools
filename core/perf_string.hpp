@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "perf_allocator.hpp"
 
 namespace perf
@@ -82,12 +83,12 @@ template <typename StringTypeA, typename StringTypeB> void append(StringTypeA &s
   {
   str += t.data();
   }
-  
+
 template <typename StringType, typename Type> void append(StringType &str, const std::atomic<Type> &t)
   {
   append(str, t.load());
   }
-  
+
 template <typename StringType> void append(StringType &str, unsigned long long t)
   {
   appendf(str, t, "%llu");
