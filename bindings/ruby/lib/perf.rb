@@ -61,6 +61,14 @@ module Perf
     end
   end
 
+  class LibMetaEvent < FFI::ManagedStruct
+    layout :impl, :pointer
+
+    def self.release(ptr)
+      self.perf_term_meta_event(ptr)
+    end
+  end
+
   attach_function :perf_init_default_config, [ :string ], :pointer
   attach_function :perf_term_config, [ :pointer ], :void
 
@@ -70,7 +78,11 @@ module Perf
   attach_function :perf_init_context, [ :pointer, :string ], :pointer
   attach_function :perf_term_context, [ :pointer ], :void
 
-  attach_function :perf_add_event, [ :pointer, :string ], :void
+  attach_function :perf_init_meta_event, [ :pointer, :string ], :pointer
+  attach_function :perf_term_meta_event, [ :pointer, :string ], :void
+
+  attach_function :perf_init_event, [ :pointer ], :pointer
+  attach_function :perf_term_event, [ :pointer ], :void
 
   attach_function :perf_dump_context, [ :pointer ], :string
   attach_function :perf_write_context, [ :pointer, :string ], :void
@@ -112,16 +124,26 @@ module Perf
       return Perf.perf_write_context(@ptr, f)
     end
 
-    def event(name)
-      Perf.perf_add_event(@ptr, name)
+    def create_meta_event(name)
+      return MetaEvent.new(Perf.perf_init_meta_event(@ptr, name))
     end
 
-    def block(name)
-      b = "#{name}::begin"
-      e = "#{name}::end"
-      event(b)
+    def block(name, &blk)
+      ev = create_meta_event(name)
+
+      ev.fire(&blk)
+    end
+  end
+
+  class MetaEvent
+    def initialize(ptr)
+      @ptr = LibMetaEvent.new(ptr)
+    end
+
+    def fire()
+      ev = Perf.perf_init_event(@ptr)
       yield
-      event(e)
+      Perf.perf_term_event(ev)
     end
   end
 

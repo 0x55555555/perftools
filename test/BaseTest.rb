@@ -1,31 +1,11 @@
 
 require 'test/unit'
+require 'TestUtils'
 require_relative '../bindings/ruby/lib/perf.rb'
 require 'json'
 
-def open_perf_db(port)
-  to_kill = []
-  to_root = ""
-  data_dir = "#{to_root}test/data_#{port}"
-  FileUtils.mkdir_p(data_dir)
-  sleep(1)
-  to_kill << IO.popen("mongod --dbpath #{data_dir}").pid
-  to_kill << IO.popen("node #{to_root}node_server/server.js").pid
 
-  # Wait for servers to start
-  sleep(2)
-
-  yield
-
-ensure
-  to_kill.each do |pid|
-    Process.kill "TERM", pid
-    Process.wait pid
-  end
-  FileUtils.rm_rf(data_dir)
-end
-
-class TestExpose < Test::Unit::TestCase
+class TestCPP < Test::Unit::TestCase
   def setup
   end
 
@@ -57,35 +37,23 @@ class TestExpose < Test::Unit::TestCase
     assert_kind_of String, obj["extra"]
   end
 
+  def test_block(ctx, num)
+    test = ""
+    ctx.block("test_block_#{num}") do
+      num.times do
+        test += "*"
+      end
+    end
+  end
+
   def test_timing
     cfg = Perf::Config.new()
     ctx = Perf::Context.new(cfg, "timing_test")
 
-    test = ""
-
-    ctx.block("test_block_10") do
-      10.times do
-        test += "*"
-      end
-    end
-
-    ctx.block("test_block_100") do
-      100.times do
-        test += "*"
-      end
-    end
-
-    ctx.block("test_block_1000") do
-      1000.times do
-        test += "*"
-      end
-    end
-
-    ctx.block("test_block_10000") do
-      10000.times do
-        test += "*"
-      end
-    end
+    test_block(ctx, 10)
+    test_block(ctx, 100)
+    test_block(ctx, 1000)
+    test_block(ctx, 10000)
 
     obj = JSON.parse(ctx.dump)
     assert_not_nil obj
@@ -94,13 +62,13 @@ class TestExpose < Test::Unit::TestCase
   end
 
   def test_contextCollection
-    open_perf_db(3000) do
+    open_perf_server do |port|
       pkg = Perf::Package.new("master", "af4343c", "testing some bits", "test/*.json", nil, "ruby-cpp-test")
 
       obj = pkg.to_s
       assert_not_nil JSON.parse(obj)
 
-      pkg.submit('http://localhost:3000/submit')
+      pkg.submit("http://localhost:#{port}/submit")
     end
   end
 end

@@ -259,11 +259,14 @@ TEST_CASE("c api", "[core]")
   auto context = perf_init_context(config, "c_test");
   REQUIRE(context);
   
-  perf_add_event(context, "test");
+  auto meta = perf_init_meta_event(context, "test");
   
+  auto event = perf_init_event(meta);
   auto dumped = perf_dump_context(context);
   jsoncons::json::parse_string(dumped); // Throws on failure
+  perf_term_event(event);
   
+  perf_term_meta_event(meta);
   perf_term_context(context);
   perf_term_config(config);
   }
