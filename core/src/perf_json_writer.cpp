@@ -38,7 +38,7 @@ void json_writer::dump(const context::event &e, const context &ctx, string &out,
     {
     append(out, ",\n");
     append(out, tab, "  \"fire_count\": ", e.fire_count);
-
+    
     if (e.duration.total_time > 0)
       {
       append(out, ",\n");
@@ -46,6 +46,15 @@ void json_writer::dump(const context::event &e, const context &ctx, string &out,
       append(out, tab, "  \"max_time\": ", e.duration.max_time, ",\n");
       append(out, tab, "  \"total_time\": ", e.duration.total_time, ",\n");
       append(out, tab, "  \"total_time_sq\": ", e.duration.total_time_sq);
+      }
+    
+    if (e.offset.total_time > 0)
+      {
+      append(out, ",\n");
+      append(out, tab, "  \"min_offset_time\": ", e.offset.min_time, ",\n");
+      append(out, tab, "  \"max_offset_time\": ", e.offset.max_time, ",\n");
+      append(out, tab, "  \"total_offset_time\": ", e.offset.total_time, ",\n");
+      append(out, tab, "  \"total_offset_time_sq\": ", e.offset.total_time_sq);
       }
     }
   append(out, "\n", tab, "}");

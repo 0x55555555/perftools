@@ -9,3 +9,4 @@
 #include "perf_single_fire_event.hpp"
 #include "perf_context.hpp"
 #include "perf_json_writer.hpp"
+#include "perf_benchmark.hpp"

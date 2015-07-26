@@ -16,6 +16,7 @@ add_library(perf SHARED
   src/perf_single_fire_event.cpp
 
   perf_allocator.hpp
+  perf_benchmark.hpp
   perf_config.hpp
   perf_context.hpp
   perf_event.hpp

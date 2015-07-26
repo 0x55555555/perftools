@@ -1,4 +1,5 @@
 #include "perf_context.hpp"
+#include <cmath>
 
 namespace perf
 {
@@ -127,6 +128,7 @@ context::event::event(event &&ev)
   : parent(ev.parent)
   , name(ev.name)
   , fire_count(ev.fire_count.load())
+  , offset(std::move(ev.offset))
   , duration(std::move(ev.duration))
   {
   }
@@ -137,6 +139,20 @@ context::event &context::event::operator=(event &&ev)
   name = ev.name;
   fire_count.store(ev.fire_count.load());
   duration = std::move(ev.duration);
+  offset = std::move(ev.offset);
   return *this;
+  }
+  
+double context::event::average() const
+  {
+  return double(duration.total_time) / fire_count;
+  }
+  
+double context::event::sd() const
+  {
+  auto mean_sq = double(duration.total_time_sq) / fire_count;
+  auto mean = average();
+  
+  return std::sqrt(mean_sq - (mean * mean));
   }
 }

@@ -39,11 +39,13 @@ public:
   
   // Find the root event for the context, all events derive from
   const event &root_event() const { return m_root; }
+  // Find the root event for the context, all events derive from
+  event &root_event() { return m_root; }
   
   /// Fire a child event
-  perf::event fire(meta_event *ev) { return perf::event(&m_root, ev); }
+  perf::event fire_child(meta_event *ev) { return perf::event(&m_root, ev); }
   /// Fire a child event
-  perf::event fire(meta_event &ev) { return perf::event(&m_root, &ev); }
+  perf::event fire_child(meta_event &ev) { return perf::event(&m_root, &ev); }
   
   /// Create a new event in the context
   detail::event_reference add_event(const char *name, detail::event_reference *parent = nullptr);
@@ -68,7 +70,7 @@ public:
     time_group &operator=(time_group &&ev);
 
     void append(std::uint64_t duration);
-
+    
     std::atomic<std::uint64_t> min_time;
     std::atomic<std::uint64_t> max_time;
     std::atomic<std::uint64_t> total_time;
@@ -84,7 +86,10 @@ public:
 
     detail::event_reference parent;
     short_string name;
-
+    
+    double average() const;
+    double sd() const;
+    
     std::atomic<std::size_t> fire_count;
     time_group offset;
     time_group duration;

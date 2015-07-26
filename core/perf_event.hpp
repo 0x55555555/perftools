@@ -58,13 +58,13 @@ public:
   const time &start_time() const { return m_start; }
   
   /// Fire a child event
-  event fire(meta_event *ev)
+  event fire_child(meta_event *ev)
     {
     return event(this, ev);
     }
   
   /// Fire a child event
-  event fire(meta_event &ev)
+  event fire_child(meta_event &ev)
     {
     return event(this, &ev);
     }
