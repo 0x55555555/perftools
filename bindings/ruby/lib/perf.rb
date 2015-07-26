@@ -75,14 +75,6 @@ module Perf
   attach_function :perf_dump_context, [ :pointer ], :string
   attach_function :perf_write_context, [ :pointer, :string ], :void
 
-  enum :error, [
-    :no_error, 0,
-    :error_in_error, 1,
-    :invalid_config, 2,
-  ]
-
-  attach_function :perf_check_error, [ :pointer ], :error
-
   class Identity
     def initialize(cfg)
       @ptr = LibIdentity.new(Perf.perf_find_identity(cfg.ptr))
@@ -111,10 +103,6 @@ module Perf
     end
 
     attr_reader :ptr
-
-    def error
-      return Perf.perf_check_error(@ptr)
-    end
 
     def dump
       return Perf.perf_dump_context(@ptr)

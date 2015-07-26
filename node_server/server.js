@@ -8,7 +8,7 @@ var db = new mongo.Db('perf', new mongo.Server('localhost',27017, {}), {});
 var express = require('express');
 var app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/submit',function(req,res) {
   var data = JSON.parse(req.body["data"]);

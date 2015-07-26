@@ -2,7 +2,7 @@ require 'rake/testtask'
 
 #desc 'Default: run specs.'
 task :default => :tests
- 
+
 # desc run cpp tests
 Rake::TestTask.new(:cpp_tests) do |t|
 

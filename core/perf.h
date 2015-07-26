@@ -14,13 +14,6 @@ struct perf_identity;
 typedef void *(*perf_alloc)(size_t size);
 typedef void (*perf_free)(void *size);
 
-typedef int perf_error;
-#define perf_no_error               0
-#define perf_error_in_error         1
-#define perf_invalid_config         2
-#define perf_recording_after_output 3
-#define perf_failed_to_write_file   4
-
 /// \name Config management
 /// @{
 
