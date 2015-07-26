@@ -6,8 +6,8 @@ namespace perf
 {
 
 config::config(const char *binding, const allocator_base &alloc)
-  : m_identity(identity::this_machine(binding))
-  , m_allocator(alloc)
+  : m_allocator(alloc)
+  , m_identity(identity::this_machine(this,binding))
   {
   }
 

@@ -71,11 +71,12 @@ void cpuid(unsigned int i, unsigned int *out)
 namespace perf
 {
 
-identity identity::this_machine(const char *binding)
+identity identity::this_machine(perf::config *config, const char *binding)
   {
   identity id;
+  id.m_config = config;
 
-  ptr_check(binding);
+  check(binding);
   append(id.m_binding, binding);
 
   // todo: tidy up,this is a bit messy, and not really the good information?

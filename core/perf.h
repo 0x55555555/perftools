@@ -53,13 +53,6 @@ PERF_EXPORT const char *perf_identity_description(const perf_identity *id);
 
 /// @}
 
-/// \name Error handling
-/// @{
-
-PERF_EXPORT perf_error perf_check_error(perf_context *ctx);
-
-/// @}
-
 
 /// \name Context management
 /// @{

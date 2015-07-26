@@ -20,15 +20,27 @@ struct allocator_base
   : m_alloc(a)
   , m_free(f)
     {
-    ptr_check(m_alloc);
-    ptr_check(m_free);
+    check(m_alloc);
+    check(m_free);
     }
 
   bool operator!=(const allocator_base &a) const
     {
     return a.m_alloc != m_alloc || a.m_free != m_free;
     }
-
+  
+  template <typename T, typename... Args> T *allocate_and_construct(Args &&... args) const
+    {
+    auto mem = m_alloc(sizeof(T));
+    return new(mem) T(std::forward<Args>(args)...);
+    }
+  
+  template <typename T> void destroy_and_free(T *t) const
+    {
+    t->~T();
+    m_free(t);
+    }
+  
 protected:
   alloc m_alloc;
   free m_free;
@@ -50,14 +62,15 @@ template <typename T> struct allocator final : public allocator_base
   pointer allocate(size_type n, const void *hint = nullptr)
     {
     (void)hint;
-    ptr_check(m_alloc);
-    return reinterpret_cast<pointer>(m_alloc(sizeof(T) * n));
+    check(m_alloc);
+    auto mem = m_alloc(sizeof(T) * n);
+    return reinterpret_cast<pointer>(mem);
     }
 
   void deallocate(pointer p, size_type n)
     {
     (void)n;
-    ptr_check(m_free);
+    check(m_free);
     return m_free(p);
     }
   };

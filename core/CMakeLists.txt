@@ -8,6 +8,7 @@ add_library(perf SHARED
   perf.h
   perf.hpp
 
+  src/perf.cpp
   src/perf_config.cpp
   src/perf_context.cpp
   src/perf_identity.cpp

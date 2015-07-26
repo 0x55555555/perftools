@@ -42,8 +42,8 @@ public:
   void unregister_context(context &, const detail::private_dummy &);
 
 private:
-  identity m_identity;
   allocator_base m_allocator;
+  identity m_identity;
   std::atomic<std::size_t> m_context_count;
   };
 

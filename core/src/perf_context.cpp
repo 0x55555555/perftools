@@ -8,7 +8,7 @@ namespace
 {
 const allocator_base &check_allocator(perf::config *c)
   {
-  ptr_check(c);
+  check(c);
   return c->allocator();
   }
 }
@@ -18,7 +18,7 @@ context::context(perf::config *c, const char *name)
   , m_events(check_allocator(m_config))
   , m_root(this, "root")
   {
-  ptr_check(name);
+  check(name);
 
   m_name += name;
   m_config->register_context(*this, detail::private_dummy());

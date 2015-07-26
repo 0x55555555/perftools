@@ -33,7 +33,7 @@ module Perf
           return base + ".dylib"
         when :windows
           return base + ".dll"
-        when :linux 
+        when :linux
           return base + ".so"
       end
     end
@@ -60,7 +60,7 @@ module Perf
       self.perf_term_context(ptr)
     end
   end
-  
+
   attach_function :perf_init_default_config, [ :string ], :pointer
   attach_function :perf_term_config, [ :pointer ], :void
 
@@ -78,11 +78,11 @@ module Perf
   enum :error, [
     :no_error, 0,
     :error_in_error, 1,
-    :invalid_config, 2, 
+    :invalid_config, 2,
   ]
 
   attach_function :perf_check_error, [ :pointer ], :error
-  
+
   class Identity
     def initialize(cfg)
       @ptr = LibIdentity.new(Perf.perf_find_identity(cfg.ptr))
@@ -139,7 +139,7 @@ module Perf
 
   class Package
     def initialize(branch, identity, description, files, recipe=nil, recipeDescription=nil)
-      @contexts = Dir.glob(files).reduce({}) do |a, f| 
+      @contexts = Dir.glob(files).reduce({}) do |a, f|
         a[f] = JSON.parse(File.read(f))
         next a
       end

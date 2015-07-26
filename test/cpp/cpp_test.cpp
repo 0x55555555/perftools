@@ -1,4 +1,5 @@
 #include "perf.hpp"
+#include "perf.h"
 
 #include <jsoncons/json.hpp>
 
@@ -74,7 +75,7 @@ void dummy_fill_single_events(perf::context &ctx)
     }
   }
 
-void check_identity(const jsoncons::json &obj)
+void check_identity(const jsoncons::json &obj, const char *binding = "cpp")
   {
   REQUIRE(obj.is_object());
   REQUIRE(obj["arch"].is_string());
@@ -84,7 +85,7 @@ void check_identity(const jsoncons::json &obj)
   REQUIRE(obj["cpu_speed"].is_ulonglong());
   REQUIRE(obj["extra"].is_string());
   REQUIRE(obj["memory_bytes"].is_ulonglong());
-  REQUIRE(obj["binding"].as_string() == "cpp");
+  REQUIRE(obj["binding"].as_string() == binding);
   }
 
 void check_timing(jsoncons::json &results)
@@ -244,3 +245,26 @@ TEST_CASE("json output", "[serialisation]")
     REQUIRE(identity_object == obj["machine_identity"]);
     }
   }
+
+TEST_CASE("c api", "[core]")
+  {
+  auto config = perf_init_default_config("c");
+  REQUIRE(config);
+  
+  auto identity = perf_find_identity(config);
+  REQUIRE(identity);
+  auto desc = perf_identity_description(identity);
+  check_identity(jsoncons::json::parse_string(desc), "c");
+  
+  auto context = perf_init_context(config, "c_test");
+  REQUIRE(context);
+  
+  perf_add_event(context, "test");
+  
+  auto dumped = perf_dump_context(context);
+  jsoncons::json::parse_string(dumped); // Throws on failure
+  
+  perf_term_context(context);
+  perf_term_config(config);
+  }
+
