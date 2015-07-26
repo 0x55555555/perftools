@@ -1,4 +1,7 @@
 #pragma once
+#include "perf_global.hpp"
+#include "perf_time.hpp"
+#include "perf_util.hpp"
 
 namespace perf
 {
@@ -42,9 +45,9 @@ public:
 
 
   /// Fire the Event with a given [start] and [end] point.
-  void fire(const time &start, const time &end);
+  void fire(const time &parent_start, const time &start, const time &end);
   /// Fire the event at a specific point in time, with zero duration.
-  void fire(const time &point = time::now());
+  void fire(const time &parent_start, const time &point = time::now());
 
   /// Find the context for this event
   perf::context *get_context() { return m_context; }
@@ -58,6 +61,9 @@ public:
   /// \private
   const detail::event_reference &get_event_reference() const { return m_event; }
 
+  /// Check the [ev] parameter is a valid parent for this event.
+  bool validate_parent(const meta_event *ev);
+  
 private:
   context *m_context;
   detail::event_reference m_event;

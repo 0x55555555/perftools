@@ -33,3 +33,9 @@ inline void check(bool b)
   }
 
 }
+
+#ifdef _DEBUG
+#define perf_assert(x) perf::check(x)
+#else
+#define perf_assert(x)
+#endif

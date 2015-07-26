@@ -24,9 +24,24 @@ public:
     {
     return index != ev.index;
     }
-
+  
+  bool operator==(const event_reference &ev) const
+    {
+    return index == ev.index;
+    }
+  
+  static event_reference invalid_reference()
+    {
+    return event_reference(std::numeric_limits<std::size_t>::max());
+    }
+  
 private:
-  std::size_t index = std::numeric_limits<std::size_t>::max();
+  event_reference(std::size_t i)
+    : index(i)
+    {
+    }
+  
+  std::size_t index;
   friend class perf::context;
   };
 }

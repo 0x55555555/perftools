@@ -3,7 +3,7 @@
 #include "perf_context.hpp"
 #include <cstdlib>
 
-namespace 
+namespace
 {
 void perf_handle_api_error()
   {

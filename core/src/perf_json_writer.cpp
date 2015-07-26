@@ -28,7 +28,7 @@ void json_writer::dump(const context::event &e, const context &ctx, string &out,
   append(out, tab, "{\n");
   append(out, tab, "  \"name\": \"", e.name, "\"");
 
-  if (e.parent != detail::event_reference())
+  if (e.parent != detail::event_reference::invalid_reference())
     {
     append(out, ",\n");
     append(out, tab, "  \"parent\": \"", ctx.event_for(e.parent).name, "\"");

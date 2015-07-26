@@ -2,10 +2,15 @@
 #include <mutex>
 #include <vector>
 
+#include "perf_config.hpp"
 #include "perf_string.hpp"
+#include "perf_time.hpp"
+#include "perf_single_fire_event.hpp"
 
 namespace perf
 {
+
+class time;
 
 /// A context stores and maintains a group of events.
 class PERF_EXPORT context
@@ -29,18 +34,29 @@ public:
   /// Find the name for the context
   const short_string &name() const { return m_name; }
 
+  /// Find the start time the context began
   const time &start_time() const;
-
+  
+  // Find the root event for the context, all events derive from
+  const event &root_event() const { return m_root; }
+  
+  /// Fire a child event
+  perf::event fire(meta_event *ev) { return perf::event(&m_root, ev); }
+  /// Fire a child event
+  perf::event fire(meta_event &ev) { return perf::event(&m_root, &ev); }
+  
   /// Create a new event in the context
   detail::event_reference add_event(const char *name, detail::event_reference *parent = nullptr);
   /// Fire [event] with a [begin] and [end]
   void fire_event(
     detail::event_reference &event,
+    const time &parent_start,
     const time &begin,
     const time &end);
   /// Fire [event] at [point]
   void fire_event(
     detail::event_reference &event,
+    const time &parent_start,
     const time &point);
   /// Finish [event]
   void finish_event(detail::event_reference &event);
@@ -70,6 +86,7 @@ public:
     short_string name;
 
     std::atomic<std::size_t> fire_count;
+    time_group offset;
     time_group duration;
     };
 

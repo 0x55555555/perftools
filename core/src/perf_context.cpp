@@ -1,4 +1,4 @@
-#include "perf.hpp"
+#include "perf_context.hpp"
 
 namespace perf
 {
@@ -38,8 +38,7 @@ detail::event_reference context::add_event(const char *name, detail::event_refer
   {
   std::lock_guard<std::mutex> l(m_events_mutex);
 
-  detail::event_reference ref;
-  ref.index = m_events.size();
+  detail::event_reference ref(m_events.size());
   m_events.emplace_back(name, parent ? *parent : m_root.get_event_reference());
 
   return ref;
@@ -47,22 +46,26 @@ detail::event_reference context::add_event(const char *name, detail::event_refer
 
 void context::fire_event(
   detail::event_reference &event,
+  const time &parent_start,
   const time &begin,
   const time &end)
   {
   auto &ev = m_events[event.index];
   ++ev.fire_count;
 
+  const std::uint64_t offset = (begin - parent_start).count();
   const std::uint64_t new_time = (end - begin).count();
 
+  ev.offset.append(offset);
   ev.duration.append(new_time);
   }
 
 void context::fire_event(
   detail::event_reference &event,
+  const time &parent_start,
   const time &point)
   {
-  fire_event(event, point, point);
+  fire_event(event, parent_start, point, point);
   }
 
 void context::finish_event(detail::event_reference &event)

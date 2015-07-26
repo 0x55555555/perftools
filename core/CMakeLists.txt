@@ -13,6 +13,7 @@ add_library(perf SHARED
   src/perf_identity.cpp
   src/perf_json_writer.cpp
   src/perf_meta_event.cpp
+  src/perf_single_fire_event.cpp
 
   perf_allocator.hpp
   perf_config.hpp

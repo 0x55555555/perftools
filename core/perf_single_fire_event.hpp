@@ -11,9 +11,7 @@ class PERF_EXPORT single_fire_event : public meta_event, public event
   {
 public:
   /// Fire a new event under [ctx], called [name]
-  single_fire_event(perf::context *ctx, const char *name) : meta_event(ctx, name), event(this)
-    {
-    }
+  single_fire_event(perf::context *ctx, const char *name);
 
   /// Fire a new event under [ctx], called [name]
   single_fire_event(perf::context &ctx, const char *name) : single_fire_event(&ctx, name)
@@ -21,7 +19,7 @@ public:
     }
 
   /// Fire a new event under [evt], called [name]
-  single_fire_event(perf::event *evt, const char *name) : meta_event(evt->get_meta_event(), name), event(this)
+  single_fire_event(perf::event *evt, const char *name) : meta_event(evt->get_meta_event(), name), event(evt, this)
     {
     }
 
@@ -37,7 +35,7 @@ public:
   void fire(const char *name)
     {
     perf::meta_event temp(this, name);
-    temp.fire();
+    temp.fire(start_time());
     }
   };
 

@@ -14,11 +14,11 @@ void dummy_fill(perf::context &ctx)
   perf::meta_event mid_m(process_m, "mid");
   
   {
-  perf::event blk(blk_m);
+  auto blk = ctx.fire(blk_m);
   
   for (uint8_t i = 0; i < (uint8_t)-1; ++i)
     {
-    perf::event blk2(blk2_m);
+    blk.fire(blk2_m);
     for (uint8_t j = 0; j < (uint8_t)-1; ++j)
       {
       }
@@ -26,13 +26,14 @@ void dummy_fill(perf::context &ctx)
   }
   
   {
-  perf::event process(process_m);
+  auto p = ctx.fire(process_m);
+  perf::event process(ctx.root_event(), process_m);
   
   for (uint16_t i = 0; i < (uint16_t)-1; ++i)
     {
     }
   
-  mid_m.fire();
+  p.fire(mid_m);
   
   for (uint16_t i = 0; i < (uint16_t)-1; ++i)
     {
