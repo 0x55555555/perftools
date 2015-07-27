@@ -53,8 +53,6 @@ PERF_EXPORT const char *perf_identity_description(const perf_identity *id);
 /// @{
 
 /// \brief Init a performance testing context.
-///
-/// A context should be created for each thread which will use perf.
 PERF_EXPORT perf_context *perf_init_context(perf_config *cfg, const char *name);
 
 /// \brief Terminate a performance testing context.
@@ -66,7 +64,7 @@ PERF_EXPORT void perf_term_context(perf_context *ctx);
 /// @{
 
 /// \brief Write the context to disk.
-PERF_EXPORT void perf_write_context(perf_context *ctx, const char *name);
+PERF_EXPORT void perf_write_context(perf_context *ctx, const char *filename);
 
 /// \brief Return the context as a string.
 PERF_EXPORT const char *perf_dump_context(perf_context *ctx);
@@ -76,7 +74,7 @@ PERF_EXPORT const char *perf_dump_context(perf_context *ctx);
 /// \name Recording events
 /// @{
 
-/// \brief create an meta event
+/// \brief Create a meta event which can be fired multiple times.
 PERF_EXPORT perf_meta_event *perf_init_meta_event(perf_context *ctx, const char *name);
   
 /// \brief destroy an meta event
