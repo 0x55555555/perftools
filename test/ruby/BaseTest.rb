@@ -1,7 +1,7 @@
 
 require 'test/unit'
-require 'TestUtils'
-require_relative '../bindings/ruby/lib/perf.rb'
+require_relative 'TestUtils'
+require_relative '../../bindings/ruby/lib/perf.rb'
 require 'json'
 
 

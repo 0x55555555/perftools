@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <mutex>
 #include <vector>
 
@@ -34,8 +35,8 @@ public:
   /// Find the name for the context
   const short_string &name() const { return m_name; }
 
-  /// Find the start time the context began
-  const time &start_time() const;
+  /// Find the time since unix epoch when this test started.
+  std::uint64_t start_time() const;
   
   // Find the root event for the context, all events derive from
   const event &root_event() const { return m_root; }
@@ -105,6 +106,7 @@ private:
   std::mutex m_events_mutex;
   config *m_config;
   std::vector<event, allocator<event>> m_events;
+  std::chrono::system_clock::time_point m_start;
 
   short_string m_name;
   single_fire_event m_root;

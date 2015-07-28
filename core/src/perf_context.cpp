@@ -16,6 +16,7 @@ const allocator_base &check_allocator(perf::config *c)
 context::context(perf::config *c, const char *name)
   : m_config(c)
   , m_events(check_allocator(m_config))
+  , m_start(std::chrono::system_clock::now())
   , m_root(this, "root")
   {
   check(name);
@@ -29,12 +30,13 @@ context::~context()
   m_config->unregister_context(*this, detail::private_dummy());
   m_config = nullptr;
   }
-
-const time &context::start_time() const
+  
+std::uint64_t context::start_time() const
   {
-  return m_root.start_time();
+  std::time_t time = std::chrono::system_clock::to_time_t(m_start);
+  return time;
   }
-
+  
 detail::event_reference context::add_event(const char *name, detail::event_reference *parent)
   {
   std::lock_guard<std::mutex> l(m_events_mutex);

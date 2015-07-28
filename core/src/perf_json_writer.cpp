@@ -73,7 +73,7 @@ string json_writer::dump(const context &c)
   conf->get_identity().json_description(results, "  ");
 
   append(results, ",\n"
-    "  \"start\": ", c.start_time().count(), ",\n"
+    "  \"start\": ", c.start_time(), ",\n"
     "  \"results\": [\n");
 
 

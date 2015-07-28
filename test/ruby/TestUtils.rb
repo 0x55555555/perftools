@@ -9,7 +9,7 @@ def open_perf_server
   to_kill << IO.popen("node #{to_root}node_server/server.js")
 
   # Wait for servers to start
-  sleep(0.5)
+  sleep(0.8)
 
   yield(port)
 

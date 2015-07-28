@@ -12,7 +12,7 @@ struct perf_context;
 struct perf_identity;
 struct perf_meta_event;
 struct perf_event;
-  
+
 typedef void *(*perf_alloc)(size_t size);
 typedef void (*perf_free)(void *size);
 
@@ -76,18 +76,18 @@ PERF_EXPORT const char *perf_dump_context(perf_context *ctx);
 
 /// \brief Create a meta event which can be fired multiple times.
 PERF_EXPORT perf_meta_event *perf_init_meta_event(perf_context *ctx, const char *name);
-  
+
 /// \brief destroy an meta event
 PERF_EXPORT void perf_term_meta_event(perf_meta_event *ctx);
-  
+
 /// \brief create an event
 PERF_EXPORT perf_event *perf_init_event(perf_meta_event *meta);
-  
+
 /// \brief destroy an event
 PERF_EXPORT void perf_term_event(perf_event *ctx);
 
 
-  
+
 /// @}
 
 }
