@@ -1,9 +1,9 @@
 
-def open_perf_server
+def open_perf_server(name, delete_records = true)
   port = 3000
   to_kill = []
   to_root = ""
-  data_dir = "#{to_root}test/data_#{port}"
+  data_dir = "#{to_root}test/data/#{name}"
   FileUtils.mkdir_p(data_dir)
   to_kill << IO.popen("mongod --dbpath #{data_dir}")
   to_kill << IO.popen("node #{to_root}node_server/server.js")
@@ -22,5 +22,5 @@ ensure
     Process.kill "TERM", pid
     p.close
   end
-  FileUtils.rm_rf(data_dir)
+  FileUtils.rm_rf(data_dir) if delete_records
 end

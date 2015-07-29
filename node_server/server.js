@@ -3,7 +3,6 @@ var mongo = require('mongodb')
   , bodyParser = require('body-parser')
   , Step = require('step')
 
-var db = new mongo.Db('perf', new mongo.Server('localhost',27017, {}), {});
 
 var express = require('express');
 var app = express();
@@ -11,32 +10,35 @@ var client = null;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/submit',function(req,res) {
-  var data = JSON.parse(req.body["data"]);
+Step(
+  function() {
+    console.log("Open DB");
+    var db = new mongo.Db('perf', new mongo.Server('localhost',27017, {}), {});
+    db.open(this);
+  },
+  function(err, client) {
+    if (err) { throw err; }
 
-  Step(
-    function() {
-      client.createCollection("perf_data", this);
-    },
-    function(err, col) {
-      if (err) { throw err; }
-      col.insert(data);
-    }
-  );
+    console.log("Create collection");
+    client.createCollection("perf_data", this);
+  },
+  function(err, collection) {
+    if (err) { throw err; }
 
-  res.end();
-});
+    app.post('/submit',function(req,res) {
+      var data = JSON.parse(req.body["data"]);
 
-db.open(function(err, db) {
-  if (err) { throw err; }
-  client = db
-  console.log("Opened db");
+      collection.insert(data);
 
-  var server = app.listen(3000, function () {
+      res.end();
+    });
 
-    var host = server.address().address;
-    var port = server.address().port;
+    var server = app.listen(3000, function () {
 
-    console.log('Server listening at http://%s:%s', host, port);
-  });
-});
+      var host = server.address().address;
+      var port = server.address().port;
+
+      console.log('Server listening at http://%s:%s', host, port);
+    });
+  }
+);

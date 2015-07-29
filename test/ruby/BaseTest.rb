@@ -62,7 +62,7 @@ class TestCPP < Test::Unit::TestCase
   end
 
   def test_contextCollection
-    open_perf_server do |port|
+    open_perf_server "context_collection" do |port|
       pkg = Perf::Package.new("master", "af4343c", "testing some bits", "test/*.json", nil, "ruby-cpp-test")
 
       obj = pkg.to_s

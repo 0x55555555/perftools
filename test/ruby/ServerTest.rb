@@ -177,7 +177,7 @@ class TestServer < Test::Unit::TestCase
       packages << Perf::Package.new("master", "af4343c", "pie", "#{test_location}/*.json", nil, "pork pork")
     end
 
-    open_perf_server do |port|
+    open_perf_server "mongo_fill", false do |port|
       packages.each { |p| p.submit("http://localhost:#{port}/submit"); sleep(0.01) }
     end
   end
