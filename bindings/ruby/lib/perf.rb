@@ -148,35 +148,38 @@ module Perf
   end
 
   class Package
-    def initialize(branch, identity, description, files, recipe=nil, recipeDescription=nil)
+    def initialize(vcs_branch, vcs_identity, vcs_description, files, recipe=nil, recipeDescription=nil)
       @contexts = Dir.glob(files).reduce({}) do |a, f|
         a[f] = JSON.parse(File.read(f))
         next a
       end
 
-      @recipeDescription = recipeDescription
-      @branch = branch
-      @identity = identity
-      @description = description
+      @vcs = {
+        :branch => vcs_branch,
+        :identity => vcs_identity,
+        :description => vcs_description
+      }
       @recipe = recipe
+      @recipeDescription = recipeDescription
     end
 
     def as_json()
       outputContexts = { }
 
+      start = []
       @contexts.each do |file, json|
         name = json["name"]
         raise "invalid name passed" unless name.length > 0
 
         output = json.clone()
         output.delete("name")
+        start << output["start"]
         outputContexts[name] = output
       end
 
       return {
-        :branch => @branch,
-        :identity => @identity,
-        :description => @description,
+        :vcs => @vcs,
+        :start => start.min,
         :recipe => @recipe,
         :recipeDescription => @recipeDescription,
         :contexts => outputContexts

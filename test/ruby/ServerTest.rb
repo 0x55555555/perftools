@@ -113,26 +113,27 @@ class TestServer < Test::Unit::TestCase
   end
 
   def test_fill
+    test_structure = {
+      "test": {
+        :parent => "root",
+        :fire_count => 5,
+        :result_begin => 1,
+        :result_jitter => 0,
+        :result_ongoing_trend => 1,
+        :result_trend => 1,
+        :offset_begin => 1,
+        :offset_trend => 0,
+        :offset_jitter => 3,
+        :offset_ongoing_trend => 0,
+      }
+    }
     seq_a = make_sequence(
       make_identity(),
       "pork pork",
       1436304084,
       1438116139,
       50,
-      {
-        "test": {
-          :parent => "root",
-          :fire_count => 5,
-          :result_begin => 1,
-          :result_jitter => 0,
-          :result_ongoing_trend => 1,
-          :result_trend => 1,
-          :offset_begin => 1,
-          :offset_trend => 0,
-          :offset_jitter => 3,
-          :offset_ongoing_trend => 0,
-        }
-      }
+      test_structure
     )
 
     seq_b = make_sequence(
@@ -141,20 +142,7 @@ class TestServer < Test::Unit::TestCase
       1436304084,
       1438116139,
       50,
-      {
-        "test": {
-          :parent => "root",
-          :fire_count => 5,
-          :result_begin => 1,
-          :result_jitter => 0,
-          :result_ongoing_trend => 1,
-          :result_trend => 1,
-          :offset_begin => 1,
-          :offset_trend => 0,
-          :offset_jitter => 3,
-          :offset_ongoing_trend => 0,
-        }
-      }
+      test_structure
     )
 
     packages = []
@@ -174,11 +162,22 @@ class TestServer < Test::Unit::TestCase
         f.write(seq_b[i])
       end
 
-      packages << Perf::Package.new("master", "af4343c", "pie", "#{test_location}/*.json", nil, "pork pork")
+      packages << Perf::Package.new("master", "af4343c", "pie", "#{test_location}/*.json", "test_recipe", "pork pork")
+      packages << Perf::Package.new("master", "af4343c", "pie", "#{test_location}/*.json", "test_other_recipe", "pork pork")
     end
 
-    open_perf_server "mongo_fill", false do |port|
-      packages.each { |p| p.submit("http://localhost:#{port}/submit"); sleep(0.01) }
+    open_perf_server "mongo_fill" do |port|
+      host = 'localhost'
+      url = "http://#{host}:#{port}"
+      packages.each { |p| p.submit("#{url}/submit"); sleep(0.01) }
+
+      sleep(0.2)
+
+      output = JSON.parse(Net::HTTP.get(host, "/summary", port))
+      puts "#{output}"
+      assert_equal 2, output.length
+      assert_equal "test_other_recipe", output[0]["_id"]
+      assert_equal "test_recipe", output[1]["_id"]
     end
   end
 end

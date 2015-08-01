@@ -17,20 +17,40 @@ Step(
     db.open(this);
   },
   function(err, client) {
-    if (err) { throw err; }
+    assert.equal(err, null);
 
     console.log("Create collection");
     client.createCollection("perf_data", this);
   },
   function(err, collection) {
-    if (err) { throw err; }
+    assert.equal(err, null);
 
-    app.post('/submit',function(req,res) {
+    app.post('/submit',function(req, res) {
       var data = JSON.parse(req.body["data"]);
 
       collection.insert(data);
 
       res.end();
+    });
+
+    app.get('/summary',function(req, res) {
+
+      collection.aggregate(
+        [
+          {
+            $group: {
+              _id: "$recipe",
+              description: { $last: "$recipe_description" },
+              first: { $min: "$start" },
+              last: { $max: "$start" }
+            }
+          }
+        ]
+      ).toArray(function(err, result) {
+        assert.equal(err, null);
+        res.end(JSON.stringify(result));
+      });
+
     });
 
     var server = app.listen(3000, function () {
