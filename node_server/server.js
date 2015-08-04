@@ -9,6 +9,11 @@ var app = express();
 var client = null;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.set("jsonp callback", true);
+
+var ui_path = "angular_ui/"
+var static_path = __dirname + '/../' + ui_path;
+app.use(express.static(static_path));
 
 Step(
   function() {
@@ -33,8 +38,7 @@ Step(
       res.end();
     });
 
-    app.get('/summary',function(req, res) {
-
+    app.get('/summary', function(req, res) {
       collection.aggregate(
         [
           {
@@ -48,11 +52,19 @@ Step(
         ]
       ).toArray(function(err, result) {
         assert.equal(err, null);
-        res.end(JSON.stringify(result));
+        res.jsonp(result);
       });
-
     });
 
+    app.get('/result_summary', function(req, res) {
+      collection.find(
+        { recipe: req.query.recipe },
+        { _id:1, start: 1 }
+      ).toArray(function(err, result) {
+        assert.equal(err, null);
+        res.jsonp(result);
+      });
+    });
     var server = app.listen(3000, function () {
 
       var host = server.address().address;
