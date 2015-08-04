@@ -4,8 +4,15 @@ var app = angular.module('myApp', [ 'd3' ]);
 
 app.controller('ResultController', function($scope, $http) {
 
-  var data = {};
-  var sync = function() {
+  var get_result = function(result) {
+    $http({
+      method: 'JSONP',
+      url: ServerUrl + 'result?id=' + result.id + '&callback=JSON_CALLBACK'
+    }).success(function(data, status) {
+      result.value = 4;
+    }).error(function(data, status) {
+      console.log("Error getting result summary info", data, status);
+    });
   }
 
   var get_results = function(key, key_data) {
@@ -15,11 +22,13 @@ app.controller('ResultController', function($scope, $http) {
     }).success(function(data, status) {
       key_data.results = [];
       for (var i in data) {
-        key_data.results.push({
+        var result = {
            date: data[i].start,
            value: 0,
            id: data[i]._id
-        });
+        };
+        key_data.results.push(result);
+        get_result(result);
       }
     }).error(function(data, status) {
       console.log("Error getting result summary info", data, status);

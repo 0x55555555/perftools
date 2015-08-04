@@ -2,6 +2,7 @@ var mongo = require('mongodb')
   , assert = require('assert')
   , bodyParser = require('body-parser')
   , Step = require('step')
+var ObjectId = mongo.ObjectId;
 
 
 var express = require('express');
@@ -65,6 +66,17 @@ Step(
         res.jsonp(result);
       });
     });
+
+    app.get('/result', function(req, res) {
+      console.log(req.query.id);
+      collection.find(
+        { _id: ObjectId(req.query.id) }
+      ).toArray(function(err, result) {
+        assert.equal(err, null);
+        res.jsonp(result);
+      });
+    });
+
     var server = app.listen(3000, function () {
 
       var host = server.address().address;
