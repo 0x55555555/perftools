@@ -2,13 +2,93 @@ var ServerUrl = 'http://localhost:3000/';
 
 var app = angular.module('myApp', [ 'd3' ]);
 
+var Result = function(total, total_sq, min, max, count) {
+  this.total = total;
+  this.total_sq = total_sq;
+  this.min = min;
+  this.max = max;
+  this.count = count;
+};
+
+Result.prototype.average = function() {
+    return this.total / this.count;
+};
+
+Result.prototype.sd = function() {
+    var mean_sq = this.total_sq / this.count;
+    var mean = this.average();
+    return Math.sqrt(mean_sq - mean * mean);
+};
+
 app.controller('ResultController', function($scope, $http) {
+  $scope.data_sets = { };
+
+  var add_data_set = function(path, start, data) {
+    var parent = $scope.data_sets;
+    for (var i = 0; i < path.length; ++i) {
+      var name = path[i];
+      if (!(name in parent)) {
+        parent[name] = { };
+      }
+
+      if (i == path.length-1) {
+        parent[start] = data;
+      }
+
+      parent = parent[name];
+    }
+  }
 
   var get_result = function(result) {
     $http({
       method: 'JSONP',
       url: ServerUrl + 'result?id=' + result.id + '&callback=JSON_CALLBACK'
     }).success(function(data, status) {
+      for (var ctx_name in data.contexts) {
+        var ctx = data.contexts[ctx_name];
+
+        var parents = {};
+        for (var res in ctx.results) {
+          var results = ctx.results[res];
+          parents[results.name] = results.parent;
+        }
+
+        var parentLists = {};
+        for (var res in parents) {
+          var path = [];
+          parentLists[res] = path;
+          var obj = res;
+          while(obj = parents[obj]) {
+            path.push(obj);
+          }
+          path.push(res);
+        }
+
+        for (var res in ctx.results) {
+          var results = ctx.results[res];
+          var path = [ data.recipe, ctx_name ].concat(parentLists[results.name]);
+
+          if (results.total_time) {
+            add_data_set(path.concat("offset"), ctx.start, new Result(
+              results.total_time,
+              results.total_time_sq,
+              results.min_time,
+              results.max_time,
+              results.fire_count
+            ));
+          }
+
+          if (results.total_offset_time) {
+            add_data_set(path.concat("offset"), ctx.start, new Result(
+              results.total_offset_time,
+              results.total_offset_time_sq,
+              results.min_offset_time,
+              results.max_offset_time,
+              results.fire_count
+            ));
+          }
+        }
+      }
       result.value = 4;
     }).error(function(data, status) {
       console.log("Error getting result summary info", data, status);

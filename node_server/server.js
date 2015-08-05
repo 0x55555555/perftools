@@ -68,12 +68,17 @@ Step(
     });
 
     app.get('/result', function(req, res) {
-      console.log(req.query.id);
       collection.find(
         { _id: ObjectId(req.query.id) }
       ).toArray(function(err, result) {
         assert.equal(err, null);
-        res.jsonp(result);
+        if (result.length == 1) {
+          res.jsonp(result[0]);
+        }
+        else {
+          res.status(500);
+          res.jsonp({});
+        }
       });
     });
 

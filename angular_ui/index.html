@@ -10,6 +10,7 @@
     {{ name }}
     <div ng-controller="ResultController">
       <h5>Got {{ results.length }} recipes</h5>
+      {{ data_sets }}
       <p ng-repeat="t in results">{{ t._id }}</p>
       <result-chart chart-data="results"></result-chart>
     </div>
