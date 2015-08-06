@@ -1,4 +1,4 @@
-var d3js = angular
+angular
   .module('d3', [])
   .factory('d3Service', ['$document', '$q', '$rootScope', '$window',
     function($document, $q, $rootScope, $window) {

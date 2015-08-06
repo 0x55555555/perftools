@@ -3,6 +3,7 @@
 *.moc
 *build/
 data/
+experiments/
 test/data/
 test/dbTest/
 node_server/node_modules/
