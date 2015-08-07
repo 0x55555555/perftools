@@ -131,31 +131,6 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
           .attr("class", "y axis")
           .attr("transform", "translate(" + padding + ",0)")
           .call(yAxisGen);
-        /*
-        function drawLineChart() {
-
-          setChartParameters();
-
-          svg.append("svg:g")
-           .attr("class", "x axis")
-           .attr("transform", "translate(0,180)")
-           .call(xAxisGen);
-
-          svg.append("svg:g")
-           .attr("class", "y axis")
-           .attr("transform", "translate(20,0)")
-           .call(yAxisGen);
-
-          svg.append("svg:path")
-           .attr({
-               d: lineFun(salesDataToPlot),
-               "stroke": "blue",
-               "stroke-width": 2,
-               "fill": "none",
-               "class": pathClass
-           });
-        }*/
-
       });
     }
   };
