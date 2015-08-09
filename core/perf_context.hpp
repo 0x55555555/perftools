@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include <cstdint>
 #include <mutex>
 #include <vector>
 
@@ -64,7 +65,7 @@ public:
   /// Finish [event]
   void finish_event(detail::event_reference &event);
 
-  struct time_group
+  struct PERF_EXPORT time_group
     {
     time_group();
     time_group(time_group &&);
@@ -79,7 +80,7 @@ public:
     };
 
   /// Internal storage for an event, containing aggregated data about the firings.
-  struct event
+  struct PERF_EXPORT event
     {
     event(const char *name, const detail::event_reference &parent);
     event(event &&ev);

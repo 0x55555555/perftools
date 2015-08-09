@@ -49,26 +49,10 @@ if(MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    set(CPP_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
+  set(CPP_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
 endif()
 
-###############################################################################
-# Cpp library
-###############################################################################
-
-add_library(perf_cpp INTERFACE
-)
-
-target_sources(perf_cpp
-  INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/perf.hpp
-)
-
-
-target_include_directories(perf_cpp
-  INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp
-)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPP_FLAGS}")

@@ -59,7 +59,7 @@ int cpuid_max()
 void cpuid(unsigned int i, unsigned int *out)
   {
 #ifdef _WIN32
-  __cpuid(out, i);
+  __cpuid((int*)out, i);
 #else
   __get_cpuid(i, out, out+1, out+2, out+3);
 #endif
@@ -82,18 +82,18 @@ identity identity::this_machine(perf::config *config, const char *binding)
   // todo: tidy up,this is a bit messy, and not really the good information?
 #if defined(_WIN32)
 #if defined(_WIN64)
-  m_os = "win32";
+  id.m_os = "win64";
 #else
-  m_os = "win64";
+  id.m_os = "win32";
 #endif
   SYSTEM_INFO sysInfo;
   GetSystemInfo(&sysInfo);
-  m_cpu_count = sysInfo.dwNumberOfProcessors;
+  id.m_cpu_count = sysInfo.dwNumberOfProcessors;
 
   MEMORYSTATUSEX statex;
   statex.dwLength = sizeof (statex);
   GlobalMemoryStatusEx(&statex);
-  m_memory_bytes = statex.ullTotalPhys;
+  id.m_memory_bytes = statex.ullTotalPhys;
 
 #elif defined(__APPLE__)
   id.m_cpu_hz = get_64_bit_int("hw.cpufrequency");
@@ -121,14 +121,15 @@ identity identity::this_machine(perf::config *config, const char *binding)
 #endif
 
 #if defined(PERF_X86) || defined(PERF_X64)
-  auto id_count = cpuid_max();
-  auto base = 0x80000002;
-  auto required = 2;
+  uint32_t id_count = cpuid_max();
+  uint32_t base = 0x80000002;
+  uint32_t required = 2;
   if ((id_count-base) >= required)
     {
-    for (std::size_t i = 0; i <= required; ++i)
+    for (uint32_t i = 0; i <= required; ++i)
       {
-      cpuid(base + i, reinterpret_cast<unsigned int *>(id.m_cpu.data() + (i * 16)));
+      char *data = id.m_cpu.data() + (i * 16);
+      cpuid(base + i, reinterpret_cast<unsigned int *>(data));
       }
     }
   id.m_cpu.resize(48);

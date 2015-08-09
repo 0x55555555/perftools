@@ -10,37 +10,42 @@ struct allocator_base
   {
   using alloc = void *(*)(size_t size);
   using free = void (*)(void *size);
-  
+
   allocator_base()
   : allocator_base(std::malloc, std::free)
     {
     }
-  
+
   allocator_base(alloc a, free f)
   : m_alloc(a)
   , m_free(f)
     {
     check(m_alloc);
     check(m_free);
+  }
+
+  bool operator==(const allocator_base &a) const
+    {
+    return a.m_alloc == m_alloc && a.m_free == m_free;
     }
 
   bool operator!=(const allocator_base &a) const
     {
-    return a.m_alloc != m_alloc || a.m_free != m_free;
+    return !(*this == a);
     }
-  
+
   template <typename T, typename... Args> T *allocate_and_construct(Args &&... args) const
     {
     auto mem = m_alloc(sizeof(T));
     return new(mem) T(std::forward<Args>(args)...);
     }
-  
+
   template <typename T> void destroy_and_free(T *t) const
     {
     t->~T();
     m_free(t);
     }
-  
+
 protected:
   alloc m_alloc;
   free m_free;
@@ -54,6 +59,11 @@ template <typename T> struct allocator final : public allocator_base
   using size_type = std::size_t;
   using pointer = T *;
   using const_pointer = const T *;
+
+  template <typename U> struct rebind
+    {
+    using other = allocator<U>;
+    };
 
   allocator(const allocator_base &a) : allocator_base(a)
     {
@@ -72,6 +82,17 @@ template <typename T> struct allocator final : public allocator_base
     (void)n;
     check(m_free);
     return m_free(p);
+    }
+
+  template <class U, class... Args> void construct(U* p, Args&&... args)
+    {
+    ::new((void *)p) U(std::forward<Args>(args)...);
+    }
+
+  template <class U> void destroy(U* p)
+    {
+    (void)p;
+    p->~U();
     }
   };
 

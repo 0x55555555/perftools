@@ -9,7 +9,16 @@ void json_writer::write(const context &c, const char *filename)
   {
   string output = dump(c);
 
-  auto file = fopen(filename, "w");
+  FILE *file = nullptr;
+#if _WIN32
+  if (!fopen_s(&file, filename, "w"))
+    {
+    file = nullptr;
+    }
+#else
+  file = fopen(filename, "w");
+#endif
+
   if (!file)
     {
     throw std::invalid_argument("filename");

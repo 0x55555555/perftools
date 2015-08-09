@@ -33,7 +33,7 @@ context::~context()
   
 std::uint64_t context::start_time() const
   {
-  std::time_t time = std::chrono::system_clock::to_time_t(m_start);
+  time_t time = std::chrono::system_clock::to_time_t(m_start);
   return time;
   }
   
@@ -71,7 +71,7 @@ void context::fire_event(
   fire_event(event, parent_start, point, point);
   }
 
-void context::finish_event(detail::event_reference &event)
+void context::finish_event(detail::event_reference &)
   {
   }
 

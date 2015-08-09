@@ -1,11 +1,11 @@
 #pragma once
-#include "perf.hpp"
+#include "perf_context.hpp"
 
 namespace perf
 {
 
 /// Writer for producing json data from a perf types
-class json_writer
+class PERF_EXPORT json_writer
 {
 public:
   /// Dump [e] to json in [out]

@@ -174,7 +174,6 @@ class TestServer < Test::Unit::TestCase
       sleep(0.2)
 
       output = JSON.parse(Net::HTTP.get(host, "/summary", port))
-      puts "#{output}"
       assert_equal 2, output.length
       assert_equal "test_other_recipe", output[0]["_id"]
       assert_equal "test_recipe", output[1]["_id"]

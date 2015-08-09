@@ -1,7 +1,15 @@
 #pragma once
 #include <stdexcept>
 
-#define PERF_EXPORT
+#ifdef _WIN32
+# ifdef PERF_BUILD
+#  define PERF_EXPORT __declspec(dllexport)
+# else
+#  define PERF_EXPORT __declspec(dllimport)
+# endif
+#else
+# define PERF_EXPORT
+#endif
 
 namespace perf
 {
@@ -12,6 +20,11 @@ inline void check(bool b)
     {
     throw std::runtime_error("");
     }
+  }
+
+template <typename T> inline void check(const T *b)
+  {
+  check(!!b);
   }
 
 }

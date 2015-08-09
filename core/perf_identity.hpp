@@ -1,4 +1,5 @@
 #pragma once
+#include "perf_global.hpp"
 #include "perf_string.hpp"
 
 namespace perf

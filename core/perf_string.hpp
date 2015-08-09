@@ -1,4 +1,6 @@
 #pragma once
+#include <atomic>
+#include <algorithm>
 #include <string>
 #include "perf_allocator.hpp"
 
@@ -25,7 +27,13 @@ template <typename StringType, typename T> void appendf(StringType &str, const T
   std::size_t likely_required_size = 128;
   auto tmp_size = std::min(str.size() + likely_required_size, max_resize_size(str));
   str.resize(tmp_size);
-  auto used = snprintf(&str[0] + old_size, tmp_size - old_size, format, t);
+  auto used = 
+#ifdef WIN32 
+    sprintf_s
+#else
+    snprintf
+#endif
+      (&str[0] + old_size, tmp_size - old_size, format, t);
 
   str.resize(old_size + used);
   }
@@ -34,8 +42,8 @@ template <std::size_t Size> class basic_short_string
   {
 public:
   basic_short_string()
-    : m_data { '\0' }
     {
+    m_data[0] = '\0';
     }
 
   basic_short_string(const char *data)

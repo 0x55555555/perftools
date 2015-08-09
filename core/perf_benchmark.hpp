@@ -29,8 +29,8 @@ public:
   
   std::size_t warm_up_count = 10;
   double max_sd_multiplier = 0.1;
-  double max_fire_count = 100;
-  double min_fire_count = 2;
+  std::size_t max_fire_count = 100;
+  std::size_t min_fire_count = 2;
   
   bool can_stop(const context::event &ev) const
     {
@@ -48,6 +48,16 @@ public:
     }
   };
   
+class benchmark_event
+  {
+public:
+  std::function<perf::event()> fire;
+
+  perf::event operator()() const
+    {
+    return fire();
+    }
+  };
 
 /// Benchmark [f] under the [parent], timing [f] (which should fire child events internally) and repeating until [params] pass.
 template <typename Fn> void benchmark_specific(event &parent, const char *name, const Fn &f, const benchmark_parameters &param = benchmark_parameters())
@@ -65,7 +75,7 @@ template <typename Fn> void benchmark_specific(event &parent, const char *name, 
   
   meta_event benchmark(parent.get_meta_event(), name);
 
-  auto fire = [&]() { return parent.fire_child(benchmark); };
+  benchmark_event fire{ [&]() { return parent.fire_child(benchmark); } };
 
   while (!param.can_stop(benchmark.get_context()->event_for(benchmark.get_event_reference())))
     {
@@ -83,7 +93,7 @@ template <typename Fn> void benchmark_specific(context &ctx, const char *name, c
 /// Benchmark [f] under the [parent], sinply timing [f] and repeating until [params] pass.
 template <typename Fn> void benchmark(event &parent, const char *name, const Fn &f, const benchmark_parameters &params = benchmark_parameters())
   {
-  auto wrapper_f = [&f](auto &begin_timing)
+  auto wrapper_f = [&f](const perf::benchmark_event &begin_timing)
     {
     auto timer = begin_timing();
     f();

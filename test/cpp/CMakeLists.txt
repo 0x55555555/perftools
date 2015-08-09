@@ -15,8 +15,11 @@ target_include_directories(perf_cpp_test SYSTEM
 
 target_link_libraries(perf_cpp_test
   perf
-  perf_cpp
 )
+
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
+endif()
 
 add_test(NAME perf_cpp_test
   COMMAND

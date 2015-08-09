@@ -120,7 +120,7 @@ void check_dummy(jsoncons::json &obj)
   check_identity(obj["machine_identity"]);
   REQUIRE(obj["results"].is_array());
 
-  auto results = obj["results"];
+  jsoncons::json results = obj["results"];
 
   REQUIRE(results[0]["name"].as_string() == "root");
   check_timing(results[0]);
@@ -202,7 +202,7 @@ TEST_CASE("benchmarking", "[timing]")
     a += "_pork";
     });
   
-  perf::benchmark_specific(ctx, "string_appending_specific", [](const auto &begin_timing)
+  perf::benchmark_specific(ctx, "string_appending_specific", [](const perf::benchmark_event &begin_timing)
     {
     std::string a("test");
     
