@@ -5,6 +5,7 @@
     <script src="js/d3.js"></script>
     <script src="js/app.js"></script>
     <script src="js/result.js"></script>
+    <script src="js/data_set.js"></script>
     <script src="js/result-chart.js"></script>
     <script src="js/result-controller.js"></script>
     <link rel="stylesheet" type="text/css" href="css/chart.css">
@@ -14,8 +15,8 @@
     <div ng-controller="ResultController">
       <h5>Got {{ results.length }} recipes</h5>
       {{ data_sets }}
-      <p ng-repeat="t in results">{{ t._id }}</p>
-      <result-chart chart-data="results"></result-chart>
+      <p ng-repeat="(k, v) in data_sets">{{ k }}</p>
+      <result-chart chart-data="data_sets"></result-chart>
     </div>
   </body>
 </html>

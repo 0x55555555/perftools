@@ -1,19 +1,29 @@
 var ServerUrl = 'http://localhost:3000/';
 
 app.controller('ResultController', function($scope, $http) {
+  $scope.data_set_tree = { };
   $scope.data_sets = { };
 
-  var add_data_set = function(path, start, data) {
-    var parent = $scope.data_sets;
+  var add_to_data_set = function(path, data) {
+    var parent = $scope.data_set_tree;
+    var result_path = "";
     for (var i = 0; i < path.length; ++i) {
       var name = path[i];
-      if (!(name in parent)) {
-        parent[name] = { };
-      }
+      result_path += "::" + name;
 
       if (i == path.length-1) {
-        parent[start] = data;
-      }
+       if (!(name in parent)) {
+         var ds = new DataSet();
+         parent[name] = ds;
+         $scope.data_sets[result_path] = ds;
+       }
+       parent[name].push(data);
+     }
+     else {
+       if (!(name in parent)) {
+         parent[name] = {};
+       }
+     }
 
       parent = parent[name];
     }
@@ -49,7 +59,8 @@ app.controller('ResultController', function($scope, $http) {
           var path = [ data.recipe, ctx_name ].concat(parentLists[results.name]);
 
           if (results.total_time) {
-            add_data_set(path.concat("offset"), ctx.start, new Result(
+            add_to_data_set(path.concat("duration"), new Result(
+              ctx.start,
               results.total_time,
               results.total_time_sq,
               results.min_time,
@@ -59,7 +70,8 @@ app.controller('ResultController', function($scope, $http) {
           }
 
           if (results.total_offset_time) {
-            add_data_set(path.concat("offset"), ctx.start, new Result(
+            add_to_data_set(path.concat("offset"), new Result(
+              ctx.start,
               results.total_offset_time,
               results.total_offset_time_sq,
               results.min_offset_time,
