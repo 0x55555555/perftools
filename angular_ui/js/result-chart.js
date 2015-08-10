@@ -17,20 +17,22 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
 
         function setChartParameters(data) {
 
-          var min = d3.min(data, function(d) {
-            return d.first;
-          });
+          var min = [];
+          var max = [];
 
-          var max = d3.max(data, function(d) {
-            return d.last;
-          });
+          for (var d in data) {
+            min.push(data[d].start());
+            max.push(data[d].end());
+          }
+          min = d3.min(min);
+          max = d3.min(max);
 
           xScale = d3.scale.linear()
               .domain([min, max])
               .range([padding, svg.attr("width") - padding]);
 
           yScale = d3.scale.linear()
-              .domain([10, 0])
+              .domain([50, 0])
               .range([padding, svg.attr("height") - padding]);
 
           var format_date = function(d) {
@@ -63,17 +65,17 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
           var output = [];
           for (var i in data) {
             var result = {
-              date: data[i].date,
-              value: data[i].value
+              date: data[i].start,
+              value: data[i].average()
             };
 
             if (i == 0) {
-              result.last_date = data[i].date,
+              result.last_date = data[i].start,
               result.last_value = 0
             }
             else {
-              result.last_date = data[i-1].date,
-              result.last_value = data[i-1].value
+              result.last_date = data[i-1].start,
+              result.last_value = data[i-1].average()
             }
 
             output.push(result);
@@ -85,8 +87,13 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
         function redrawLineChart(data) {
           lines.selectAll('*').remove();
 
+          var value_array = [];
+          for (var val in data) {
+            value_array.push(data[val]);
+          }
+
           var data_point = lines.selectAll("circle")
-            .data(data)
+            .data(value_array)
               .enter()
                 .append("g")
                   .selectAll("circle")
