@@ -22,7 +22,7 @@ struct allocator_base
     {
     check(m_alloc);
     check(m_free);
-  }
+    }
 
   bool operator==(const allocator_base &a) const
     {
