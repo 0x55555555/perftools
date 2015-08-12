@@ -23,3 +23,7 @@ DataSet.prototype.start = function() {
 DataSet.prototype.end = function(result) {
     return this._end;
 };
+
+var DataSetMetaData = function() {
+  this.show = true;
+};

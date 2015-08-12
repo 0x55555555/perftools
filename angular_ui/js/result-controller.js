@@ -3,6 +3,7 @@ var ServerUrl = 'http://localhost:3000/';
 app.controller('ResultController', function($scope, $http) {
   $scope.data_set_tree = { };
   $scope.data_sets = { };
+  $scope.data_sets_meta_data = { };
 
   var add_to_data_set = function(path, data) {
     var parent = $scope.data_set_tree;
@@ -16,6 +17,7 @@ app.controller('ResultController', function($scope, $http) {
          var ds = new DataSet();
          parent[name] = ds;
          $scope.data_sets[result_path] = ds;
+         $scope.data_sets_meta_data[result_path] = new DataSetMetaData();
        }
        parent[name].push(data);
      }
