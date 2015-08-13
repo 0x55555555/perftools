@@ -13,7 +13,6 @@
   <body>
     {{ name }}
     <div ng-controller="ResultController">
-      <h5>Got {{ results.length }} recipes</h5>
       <p ng-repeat="(k, v) in data_sets"><input type="checkbox" ng-model="data_sets_meta_data[k].show"> {{data_sets_meta_data[k]}} {{ k }}</p>
       <result-chart chart-data="data_sets"></result-chart>
     </div>
