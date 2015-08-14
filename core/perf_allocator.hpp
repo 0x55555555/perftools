@@ -53,7 +53,7 @@ protected:
 
 /// Implementation of std::allocator used for
 /// allocating and returning all api and internal objects
-template <typename T> struct allocator final : public allocator_base
+template <typename T> struct allocator : public allocator_base
   {
   using value_type = T;
   using size_type = std::size_t;

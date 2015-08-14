@@ -15,6 +15,8 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
 
         var lines = svg.append("g");
 
+        var view = new ResultView();
+
         function setChartParameters(data) {
 
           var min = [];
@@ -84,8 +86,10 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
           return output;
         }
 
-        function redrawLineChart(data) {
+        function redrawLineChart(input_data) {
           lines.selectAll('*').remove();
+
+          var data = view.processedResults(input_data);
 
           var value_array = [];
           for (var val in data) {
