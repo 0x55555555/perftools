@@ -1,5 +1,6 @@
-var Result = function(start, total, total_sq, min, max, count) {
+var Result = function(start, identity, total, total_sq, min, max, count) {
   this.start = start;
+  this.machine_identity = identity;
   this.total = total;
   this.total_sq = total_sq;
   this.min = min;

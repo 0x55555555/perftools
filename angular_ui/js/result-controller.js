@@ -63,6 +63,7 @@ app.controller('ResultController', function($scope, $http) {
           if (results.total_time) {
             add_to_data_set(path.concat("duration"), new Result(
               ctx.start,
+              ctx.machine_identity,
               results.total_time,
               results.total_time_sq,
               results.min_time,
@@ -74,6 +75,7 @@ app.controller('ResultController', function($scope, $http) {
           if (results.total_offset_time) {
             add_to_data_set(path.concat("offset"), new Result(
               ctx.start,
+              ctx.machine_identity,
               results.total_offset_time,
               results.total_offset_time_sq,
               results.min_offset_time,
