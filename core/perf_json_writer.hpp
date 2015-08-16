@@ -4,7 +4,8 @@
 namespace perf
 {
 
-/// Writer for producing json data from a perf types
+/// \brief Writer for producing json data from a perf types
+/// \ingroup CPP_API
 class PERF_EXPORT json_writer
 {
 public:
@@ -13,6 +14,7 @@ public:
   /// Dump [ctx] to json and return
   string dump(const context &ctx);
 
+  /// Write the given context to json file, [filename]
   void write(const context &ctx, const char *filename);
 };
 

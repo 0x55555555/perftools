@@ -11,9 +11,20 @@
 # define PERF_EXPORT
 #endif
 
+#ifdef _DEBUG
+#define PERF_ASSERT(x) perf::check(x)
+#else
+#define PERF_ASSERT(x)
+#endif
+
+/// \brief The Perf C++ api is all wrapped inside the namespace perf, except for a
+/// couple of macros which all start with "PERF_"
+/// \ingroup CPP_API
 namespace perf
 {
 
+/// Utility method to check a value is true
+/// \private
 inline void check(bool b)
   {
   if (!b)
@@ -22,15 +33,11 @@ inline void check(bool b)
     }
   }
 
+/// Utility method to check a pointer is valid
+/// \private
 template <typename T> inline void check(const T *b)
   {
   check(!!b);
   }
 
 }
-
-#ifdef _DEBUG
-#define perf_assert(x) perf::check(x)
-#else
-#define perf_assert(x)
-#endif

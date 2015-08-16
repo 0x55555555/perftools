@@ -14,7 +14,8 @@ namespace perf
 
 class time;
 
-/// A context stores and maintains a group of events.
+/// \brief A context stores and maintains a group of events.
+/// \ingroup CPP_API
 class PERF_EXPORT context
   {
 public:
@@ -34,21 +35,21 @@ public:
     }
 
   /// Find the name for the context
-  const short_string &name() const { return m_name; }
+  const detail::short_string &name() const { return m_name; }
 
   /// Find the time since unix epoch when this test started.
   std::uint64_t start_time() const;
-  
+
   // Find the root event for the context, all events derive from
   const event &root_event() const { return m_root; }
   // Find the root event for the context, all events derive from
   event &root_event() { return m_root; }
-  
+
   /// Fire a child event
   perf::event fire_child(meta_event *ev) { return perf::event(&m_root, ev); }
   /// Fire a child event
   perf::event fire_child(meta_event &ev) { return perf::event(&m_root, &ev); }
-  
+
   /// Create a new event in the context
   detail::event_reference add_event(const char *name, detail::event_reference *parent = nullptr);
   /// Fire [event] with a [begin] and [end]
@@ -65,6 +66,7 @@ public:
   /// Finish [event]
   void finish_event(detail::event_reference &event);
 
+  /// \brief Stores data on past timing results.
   struct PERF_EXPORT time_group
     {
     time_group();
@@ -72,14 +74,14 @@ public:
     time_group &operator=(time_group &&ev);
 
     void append(std::uint64_t duration);
-    
+
     std::atomic<std::uint64_t> min_time;
     std::atomic<std::uint64_t> max_time;
     std::atomic<std::uint64_t> total_time;
     std::atomic<std::uint64_t> total_time_sq;
     };
 
-  /// Internal storage for an event, containing aggregated data about the firings.
+  /// \brief Internal storage for an event, containing aggregated data about the firings.
   struct PERF_EXPORT event
     {
     event(const char *name, const detail::event_reference &parent);
@@ -87,18 +89,18 @@ public:
     event &operator=(event &&ev);
 
     detail::event_reference parent;
-    short_string name;
-    
+    detail::short_string name;
+
     double average() const;
     double sd() const;
-    
+
     std::atomic<std::size_t> fire_count;
     time_group offset;
     time_group duration;
     };
 
   /// Find all events contained in the context
-  const std::vector<event, allocator<event>> &events() const { return m_events; }
+  const std::vector<event, detail::allocator<event>> &events() const { return m_events; }
 
   /// Find an event by reference
   const event &event_for(const detail::event_reference &ev) const { return m_events[ev.index]; }
@@ -106,10 +108,10 @@ public:
 private:
   std::mutex m_events_mutex;
   config *m_config;
-  std::vector<event, allocator<event>> m_events;
+  std::vector<event, detail::allocator<event>> m_events;
   std::chrono::system_clock::time_point m_start;
 
-  short_string m_name;
+  detail::short_string m_name;
   single_fire_event m_root;
   };
 

@@ -8,8 +8,9 @@ namespace perf
 
 class context;
 
-/// A descriptor for an event, containing a name and a handle to fire it.
+/// \brief A descriptor for an event, containing a name and a handle to fire it.
 /// \note it is safe to use a single context to create meta_events from multiple threads
+/// \ingroup CPP_API
 class PERF_EXPORT meta_event
   {
 public:
@@ -63,7 +64,7 @@ public:
 
   /// Check the [ev] parameter is a valid parent for this event.
   bool validate_parent(const meta_event *ev);
-  
+
 private:
   context *m_context;
   detail::event_reference m_event;

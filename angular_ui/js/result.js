@@ -17,3 +17,28 @@ Result.prototype.sd = function() {
     var mean = this.average();
     return Math.sqrt(mean_sq - mean * mean);
 };
+
+Result.clone = function(a) {
+  return new Result(
+    a.start,
+    a.machine_identity,
+    a.total,
+    a.total_sq,
+    a.min,
+    a.max,
+    a.count
+  );
+};
+
+Result.combine = function(a, b) {
+  var cloned = Result.clone(a);
+
+  this.start = Math.min(cloned.start, b.start);
+  this.total += b.total;
+  this.total_sq += b.total_sq;
+  this.min = Math.min(cloned.min, b.min);
+  this.max = Math.max(cloned.max, b.max);
+  this.count += b.count;
+  
+  return cloned;
+};

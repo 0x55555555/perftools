@@ -4,11 +4,12 @@
 
 namespace perf
 {
-  
+
 class config;
 
-/// A descriptive class for a machines identity
+/// \brief A descriptive class for a machines identity
 /// Contains information about the performance statistics of the machine.
+/// \ingroup CPP_API
 class PERF_EXPORT identity
   {
 public:
@@ -17,20 +18,20 @@ public:
 
   /// Get the machines description as json.
   void json_description(string &, const char *line_start="") const;
-  
+
   /// Get the config that owns this identity.
   perf::config *config() const { return m_config; }
-  
+
 protected:
   identity() { }
-  
+
   perf::config *m_config;
 
-  short_string m_cpu;
-  short_string m_binding;
-  short_string m_arch;
-  short_string m_os;
-  short_string m_extra;
+  detail::short_string m_cpu;
+  detail::short_string m_binding;
+  detail::short_string m_arch;
+  detail::short_string m_os;
+  detail::short_string m_extra;
   std::size_t m_cpu_count;
   std::size_t m_thread_count;
   std::size_t m_cpu_hz;

@@ -5,8 +5,9 @@
 namespace perf
 {
 
-/// A single fire event creates a meta_event and fires it in a single object
+/// \brief A single fire event creates a meta_event and fires it in a single object
 /// Useful for one off events
+/// \ingroup CPP_API
 class PERF_EXPORT single_fire_event : public meta_event, public event
   {
 public:

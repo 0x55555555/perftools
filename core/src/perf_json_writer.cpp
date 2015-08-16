@@ -34,6 +34,8 @@ void json_writer::write(const context &c, const char *filename)
 
 void json_writer::dump(const context::event &e, const context &ctx, string &out, const char *tab)
   {
+  using namespace detail;
+  
   append(out, tab, "{\n");
   append(out, tab, "  \"name\": \"", e.name, "\"");
 
@@ -71,6 +73,8 @@ void json_writer::dump(const context::event &e, const context &ctx, string &out,
 
 string json_writer::dump(const context &c)
   {
+  using namespace detail;
+  
   auto conf = c.get_config();
   string results(conf->allocator());
 

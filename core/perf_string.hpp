@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <atomic>
 #include <algorithm>
 #include <string>
@@ -7,14 +8,22 @@
 namespace perf
 {
 
-using string = std::basic_string<char, std::char_traits<char>, allocator<char>>;
+/// String classes used in perf API.
+/// \ingroup CPP_API
+using string = std::basic_string<char, std::char_traits<char>, detail::allocator<char>>;
+
+namespace detail
+{
+
 template <std::size_t Size> class basic_short_string;
 
+/// Find the maximum size a given string type can resize to.
 inline std::size_t max_resize_size(string &)
   {
   return std::numeric_limits<std::size_t>::max();
   }
 
+/// Find the maximum size a given string type can resize to.
 template <std::size_t Size> std::size_t max_resize_size(basic_short_string<Size> &)
   {
   return Size-1;
@@ -27,8 +36,8 @@ template <typename StringType, typename T> void appendf(StringType &str, const T
   std::size_t likely_required_size = 128;
   auto tmp_size = std::min(str.size() + likely_required_size, max_resize_size(str));
   str.resize(tmp_size);
-  auto used = 
-#ifdef WIN32 
+  auto used =
+#ifdef WIN32
     sprintf_s
 #else
     snprintf
@@ -38,6 +47,7 @@ template <typename StringType, typename T> void appendf(StringType &str, const T
   str.resize(old_size + used);
   }
 
+/// Template wrapper for short strings, containing a fixed array of characters.
 template <std::size_t Size> class basic_short_string
   {
 public:
@@ -53,9 +63,9 @@ public:
     }
 
   std::size_t capacity() const { return Size; }
-  std::size_t size() const { return strlen(m_data); }
-  char *data() { return m_data; }
-  const char *data() const { return m_data; }
+  std::size_t size() const { return strlen(m_data.data()); }
+  char *data() { return m_data.data(); }
+  const char *data() const { return m_data.data(); }
 
   char &operator[](std::size_t i) { return m_data[i]; }
 
@@ -78,8 +88,10 @@ public:
     }
 
 private:
-  char m_data[Size];
+  std::array<char, Size> m_data;
   };
+
+/// Wrapper type for a short string, used internally for string snippets.
 using short_string = basic_short_string<64>;
 
 template <typename StringType> void append(StringType &str, const char *t)
@@ -92,11 +104,6 @@ template <typename StringTypeA, typename StringTypeB> void append(StringTypeA &s
   str += t.data();
   }
 
-template <typename StringType, typename Type> void append(StringType &str, const std::atomic<Type> &t)
-  {
-  append(str, t.load());
-  }
-
 template <typename StringType> void append(StringType &str, unsigned long long t)
   {
   appendf(str, t, "%llu");
@@ -107,10 +114,17 @@ template <typename StringType> void append(StringType &str, unsigned long t)
   appendf(str, t, "%lu");
   }
 
+template <typename StringType, typename Type> void append(StringType &str, const std::atomic<Type> &t)
+  {
+  append(str, t.load());
+  }
+
 template <typename StringType, typename... Args, typename T> void append(StringType &str, const T &t, Args &&...args)
   {
   append(str, t);
   append(str, std::forward<Args>(args)...);
   }
+
+}
 
 }

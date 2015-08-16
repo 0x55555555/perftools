@@ -6,11 +6,12 @@
 
 namespace perf
 {
-  
+
 class context;
 
-/// A config holds whole library information for perf to use
+/// \brief A config holds whole library information for perf to use
 /// including allocation strategies, and identity information.
+/// \ingroup CPP_API
 class PERF_EXPORT config
   {
 public:

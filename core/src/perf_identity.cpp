@@ -21,7 +21,7 @@ uint64_t get_64_bit_int(const char *id)
   }
 
 // osx sysctlbyname string
-  void append_string(perf::short_string &str, const char *id)
+  void append_string(perf::detail::short_string &str, const char *id)
   {
   std::size_t len = 0;
   sysctlbyname(id, NULL, &len, NULL, 0);
@@ -143,6 +143,7 @@ identity identity::this_machine(perf::config *config, const char *binding)
 
 void identity::json_description(string& id, const char* line_start) const
   {
+  using namespace detail;
   append(id, line_start, "{\n");
   append(id, line_start, "  \"arch\": \"", m_arch, "\",\n");
   append(id, line_start, "  \"os\": \"", m_os, "\",\n");

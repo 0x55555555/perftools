@@ -12,6 +12,10 @@
 # define PERF_C_EXPORT
 #endif
 
+/// \defgroup C_API
+/// This module exposes the perf api to C, useful for C only
+/// applications and importing perf into other languages.
+
 extern "C"
 {
 
@@ -21,8 +25,17 @@ struct perf_identity;
 struct perf_meta_event;
 struct perf_event;
 
+/// @addtogroup C_API
+/// @{
+
+/// Allocation function
+/// \param size The size to allocate
+/// \note Accepts malloc
 typedef void *(*perf_alloc)(size_t size);
-typedef void (*perf_free)(void *size);
+/// Deallocation function
+/// \param memory The memory to free
+/// \note Accepts free
+typedef void (*perf_free)(void *memory);
 
 /// \name Config management
 /// @{
@@ -94,6 +107,7 @@ PERF_C_EXPORT perf_event *perf_init_event(perf_meta_event *meta);
 /// \brief destroy an event
 PERF_C_EXPORT void perf_term_event(perf_event *ctx);
 
+/// @}
 /// @}
 
 }

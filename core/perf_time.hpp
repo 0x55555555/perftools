@@ -5,7 +5,8 @@
 namespace perf
 {
 
-/// A time point in the current system, relative to some unknown clock.
+/// \brief A time point in the current system, relative to some unknown clock.
+/// \ingroup CPP_API
 class time
   {
 public:

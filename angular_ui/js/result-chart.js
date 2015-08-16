@@ -30,11 +30,11 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
           max = d3.min(max);
 
           xScale = d3.scale.linear()
-              .domain([min, max])
+              .domain(data.x.range)
               .range([padding, svg.attr("width") - padding]);
 
           yScale = d3.scale.linear()
-              .domain([50, 0])
+              .domain(data.y.range)
               .range([padding, svg.attr("height") - padding]);
 
           var format_date = function(d) {
@@ -89,20 +89,17 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
         function redrawLineChart(input_data) {
           lines.selectAll('*').remove();
 
-          var data = view.processedResults(input_data);
+          var data = view.processedResults(input_data.results);
 
           var value_array = [];
           for (var val in data) {
             value_array.push(data[val]);
           }
 
-          var data_point = lines.selectAll("circle")
-            .data(value_array)
-              .enter()
-                .append("g")
-                  .selectAll("circle")
-                    .data(function(d) { return process_data(d.results); })
-                      .enter();
+          var data_point = lines
+            .selectAll("circle")
+              .data(process_data(data))
+                .enter();
 
           data_point.append("line")
             .attr("x1", function(d, i) { return xScale(d.date); })

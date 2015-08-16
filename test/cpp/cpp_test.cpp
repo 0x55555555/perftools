@@ -196,13 +196,13 @@ TEST_CASE("benchmarking", "[timing]")
   perf::context ctx(cfg, "string_benchmarks");
 
 
-  perf::benchmark(ctx, "string_appending", []()
+  perf::benchmark::benchmark(ctx, "string_appending", []()
     {
     std::string a("test");
     a += "_pork";
     });
   
-  perf::benchmark_specific(ctx, "string_appending_specific", [](const perf::benchmark_event &begin_timing)
+  perf::benchmark::benchmark_specific(ctx, "string_appending_specific", [](const perf::benchmark::wrapper &begin_timing)
     {
     std::string a("test");
     
