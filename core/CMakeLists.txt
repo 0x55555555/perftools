@@ -44,13 +44,19 @@ target_compile_definitions(perf
 )
 
 # Enable all warnings
-if(MSVC)
+if(WIN32)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   else()
     set(CPP_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
+
+  target_link_libraries(perf
+    PRIVATE
+	 PowrProf.lib
+  )
+  
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CPP_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
 endif()

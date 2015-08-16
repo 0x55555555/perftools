@@ -1,6 +1,17 @@
 var Result = function(start, identity, total, total_sq, min, max, count) {
-  this.start = start;
-  this.machine_identity = identity;
+  if (start instanceof Array) {
+    this.starts = start;
+  }
+  else {
+    this.starts = [ start ];
+  }
+
+  if (identity instanceof Array) {
+    this.machine_identities = identity;
+  }
+  else {
+    this.machine_identities = [ identity ];
+  }
   this.total = total;
   this.total_sq = total_sq;
   this.min = min;
@@ -20,8 +31,8 @@ Result.prototype.sd = function() {
 
 Result.clone = function(a) {
   return new Result(
-    a.start,
-    a.machine_identity,
+    clone_array(a.starts),
+    clone_array(a.machine_identities),
     a.total,
     a.total_sq,
     a.min,
@@ -33,12 +44,13 @@ Result.clone = function(a) {
 Result.combine = function(a, b) {
   var cloned = Result.clone(a);
 
-  this.start = Math.min(cloned.start, b.start);
-  this.total += b.total;
-  this.total_sq += b.total_sq;
-  this.min = Math.min(cloned.min, b.min);
-  this.max = Math.max(cloned.max, b.max);
-  this.count += b.count;
-  
+  cloned.starts = cloned.starts.concat(b.starts);
+  cloned.machine_identities = cloned.machine_identities.concat(b.machine_identities);
+  cloned.total += b.total;
+  cloned.total_sq += b.total_sq;
+  cloned.min = Math.min(cloned.min, b.min);
+  cloned.max = Math.max(cloned.max, b.max);
+  cloned.count += b.count;
+
   return cloned;
 };

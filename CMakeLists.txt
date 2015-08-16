@@ -4,7 +4,7 @@ enable_testing()
 project(perf_stack)
 
 # Enable c++1y
-if(NOT MSVC)
+if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4251")

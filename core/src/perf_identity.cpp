@@ -3,6 +3,18 @@
 
 #if defined(_WIN32)
 # include <Windows.h>
+# include <Powerbase.h>
+# include <vector>
+
+typedef struct _PROCESSOR_POWER_INFORMATION {
+	ULONG Number;
+	ULONG MaxMhz;
+	ULONG CurrentMhz;
+	ULONG MhzLimit;
+	ULONG MaxIdleState;
+	ULONG CurrentIdleState;
+} PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
+
 #elif defined(__APPLE__)
 # include <sys/sysctl.h>
 # include <cpuid.h>
@@ -94,6 +106,17 @@ identity identity::this_machine(perf::config *config, const char *binding)
   statex.dwLength = sizeof (statex);
   GlobalMemoryStatusEx(&statex);
   id.m_memory_bytes = statex.ullTotalPhys;
+
+  id.m_cpu_hz = 0;
+  /*std::vector<PROCESSOR_POWER_INFORMATION> power_information(sysInfo.dwNumberOfProcessors);
+  if (CallNtPowerInformation(ProcessorInformation,
+	  NULL,
+	  0,
+	  power_information.data(),
+	  sizeof(PROCESSOR_POWER_INFORMATION) * power_information.size()) == 0)
+    {
+
+    }*/
 
 #elif defined(__APPLE__)
   id.m_cpu_hz = get_64_bit_int("hw.cpufrequency");

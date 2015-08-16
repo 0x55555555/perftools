@@ -19,22 +19,12 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
 
         function setChartParameters(data) {
 
-          var min = [];
-          var max = [];
-
-          for (var d in data) {
-            min.push(data[d].start());
-            max.push(data[d].end());
-          }
-          min = d3.min(min);
-          max = d3.min(max);
-
           xScale = d3.scale.linear()
               .domain(data.x.range)
               .range([padding, svg.attr("width") - padding]);
 
           yScale = d3.scale.linear()
-              .domain(data.y.range)
+              .domain([data.y.range[1], data.y.range[0]])
               .range([padding, svg.attr("height") - padding]);
 
           var format_date = function(d) {
@@ -44,7 +34,7 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
             var dd  = date.getDate().toString();
 
             var result = dd + "/" + mm + "/" + yyyy;
-            if ((max - min) < 60*60*24*2) {
+            if ((data.x.range[1] - data.x.range[0]) < 60*60*24*2) {
               result = date.getHours() + ":" + date.getMinutes() + " " + result;
             }
 
@@ -63,54 +53,33 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
               .ticks(5);
         }
 
-        function process_data(data) {
-          var output = [];
-          for (var i in data) {
-            var result = {
-              date: data[i].start,
-              value: data[i].average()
-            };
-
-            if (i == 0) {
-              result.last_date = data[i].start,
-              result.last_value = 0
-            }
-            else {
-              result.last_date = data[i-1].start,
-              result.last_value = data[i-1].average()
-            }
-
-            output.push(result);
-          }
-
-          return output;
-        }
-
         function redrawLineChart(input_data) {
           lines.selectAll('*').remove();
 
-          var data = view.processedResults(input_data.results);
-
-          var value_array = [];
-          for (var val in data) {
-            value_array.push(data[val]);
-          }
+          var data = view.processedResults(input_data);
+          var results = data.results;
 
           var data_point = lines
             .selectAll("circle")
-              .data(process_data(data))
+              .data(results)
                 .enter();
 
           data_point.append("line")
-            .attr("x1", function(d, i) { return xScale(d.date); })
-            .attr("y1", function(d, i) { return yScale(d.value); })
-            .attr("x2", function(d, i) { return xScale(d.last_date); })
-            .attr("y2", function(d, i) { return yScale(d.last_value); })
+            .attr("x1", function(d, i) {
+              return xScale(results[i].starts[0]); })
+            .attr("y1", function(d, i) {
+              return yScale(results[i].average()); })
+            .attr("x2", function(d, i) {
+              return xScale(results[i-1] ? results[i-1].starts[0] : results[i].starts[0]); })
+            .attr("y2", function(d, i) {
+              return yScale(results[i-1] ? results[i-1].average() : results[i].average()); })
             .style("stroke", "indigo")
             .style("stroke-width", 2);
           data_point.append("circle")
-            .attr("cx", function(d, i) { return xScale(d.date); })
-            .attr("cy", function(d, i) { return yScale(d.value); })
+            .attr("cx", function(d, i) {
+              return xScale(d.starts[0]); })
+            .attr("cy", function(d, i) {
+              return yScale(d.average()); })
             .attr("r", 3)
             .style("fill", "purple");
 
@@ -127,7 +96,6 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
 
         var inputData = exp(scope);
         inputData = inputData != undefined ? inputData : [];
-        setChartParameters(inputData);
         redrawLineChart(inputData != undefined ? inputData : []);
 
         svg.append("svg:g")
