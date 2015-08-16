@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Perftools by jorj1988</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Perftools</h1>
+          <h2>System for testing performance of applications</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/jorj1988/perftools/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/jorj1988/perftools/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/jorj1988/perftools" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="perfstack" class="anchor" href="#perfstack" aria-hidden="true"><span class="octicon octicon-link"></span></a>perfstack</h1>
+
+<p>System for testing performance of applications</p>
+
+<h2>
+<a id="performance-gathering" class="anchor" href="#performance-gathering" aria-hidden="true"><span class="octicon octicon-link"></span></a>Performance Gathering</h2>
+
+<p>perfstack has several bindings to gather performance results. All bindings produce a common file format,
+and can be mixed together in profiling sessions.</p>
+
+<h3>
+<a id="c-bindings" class="anchor" href="#c-bindings" aria-hidden="true"><span class="octicon octicon-link"></span></a>C++ Bindings</h3>
+
+<p>The top level bindings are written in C++, all other bindings use C++ internally.</p>
+
+<p>The below code tests the performance of a piece of code called "block":</p>
+
+<div class="highlight highlight-cpp"><pre>perf::config cfg;
+perf::context <span class="pl-en">ctx</span>(cfg, <span class="pl-s"><span class="pl-pds">"</span>my context<span class="pl-pds">"</span></span>);
+
+perf::meta_event <span class="pl-en">blk</span>(ctx, <span class="pl-s"><span class="pl-pds">"</span>block<span class="pl-pds">"</span></span>);
+
+{
+  <span class="pl-k">auto</span> f = ctx.<span class="pl-c1">fire_child</span>(blk);
+
+  <span class="pl-c">/// performamce critical work</span>
+}
+
+perf::json_writer json;
+json.write(ctx, <span class="pl-s"><span class="pl-pds">"</span>cpp.json<span class="pl-pds">"</span></span>);</pre></div>
+
+<p>perfstack also contains utilities to benchmark code by running it repeatedly:</p>
+
+<div class="highlight highlight-cpp"><pre>perf::config cfg;
+perf::context <span class="pl-en">ctx</span>(cfg, <span class="pl-s"><span class="pl-pds">"</span>my context<span class="pl-pds">"</span></span>);
+
+<span class="pl-en">perf::benchmark</span>(ctx, <span class="pl-s"><span class="pl-pds">"</span>string_appending<span class="pl-pds">"</span></span>, []()
+{
+  std::string <span class="pl-smi">a</span>(<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>);
+  a += <span class="pl-s"><span class="pl-pds">"</span>pork<span class="pl-pds">"</span></span>;
+});</pre></div>
+
+<h3>
+<a id="c-bindings-1" class="anchor" href="#c-bindings-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>C Bindings</h3>
+
+<p>perfstack wraps the C++ bindings in C to allow other languages to utilise it.</p>
+
+<div class="highlight highlight-c"><pre><span class="pl-k">auto</span> config = perf_init_default_config(<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>);
+<span class="pl-k">auto</span> context = perf_init_context(config, <span class="pl-s"><span class="pl-pds">"</span>c_test<span class="pl-pds">"</span></span>);
+
+<span class="pl-k">auto</span> meta = perf_init_meta_event(context, <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>);
+
+{
+  <span class="pl-k">auto</span> event = <span class="pl-c1">perf_init_event</span>(meta);
+  <span class="pl-c">/// perfornamce critical work</span>
+
+  <span class="pl-c1">perf_term_event</span>(event);
+}
+
+<span class="pl-en">perf_write_context</span>(context, <span class="pl-s"><span class="pl-pds">"</span>c.json<span class="pl-pds">"</span></span>);
+
+<span class="pl-en">perf_term_meta_event</span>(meta);
+<span class="pl-en">perf_term_context</span>(context);
+<span class="pl-en">perf_term_config</span>(config);</pre></div>
+
+<h3>
+<a id="python-3-bindings" class="anchor" href="#python-3-bindings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Python 3 Bindings</h3>
+
+<p>Python 3 can be used to generate performance data.</p>
+
+<div class="highlight highlight-python"><pre><span class="pl-k">import</span> perf
+
+cfg <span class="pl-k">=</span> perf.Config()
+ctx <span class="pl-k">=</span> perf.Context(cfg, <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>)
+
+ev1 <span class="pl-k">=</span> perf.MetaEvent(ctx, <span class="pl-s"><span class="pl-pds">"</span>pork1<span class="pl-pds">"</span></span>)
+ev2 <span class="pl-k">=</span> perf.MetaEvent(ctx, <span class="pl-s"><span class="pl-pds">"</span>pork2<span class="pl-pds">"</span></span>)
+
+
+<span class="pl-k">with</span> perf.Event(ev1):
+    <span class="pl-c"># perormance critical work</span>
+
+    <span class="pl-k">with</span> perf.Event(ev2):
+        <span class="pl-c"># inner perormance critical work</span>
+
+ctx.write(<span class="pl-s"><span class="pl-pds">"</span>python.json<span class="pl-pds">"</span></span>)</pre></div>
+
+<h3>
+<a id="ruby-bindings" class="anchor" href="#ruby-bindings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ruby Bindings</h3>
+
+<p>Ruby can also generate performance data</p>
+
+<div class="highlight highlight-ruby"><pre>cfg <span class="pl-k">=</span> <span class="pl-c1">Perf</span>::<span class="pl-c1">Config</span>.<span class="pl-k">new</span>()
+ctx <span class="pl-k">=</span> <span class="pl-c1">Perf</span>::<span class="pl-c1">Context</span>.<span class="pl-k">new</span>(cfg, <span class="pl-s"><span class="pl-pds">"</span>timing_test<span class="pl-pds">"</span></span>)
+
+ctx.block(<span class="pl-s"><span class="pl-pds">"</span>test_block<span class="pl-pds">"</span></span>) <span class="pl-k">do</span>
+  <span class="pl-c"># Timed block</span>
+<span class="pl-k">end</span>
+
+ctx.write(<span class="pl-s"><span class="pl-pds">"</span>ruby.json<span class="pl-pds">"</span></span>)</pre></div>
+        </section>
+
+        <footer>
+          Perftools is maintained by <a href="https://github.com/jorj1988">jorj1988</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+                  <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-66387169-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+      </div>
+    </div>
+  </body>
+</html>
