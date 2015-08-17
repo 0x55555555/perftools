@@ -18,7 +18,6 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
         var view = new ResultView();
 
         function setChartParameters(data) {
-
           xScale = d3.scale.linear()
               .domain(data.x.range)
               .range([padding, svg.attr("width") - padding]);
@@ -30,13 +29,13 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
           xAxisGen = d3.svg.axis()
               .scale(xScale)
               .orient("bottom")
-              .ticks(5)
+              .ticks(data.y.tickCount())
               .tickFormat(data.x.format);
 
           yAxisGen = d3.svg.axis()
               .scale(yScale)
               .orient("left")
-              .ticks(5)
+              .ticks(data.y.tickCount())
               .tickFormat(data.y.format);
         }
 
@@ -44,31 +43,42 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
           lines.selectAll('*').remove();
 
           var data = view.processedResults(input_data);
+          var display = data.display;
           var results = data.results;
 
-          var data_point = lines
-            .selectAll("circle")
-              .data(results)
-                .enter();
+          if (display.average) {
+            var last_x = function(d, i) {
+              return xScale(results[i-1] ? results[i-1].starts[0] : results[i].starts[0]);
+            }
+            var last_y = function(d, i) {
+              return yScale(results[i-1] ? results[i-1].average() : results[i].average());
+            }
+            var current_x = function(d, i) {
+              return xScale(results[i].starts[0]);
+            }
+            var current_y = function(d, i) {
+              return yScale(results[i].average());
+            }
+            
+            var data_point = lines
+              .selectAll("circle")
+                .data(results)
+                  .enter();
 
-          data_point.append("line")
-            .attr("x1", function(d, i) {
-              return xScale(results[i].starts[0]); })
-            .attr("y1", function(d, i) {
-              return yScale(results[i].average()); })
-            .attr("x2", function(d, i) {
-              return xScale(results[i-1] ? results[i-1].starts[0] : results[i].starts[0]); })
-            .attr("y2", function(d, i) {
-              return yScale(results[i-1] ? results[i-1].average() : results[i].average()); })
-            .style("stroke", "indigo")
-            .style("stroke-width", 2);
-          data_point.append("circle")
-            .attr("cx", function(d, i) {
-              return xScale(d.starts[0]); })
-            .attr("cy", function(d, i) {
-              return yScale(d.average()); })
-            .attr("r", 3)
-            .style("fill", "purple");
+            data_point.append("line")
+              .attr("x1", current_x)
+              .attr("y1", current_y)
+              .attr("x2", last_x)
+              .attr("y2", last_y)
+              .style("stroke", "indigo")
+              .style("stroke-width", 2);
+
+            data_point.append("circle")
+              .attr("cx", current_x)
+              .attr("cy", current_y)
+              .attr("r", 3)
+              .style("fill", "purple");
+          }
 
           setChartParameters(data);
           svg.selectAll("g.x.axis").call(xAxisGen);

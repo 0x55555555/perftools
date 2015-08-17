@@ -13,6 +13,10 @@ ResultRange.prototype.defaultFormat = function(val) {
   return val.toString();
 }
 
+ResultRange.prototype.tickCount = function(val) {
+  return 5;
+}
+
 ResultRange.prototype.expand = function(val) {
   if (this.range[0] === null || val < this.range[0]) {
     this.range[0] = val;
@@ -26,6 +30,9 @@ var ResultViewParams = function(results, x_range, y_range) {
   this.results = results;
   this.x = x_range;
   this.y = y_range;
+  this.display = {
+    "average": true,
+  };
 };
 
 ResultView.prototype.processedResults = function(input) {
