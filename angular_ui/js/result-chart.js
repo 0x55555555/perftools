@@ -27,30 +27,17 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
               .domain([data.y.range[1], data.y.range[0]])
               .range([padding, svg.attr("height") - padding]);
 
-          var format_date = function(d) {
-            var date = new Date(d * 1000);
-            var yyyy = date.getFullYear().toString();
-            var mm = (date.getMonth()+1).toString(); // getMonth() is zero-based
-            var dd  = date.getDate().toString();
-
-            var result = dd + "/" + mm + "/" + yyyy;
-            if ((data.x.range[1] - data.x.range[0]) < 60*60*24*2) {
-              result = date.getHours() + ":" + date.getMinutes() + " " + result;
-            }
-
-            return result;
-          };
-
           xAxisGen = d3.svg.axis()
               .scale(xScale)
               .orient("bottom")
               .ticks(5)
-              .tickFormat(format_date);
+              .tickFormat(data.x.format);
 
           yAxisGen = d3.svg.axis()
               .scale(yScale)
               .orient("left")
-              .ticks(5);
+              .ticks(5)
+              .tickFormat(data.y.format);
         }
 
         function redrawLineChart(input_data) {

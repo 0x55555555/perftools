@@ -6,7 +6,12 @@ var ResultView = function() {
 
 var ResultRange = function() {
   this.range = [ null, null ];
+  this.format = ResultRange.defaultFormat;
 };
+
+ResultRange.prototype.defaultFormat = function(val) {
+  return val.toString();
+}
 
 ResultRange.prototype.expand = function(val) {
   if (this.range[0] === null || val < this.range[0]) {
@@ -44,7 +49,7 @@ ResultView.prototype.processedResults = function(input) {
       else {
         results[grp] = Result.clone(result);
       }
-      
+
       for (var i in result.starts) {
         x_range.expand(result.starts[i]);
       }
@@ -57,6 +62,20 @@ ResultView.prototype.processedResults = function(input) {
   }
 
   this._sort(result_list);
+
+  x_range.format = function(d) {
+    var date = new Date(d * 1000);
+    var yyyy = date.getFullYear().toString();
+    var mm = (date.getMonth()+1).toString(); // getMonth() is zero-based
+    var dd  = date.getDate().toString();
+
+    var result = dd + "/" + mm + "/" + yyyy;
+    if ((x_range.range[1] - x_range.range[0]) < 60*60*24*2) {
+      result = date.getHours() + ":" + date.getMinutes() + " " + result;
+    }
+
+    return result;
+  };
 
   y_range.expand(0);
   y_range.expand(50);
