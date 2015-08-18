@@ -88,17 +88,10 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
             data_point.append("line")
               .attr("x1", current_x)
               .attr("y1", current_y_min)
-              .attr("x2", last_x)
-              .attr("y2", last_y_min)
-              .style("stroke", "indigo")
-              .style("stroke-width", 1);
-
-            data_point.append("line")
-              .attr("x1", current_x)
-              .attr("y1", current_y_max)
-              .attr("x2", last_x)
+              .attr("x2", current_x)
               .attr("y2", last_y_max)
               .style("stroke", "indigo")
+              .style("stroke-opacity", 0.3)
               .style("stroke-width", 1);
 
             data_point.append("circle")

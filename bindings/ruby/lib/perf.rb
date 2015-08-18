@@ -148,7 +148,7 @@ module Perf
   end
 
   class Package
-    def initialize(vcs_branch, vcs_identity, vcs_description, files, recipe=nil, recipeDescription=nil)
+    def initialize(vcs_branch, vcs_identity, vcs_description, files, recipe=nil, comment=nil)
       @contexts = Dir.glob(files).reduce({}) do |a, f|
         a[f] = JSON.parse(File.read(f))
         next a
@@ -160,7 +160,7 @@ module Perf
         :description => vcs_description
       }
       @recipe = recipe
-      @recipeDescription = recipeDescription
+      @comment = comment
     end
 
     def as_json()
@@ -181,7 +181,7 @@ module Perf
         :vcs => @vcs,
         :start => start.min,
         :recipe => @recipe,
-        :recipeDescription => @recipeDescription,
+        :comment => @comment,
         :contexts => outputContexts
       }
     end

@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+# Entry point for perf application, invokes the main ruby file.
+require_relative '../lib/command_line_tools.rb'
+
+PerfCmdLine.new.run(ARGV)

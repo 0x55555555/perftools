@@ -34,6 +34,7 @@ Step(
     app.post('/submit',function(req, res) {
       var data = JSON.parse(req.body["data"]);
 
+      console.log("Inserting results")
       collection.insert(data);
 
       res.end();
@@ -45,7 +46,6 @@ Step(
           {
             $group: {
               _id: "$recipe",
-              description: { $last: "$recipe_description" },
               first: { $min: "$start" },
               last: { $max: "$start" }
             }
