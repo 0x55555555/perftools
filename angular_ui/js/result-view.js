@@ -2,6 +2,15 @@ var ResultView = function() {
   this._filter = function() { return true; };
   this._group = function(result) { return result.starts[0]};
   this._sort = function() { };
+  this._select = function(entry) {
+    return {
+      x: entry.starts[0],
+      y: entry.average(),
+      y_sd: entry.sd(),
+      y_min: entry.min,
+      y_max: entry.max
+    }
+  };
 };
 
 var ResultRange = function() {
@@ -70,6 +79,10 @@ ResultView.prototype.processedResults = function(input) {
 
   this._sort(result_list);
 
+  for (var key in result_list) {
+    result_list[key] = this._select(result_list[key]);
+  }
+
   x_range.format = function(d) {
     var date = new Date(d * 1000);
     var yyyy = date.getFullYear().toString();
@@ -85,7 +98,7 @@ ResultView.prototype.processedResults = function(input) {
   };
 
   y_range.expand(0);
-  y_range.expand(50);
+  y_range.expand(100);
 
   return new ResultViewParams(result_list, x_range, y_range);
 }

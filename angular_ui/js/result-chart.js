@@ -48,18 +48,30 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
 
           if (display.average) {
             var last_x = function(d, i) {
-              return xScale(results[i-1] ? results[i-1].starts[0] : results[i].starts[0]);
+              return xScale(results[i-1] ? results[i-1].x : results[i].x);
             }
             var last_y = function(d, i) {
-              return yScale(results[i-1] ? results[i-1].average() : results[i].average());
+              return yScale(results[i-1] ? results[i-1].y : results[i].y);
+            }
+            var last_y_min = function(d, i) {
+              return yScale(results[i-1] ? results[i-1].y_min : results[i].y_min);
+            }
+            var last_y_max = function(d, i) {
+              return yScale(results[i-1] ? results[i-1].y_max : results[i].y_max);
             }
             var current_x = function(d, i) {
-              return xScale(results[i].starts[0]);
+              return xScale(results[i].x);
             }
             var current_y = function(d, i) {
-              return yScale(results[i].average());
+              return yScale(results[i].y);
             }
-            
+            var current_y_min = function(d, i) {
+              return yScale(results[i].y_min);
+            }
+            var current_y_max = function(d, i) {
+              return yScale(results[i].y_max);
+            }
+
             var data_point = lines
               .selectAll("circle")
                 .data(results)
@@ -73,11 +85,48 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
               .style("stroke", "indigo")
               .style("stroke-width", 2);
 
+            data_point.append("line")
+              .attr("x1", current_x)
+              .attr("y1", current_y_min)
+              .attr("x2", last_x)
+              .attr("y2", last_y_min)
+              .style("stroke", "indigo")
+              .style("stroke-width", 1);
+
+            data_point.append("line")
+              .attr("x1", current_x)
+              .attr("y1", current_y_max)
+              .attr("x2", last_x)
+              .attr("y2", last_y_max)
+              .style("stroke", "indigo")
+              .style("stroke-width", 1);
+
             data_point.append("circle")
               .attr("cx", current_x)
               .attr("cy", current_y)
               .attr("r", 3)
               .style("fill", "purple");
+
+            poly = [];
+
+            for (var r = 0; r < results.length; ++r) {
+              poly.push({ x: xScale(results[r].x), y: yScale(results[r].y + results[r].y_sd) });
+            }
+
+            for (var r = results.length-1; r >= 0; --r) {
+              poly.push({ x: xScale(results[r].x), y: yScale(results[r].y - results[r].y_sd) });
+            }
+
+            lines.selectAll("polygon")
+                .data([poly])
+              .enter().append("polygon")
+                .attr("points",function(d) {
+                    return d.map(function(d) {
+                        return [d.x, d.y].join(",");
+                    }).join(" ");
+                })
+                .attr('fill-opacity', 0.2)
+                .attr("fill","purple")
           }
 
           setChartParameters(data);
