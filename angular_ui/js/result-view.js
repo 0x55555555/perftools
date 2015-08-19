@@ -41,6 +41,8 @@ var ResultViewParams = function(results, x_range, y_range) {
   this.y = y_range;
   this.display = {
     "average": true,
+    "range": true,
+    "minmax": true,
   };
 };
 
@@ -100,5 +102,5 @@ ResultView.prototype.processedResults = function(input) {
   y_range.expand(0);
   y_range.expand(100);
 
-  return new ResultViewParams(result_list, x_range, y_range);
+  return new ResultViewParams([result_list], x_range, y_range);
 }
