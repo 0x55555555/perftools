@@ -87,17 +87,31 @@ ChartGenerator.prototype.generate_graph = function(parent, results, display, xSc
   }
 }
 
-app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse, $window, d3Service) {
+app.directive("myGraph", [ "d3Service", function(d3Service) {
   return {
     restrict: "E",
     link: function(scope, elem, attrs) {
       d3Service.d3().then(function(d3) {
 
+        var root = elem[0];
+        var svg = d3.select(root)
+          .append("circle");
+      });
+    }
+  }
+}]);
+
+app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($parse, $compile, d3Service) {
+  return {
+    restrict: "E",
+    link: function($scope, $elem, $attrs) {
+      d3Service.d3().then(function(d3) {
+
         var padding = 40;
         var xScale, yScale, xAxisGen, yAxisGen;
 
-        var rawSvg = elem[0];
-        var svg = d3.select(rawSvg)
+        var root = $elem[0];
+        var svg = d3.select(root)
           .append("svg")
             .attr("width", 850)
             .attr("height", 400);
@@ -110,6 +124,15 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
           graphs.selectAll('*').remove();
 
           var data = view.processedResults(input_data);
+          var graph_to_create = $compile("<my-graph></my-graph>");
+          graphs.selectAll("my-graph")
+            .data(data.results)
+            .enter()
+              .append("g")
+              .select(function() {
+                this.appendChild(graph_to_create($scope)[0]);
+              });
+
 
           for (var i in data.results) {
             new ChartGenerator().generate_graph(graphs, data.results[i], data.display, xScale, yScale)
@@ -139,13 +162,13 @@ app.directive("resultChart", [ "$parse", "$window", "d3Service", function($parse
           svg.selectAll("g.y.axis").call(yAxisGen);
         }
 
-        var exp = $parse(attrs.chartData);
-        scope.$watch(exp, function(newVal, oldVal){
+        var exp = $parse($attrs.chartData);
+        $scope.$watch(exp, function(newVal, oldVal){
           inputData = newVal;
           redrawLineChart(newVal != undefined ? newVal : []);
         }, true);
 
-        var inputData = exp(scope);
+        var inputData = exp($scope);
         inputData = inputData != undefined ? inputData : [];
         redrawLineChart(inputData != undefined ? inputData : []);
 
