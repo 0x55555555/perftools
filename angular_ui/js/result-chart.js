@@ -3,99 +3,104 @@ var ChartGenerator = function() {
 };
 
 ChartGenerator.prototype.generate_graph = function(parent, results, display, xScale, yScale) {
-
-  var last_x = function(d, i) {
-    return xScale(results[i-1] ? results[i-1].x : results[i].x);
-  }
-  var last_y = function(d, i) {
-    return yScale(results[i-1] ? results[i-1].y : results[i].y);
-  }
-  var last_y_min = function(d, i) {
-    return yScale(results[i-1] ? results[i-1].y_min : results[i].y_min);
-  }
-  var last_y_max = function(d, i) {
-    return yScale(results[i-1] ? results[i-1].y_max : results[i].y_max);
-  }
-  var current_x = function(d, i) {
-    return xScale(results[i].x);
-  }
-  var current_y = function(d, i) {
-    return yScale(results[i].y);
-  }
-  var current_y_min = function(d, i) {
-    return yScale(results[i].y_min);
-  }
-  var current_y_max = function(d, i) {
-    return yScale(results[i].y_max);
-  }
-
-  var graph = parent.append("g");
-
-  if (display.average) {
-    var data_point = graph
-      .selectAll("circle")
-        .data(results)
-          .enter();
-
-    data_point.append("line")
-      .attr("x1", current_x)
-      .attr("y1", current_y)
-      .attr("x2", last_x)
-      .attr("y2", last_y)
-      .style("stroke", "indigo")
-      .style("stroke-width", 2);
-
-    data_point.append("circle")
-      .attr("cx", current_x)
-      .attr("cy", current_y)
-      .attr("r", 3)
-      .style("fill", "purple");
-  }
-
-  if (display.minmax) {
-    data_point.append("line")
-      .attr("x1", current_x)
-      .attr("y1", current_y_min)
-      .attr("x2", current_x)
-      .attr("y2", current_y_max)
-      .style("stroke", "indigo")
-      .style("stroke-opacity", 0.3)
-      .style("stroke-width", 1);
-  }
-
-  if (display.range) {
-    poly = [];
-
-    for (var r = 0; r < results.length; ++r) {
-      poly.push({ x: xScale(results[r].x), y: yScale(results[r].y + results[r].y_sd) });
-    }
-
-    for (var r = results.length-1; r >= 0; --r) {
-      poly.push({ x: xScale(results[r].x), y: yScale(results[r].y - results[r].y_sd) });
-    }
-
-    graph.selectAll("polygon")
-        .data([poly])
-      .enter().append("polygon")
-        .attr("points",function(d) {
-            return d.map(function(d) {
-                return [d.x, d.y].join(",");
-            }).join(" ");
-        })
-        .attr('fill-opacity', 0.2)
-        .attr("fill","purple")
-  }
 }
 
-app.directive("myGraph", [ "d3Service", function(d3Service) {
+app.directive("resultChartData", [ "d3Service", function(d3Service) {
   return {
-    restrict: "E",
-    link: function(scope, elem, attrs) {
+    restrict: "A",
+    link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
 
-        var root = elem[0];
-        var svg = d3.select(root)
-          .append("circle");
+        var display_data = $scope.display_data
+        var results = $scope.data;
+        var xScale = $scope.x_scale;
+        var yScale = $scope.y_scale;
+
+        var last_x = function(d, i) {
+          return xScale(results[i-1] ? results[i-1].x : results[i].x);
+        }
+        var last_y = function(d, i) {
+          return yScale(results[i-1] ? results[i-1].y : results[i].y);
+        }
+        var last_y_min = function(d, i) {
+          return yScale(results[i-1] ? results[i-1].y_min : results[i].y_min);
+        }
+        var last_y_max = function(d, i) {
+          return yScale(results[i-1] ? results[i-1].y_max : results[i].y_max);
+        }
+        var current_x = function(d, i) {
+          return xScale(results[i].x);
+        }
+        var current_y = function(d, i) {
+          return yScale(results[i].y);
+        }
+        var current_y_min = function(d, i) {
+          return yScale(results[i].y_min);
+        }
+        var current_y_max = function(d, i) {
+          return yScale(results[i].y_max);
+        }
+
+        var graph = d3.select($elem[0]);
+
+        graph.on("mousemove", function() {
+          console.log("move", arguments, d3.mouse(this))
+        })
+
+        if (display_data.average) {
+          var data_point = graph
+            .selectAll("circle")
+              .data(results)
+                .enter();
+
+          data_point.append("line")
+            .attr("x1", current_x)
+            .attr("y1", current_y)
+            .attr("x2", last_x)
+            .attr("y2", last_y)
+            .style("stroke", "indigo")
+            .style("stroke-width", 2);
+
+          data_point.append("circle")
+            .attr("cx", current_x)
+            .attr("cy", current_y)
+            .attr("r", 3)
+            .style("fill", "purple");
+        }
+
+        if (display_data.minmax) {
+          data_point.append("line")
+            .attr("x1", current_x)
+            .attr("y1", current_y_min)
+            .attr("x2", current_x)
+            .attr("y2", current_y_max)
+            .style("stroke", "indigo")
+            .style("stroke-opacity", 0.3)
+            .style("stroke-width", 1);
+        }
+
+        if (display_data.range) {
+          poly = [];
+
+          for (var r = 0; r < results.length; ++r) {
+            poly.push({ x: xScale(results[r].x), y: yScale(results[r].y + results[r].y_sd) });
+          }
+
+          for (var r = results.length-1; r >= 0; --r) {
+            poly.push({ x: xScale(results[r].x), y: yScale(results[r].y - results[r].y_sd) });
+          }
+
+          graph.selectAll("polygon")
+              .data([poly])
+            .enter().append("polygon")
+              .attr("points",function(d) {
+                  return d.map(function(d) {
+                      return [d.x, d.y].join(",");
+                  }).join(" ");
+              })
+              .attr('fill-opacity', 0.2)
+              .attr("fill","purple")
+        }
       });
     }
   }
@@ -124,13 +129,21 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
           graphs.selectAll('*').remove();
 
           var data = view.processedResults(input_data);
-          var graph_to_create = $compile("<my-graph></my-graph>");
-          graphs.selectAll("my-graph")
-            .data(data.results)
+          var graph_to_create = $compile("<svg data-result-chart-data></svg>");
+          var graphs_selection = graphs.selectAll("svg")
+            .data(data.results);
+
+          graphs_selection.exit().remove();
+          graphs_selection
             .enter()
               .append("g")
-              .select(function() {
-                this.appendChild(graph_to_create($scope)[0]);
+              .select(function(d) {
+                this.appendChild(graph_to_create({
+                  data: d,
+                  display_data: data.display,
+                  x_scale: xScale,
+                  y_scale: yScale
+                })[0]);
               });
 
 
