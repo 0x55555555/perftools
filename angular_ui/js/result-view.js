@@ -1,7 +1,17 @@
 var ResultView = function() {
-  this._filter = function() { return true; };
-  this._group = function(result) { return new Date(result.starts[0]).getDay() };
-  this._sort = function() { };
+  this._filter = function(set, result) { return true; };
+  this._group = function(set, result) {
+    //return new Date(result.starts[0] * 1000).getDay()
+    return result.starts[0];
+  };
+  this._set = function(set, result) {
+    return set;
+  };
+  this._sort = function(list) {
+    list.sort(function(a, b) {
+      return a.x - b.x;
+    });
+  };
   this._select = function(entry) {
     return {
       x: entry.starts[0],
@@ -51,38 +61,48 @@ ResultView.prototype.processedResults = function(input) {
   var y_range = new ResultRange();
 
   var results = { };
+
   for (var i in input.results) {
     var data_set = input.results[i];
     for (var r in data_set.results) {
       var result = data_set.results[r];
-      if (!this._filter(result)) {
+      if (!this._filter(r, result)) {
         continue;
       }
 
-      var grp = this._group(result);
+      var set = this._set(i, result);
+      var results_set = results[set];
+      if (results_set == null) {
+        results_set = { };
+        results[set] = results_set;
+      }
+
+      var grp = this._group(r, result);
 
       if (results.hasOwnProperty(grp)) {
-        results[grp] = Result.combine(results[grp], result);
+        results_set[grp] = Result.combine(results[grp], result);
       }
       else {
-        results[grp] = Result.clone(result);
-      }
-
-      for (var i in result.starts) {
-        x_range.expand(result.starts[i]);
+        results_set[grp] = Result.clone(result);
       }
     }
   }
 
   var result_list = [];
-  for (var key in results) {
-    result_list.push(results[key]);
-  }
+  for (var set_name in results) {
+    var set = results[set_name];
+    var set_list = [];
+    result_list.push(set_list);
+    for (var key in set) {
+      var sel = this._select(set[key]);
+      set_list.push(sel);
 
-  this._sort(result_list);
+      x_range.expand(sel.x);
+      y_range.expand(sel.y_min);
+      y_range.expand(sel.y_max);
+    }
 
-  for (var key in result_list) {
-    result_list[key] = this._select(result_list[key]);
+    this._sort(set_list);
   }
 
   x_range.format = function(d) {
@@ -99,8 +119,5 @@ ResultView.prototype.processedResults = function(input) {
     return result;
   };
 
-  y_range.expand(0);
-  y_range.expand(100);
-
-  return new ResultViewParams([result_list], x_range, y_range);
+  return new ResultViewParams(result_list, x_range, y_range);
 }

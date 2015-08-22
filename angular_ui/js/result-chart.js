@@ -56,7 +56,6 @@ app.directive("resultChartData", [ "d3Service", function(d3Service) {
     restrict: "A",
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
-
         var display_data = $scope.display_data;
         var colour = $scope.colour;
         var results = $scope.data;
@@ -172,7 +171,6 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
           graphs.selectAll('*').remove();
 
           var data = view.processedResults(input_data);
-          var graph_to_create = $compile("<svg data-result-chart-data></svg>");
           var graphs_selection = graphs.selectAll("svg")
             .data(data.results);
 
@@ -180,8 +178,8 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
           graphs_selection
             .enter()
               .append("g")
-              .select(function(d) {
-                this.appendChild(graph_to_create({
+              .select(function(d, i) {
+                this.appendChild($compile("<svg data-result-chart-data></svg>")({
                   data: d,
                   display_data: data.display,
                   x_scale: xScale,
