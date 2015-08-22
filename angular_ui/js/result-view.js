@@ -1,6 +1,6 @@
 var ResultView = function() {
   this._filter = function() { return true; };
-  this._group = function(result) { return result.starts[0]};
+  this._group = function(result) { return new Date(result.starts[0]).getDay() };
   this._sort = function() { };
   this._select = function(entry) {
     return {

@@ -1,8 +1,54 @@
 
-var ChartGenerator = function() {
-};
+var HoverEffect = function(parent, xScale, yScale, get_x, get_y, format_x, format_y) {
+  var group = parent.append("g");
 
-ChartGenerator.prototype.generate_graph = function(parent, results, display, xScale, yScale) {
+  var x = group.append("line")
+    .style({
+      "stroke": 'black',
+      "stroke-width": 2,
+      "fill": "none"
+    });
+
+  var y = group.append("line")
+    .style({
+      "stroke": 'black',
+      "stroke-width": 2,
+      "fill": "none"
+    });
+
+  this.hide = function(d) {
+    group.transition()
+      .duration(400)
+      .ease("linear")
+      .attr('opacity', 0.0);
+  }
+
+  this.show = function(d) {
+    group.transition()
+      .duration(400)
+      .ease("linear")
+      .attr('opacity', 1.0);
+
+    x.transition()
+      .duration(100)
+      .ease("linear")
+        .attr({
+          'x1': get_x(d),
+          'y1': get_y(d),
+          'x2': get_x(d),
+          'y2': yScale.range()[1]
+        });
+
+    y.transition()
+      .duration(100)
+      .ease("linear")
+        .attr({
+          'x1': get_x(d),
+          'y1': get_y(d),
+          'x2': xScale.range()[0],
+          'y2': get_y(d)
+        });
+  }
 }
 
 app.directive("resultChartData", [ "d3Service", function(d3Service) {
@@ -11,95 +57,92 @@ app.directive("resultChartData", [ "d3Service", function(d3Service) {
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
 
-        var display_data = $scope.display_data
+        var display_data = $scope.display_data;
+        var colour = $scope.colour;
         var results = $scope.data;
         var xScale = $scope.x_scale;
         var yScale = $scope.y_scale;
 
-        var last_x = function(d, i) {
-          return xScale(results[i-1] ? results[i-1].x : results[i].x);
-        }
-        var last_y = function(d, i) {
-          return yScale(results[i-1] ? results[i-1].y : results[i].y);
-        }
-        var last_y_min = function(d, i) {
-          return yScale(results[i-1] ? results[i-1].y_min : results[i].y_min);
-        }
-        var last_y_max = function(d, i) {
-          return yScale(results[i-1] ? results[i-1].y_max : results[i].y_max);
-        }
-        var current_x = function(d, i) {
-          return xScale(results[i].x);
-        }
-        var current_y = function(d, i) {
-          return yScale(results[i].y);
-        }
-        var current_y_min = function(d, i) {
-          return yScale(results[i].y_min);
-        }
-        var current_y_max = function(d, i) {
-          return yScale(results[i].y_max);
-        }
+        var current_x = function(d, i) { return xScale(d.x); }
+        var current_y = function(d, i) { return yScale(d.y); }
+        var current_y_sd_min = function(d) { return yScale(d.y - d.y_sd) }
+        var current_y_sd_max = function(d) { return yScale(d.y + d.y_sd) }
+        var current_y_min = function(d, i) { return yScale(d.y_min); }
+        var current_y_max = function(d, i) { return yScale(d.y_max); }
 
         var graph = d3.select($elem[0]);
 
-        graph.on("mousemove", function() {
-          console.log("move", arguments, d3.mouse(this))
-        })
+        var hover = new HoverEffect(graph, xScale, yScale, current_x, current_y);
 
-        if (display_data.average) {
-          var data_point = graph
-            .selectAll("circle")
-              .data(results)
-                .enter();
+        // Add an area for the sd around the mean.
+        if (display_data.range) {
+          var area = d3.svg.area()
+            .x(current_x)
+            .y0(current_y_sd_min)
+            .y1(current_y_sd_max);
 
-          data_point.append("line")
-            .attr("x1", current_x)
-            .attr("y1", current_y)
-            .attr("x2", last_x)
-            .attr("y2", last_y)
-            .style("stroke", "indigo")
-            .style("stroke-width", 2);
-
-          data_point.append("circle")
-            .attr("cx", current_x)
-            .attr("cy", current_y)
-            .attr("r", 3)
-            .style("fill", "purple");
+          graph.append("path")
+            .attr({
+              'd': area(results),
+              'fill-opacity': 0.2,
+              'fill': colour
+            });
         }
 
+        // Add a line for the mean
+        if (display_data.average) {
+          var line = d3.svg.line()
+            .x(current_x)
+            .y(current_y)
+            .interpolate("basis");
+
+          graph.append("path")
+            .attr({'d': line(results)})
+            .style({
+              "stroke": colour,
+              "stroke-width": 2,
+              "fill": "none"
+            });
+        }
+
+        // Setup members for per point ren
+        var data_point = graph
+          .selectAll("g")
+            .data(results)
+              .enter()
+                .append("g");
+
+        // Add min and max lines through points
         if (display_data.minmax) {
           data_point.append("line")
             .attr("x1", current_x)
             .attr("y1", current_y_min)
             .attr("x2", current_x)
             .attr("y2", current_y_max)
-            .style("stroke", "indigo")
+            .style("stroke", colour)
             .style("stroke-opacity", 0.3)
             .style("stroke-width", 1);
         }
 
-        if (display_data.range) {
-          poly = [];
-
-          for (var r = 0; r < results.length; ++r) {
-            poly.push({ x: xScale(results[r].x), y: yScale(results[r].y + results[r].y_sd) });
-          }
-
-          for (var r = results.length-1; r >= 0; --r) {
-            poly.push({ x: xScale(results[r].x), y: yScale(results[r].y - results[r].y_sd) });
-          }
-
-          graph.selectAll("polygon")
-              .data([poly])
-            .enter().append("polygon")
-              .attr("points",function(d) {
-                  return d.map(function(d) {
-                      return [d.x, d.y].join(",");
-                  }).join(" ");
-              })
-              .attr('fill-opacity', 0.2)
-              .attr("fill","purple")
+        // add points for means
+        if (display_data.average) {
+          data_point
+            .append("circle")
+              .attr("cx", current_x)
+              .attr("cy", current_y)
+              .attr("r", 5)
+              .style("fill", 'white')
+              .style("fill-opacity", 0.8)
+              .on("mouseover", hover.show)
+              .on("mouseout", hover.hide)
+          data_point
+            .append("circle")
+              .attr("cx", current_x)
+              .attr("cy", current_y)
+              .attr("r", 3)
+              .style("fill", colour)
+              .on("mouseover", hover.show)
+              .on("mouseout", hover.hide);
         }
       });
     }
@@ -142,14 +185,10 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
                   data: d,
                   display_data: data.display,
                   x_scale: xScale,
-                  y_scale: yScale
+                  y_scale: yScale,
+                  colour: "purple"
                 })[0]);
               });
-
-
-          for (var i in data.results) {
-            new ChartGenerator().generate_graph(graphs, data.results[i], data.display, xScale, yScale)
-          }
 
           xScale = d3.scale.linear()
               .domain(data.x.range)
