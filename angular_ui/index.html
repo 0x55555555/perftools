@@ -10,6 +10,7 @@
     <script src="js/data_set.js"></script>
     <script src="js/result-chart.js"></script>
     <script src="js/result-controller.js"></script>
+    <script src="js/zoom-chart.js"></script>
     <link rel="stylesheet" type="text/css" href="css/chart.css">
   </head>
   <body>
@@ -17,6 +18,7 @@
     <div ng-controller="ResultController">
       <p ng-repeat="(k, v) in data_sets.results"><input type="checkbox" ng-model="data_sets_meta_data[k].show"> {{data_sets_meta_data[k]}} {{ k }}</p>
       <result-chart chart-data="data_sets"></result-chart>
+      <zoom-chart chart-data="data_sets"></zoom-chart>
     </div>
   </body>
 </html>

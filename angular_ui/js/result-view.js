@@ -92,7 +92,7 @@ ResultView.prototype.processedResults = function(input) {
   for (var set_name in results) {
     var set = results[set_name];
     var set_list = [];
-    result_list.push(set_list);
+    result_list.push({ data: set_list, colour: "#"+((1<<24)*Math.random()|0).toString(16) });
     for (var key in set) {
       var sel = this._select(set[key]);
       set_list.push(sel);

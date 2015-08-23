@@ -56,6 +56,7 @@ app.directive("resultChartData", [ "d3Service", function(d3Service) {
     restrict: "A",
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
+        var InteractionCloseness = 80;
         var display_data = $scope.display_data;
         var colour = $scope.colour;
         var results = $scope.data;
@@ -143,6 +144,17 @@ app.directive("resultChartData", [ "d3Service", function(d3Service) {
               .on("mouseover", hover.show)
               .on("mouseout", hover.hide);
         }
+
+        var detail = {
+          show: function() {
+            data_point.attr('opacity', 1.0);
+            console.log("show");
+          },
+          hide: function() {
+            data_point.attr('opacity', 0.0);
+            console.log("hide");
+          }
+        }
       });
     }
   }
@@ -180,11 +192,11 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
               .append("g")
               .select(function(d, i) {
                 this.appendChild($compile("<svg data-result-chart-data></svg>")({
-                  data: d,
+                  data: d.data,
                   display_data: data.display,
                   x_scale: xScale,
                   y_scale: yScale,
-                  colour: "purple"
+                  colour: d.colour
                 })[0]);
               });
 
