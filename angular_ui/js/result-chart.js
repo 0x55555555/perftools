@@ -179,7 +179,24 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
             .attr("width", 850)
             .attr("height", 400);
 
+        var clip = svg.append("defs")
+          .append("clipPath")
+          .attr("id","graphClip")
+          .append("rect");
+
         var graphs = svg.append("g");
+        var refreshClip = function() {
+          var x = xScale.range();
+          var y = yScale.range();
+          clip
+            .attr("x", x[0])
+            .attr("y", y[0])
+            .attr("width", x[1]-x[0])
+            .attr("height", y[1]-y[0]);
+
+          graphs.attr("clip-path","url(#graphClip)");
+        }
+
 
         function redrawLineChart() {
           if (!xRange || !inputData) {
@@ -200,6 +217,7 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
           yScale = d3.scale.linear()
               .domain(inputData.y.invert().range)
               .range([padding, svg.attr("height") - padding]);
+          refreshClip();
 
 
           graphs_selection.exit().remove();
