@@ -59,7 +59,7 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
           if (!$scope.data()) {
             return;
           }
-          
+
           selectors.selectAll('*').remove();
 
           xScale = d3.scale.linear()
@@ -94,11 +94,11 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
           current_max.min = function() { return current_min.value + current_min.width; }
           current_max.max = function() { return max; }
 
-          var update_centre = function() {
+          var update_centre = function(handles) {
             centre.value = (current_max.value+current_min.value) / 2;
-            centre.width = (current_max.value-current_min.value) - current_min.width;
+            centre.width = (current_max.value-current_min.value) - (handles ? current_min.width : 0.0);
           }
-          update_centre();
+          update_centre(true);
 
           var update_scope = function(apply) {
             $scope.range.setMin(xScale.invert(current_min.value));
@@ -114,10 +114,12 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
           }
 
           centre.changed = function() {
-            current_min.value = centre.value - centre.width / 2;
-            current_max.value = centre.value + centre.width / 2;
+            current_min.value = Math.max(current_min.min(), centre.value - centre.width / 2);
+            current_max.value = Math.min(current_max.max(), centre.value + centre.width / 2);
+
             min_handle.sync();
             max_handle.sync();
+            update_centre(false);
             update_scope(true);
           }
 
@@ -127,7 +129,7 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
         }
 
         $scope.$watch(
-          function() { 
+          function() {
             var data = $scope.data();
             return data ? data.x.range : [0, 0];
           },
