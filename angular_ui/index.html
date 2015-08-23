@@ -6,6 +6,7 @@
     <script src="js/d3.js"></script>
     <script src="js/app.js"></script>
     <script src="js/result.js"></script>
+    <script src="js/result-range.js"></script>
     <script src="js/result-view.js"></script>
     <script src="js/data_set.js"></script>
     <script src="js/result-chart.js"></script>
@@ -16,9 +17,8 @@
   <body>
     {{ name }}
     <div ng-controller="ResultController">
-      <p ng-repeat="(k, v) in data_sets.results"><input type="checkbox" ng-model="data_sets_meta_data[k].show"> {{data_sets_meta_data[k]}} {{ k }}</p>
-      <result-chart chart-data="data_sets"></result-chart>
-      <zoom-chart chart-data="data_sets"></zoom-chart>
+      <result-chart data="processed" range="range"></result-chart>
+      <zoom-chart data="processed" range="range"></zoom-chart>
     </div>
   </body>
 </html>

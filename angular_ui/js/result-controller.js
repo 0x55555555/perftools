@@ -4,6 +4,9 @@ app.controller('ResultController', function($scope, $http) {
   $scope.data_set_tree = { };
   $scope.data_sets = { results: { } };
   $scope.data_sets_meta_data = { };
+  $scope.range = new ResultRange();
+  $scope.view = new ResultView();
+  $scope.processed = null
 
   var add_to_data_set = function(path, data) {
     var parent = $scope.data_set_tree;
@@ -18,6 +21,8 @@ app.controller('ResultController', function($scope, $http) {
          parent[name] = ds;
          $scope.data_sets.results[result_path] = ds;
          $scope.data_sets_meta_data[result_path] = new DataSetMetaData();
+         
+         $scope.processed = $scope.view.processedResults($scope.data_sets);
        }
        parent[name].push(data);
      }

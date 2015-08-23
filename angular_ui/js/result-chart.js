@@ -163,11 +163,15 @@ app.directive("resultChartData", [ "d3Service", function(d3Service) {
 app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($parse, $compile, d3Service) {
   return {
     restrict: "E",
+    scope: {
+       data: "&",
+       range: "&"
+    },
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
 
         var padding = 40;
-        var xScale, yScale, xAxisGen, yAxisGen;
+        var xScale, yScale, xAxisGen, yAxisGen, inputData, xRange;
 
         var root = $elem[0];
         var svg = d3.select(root)
@@ -177,14 +181,26 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
 
         var graphs = svg.append("g");
 
-        var view = new ResultView();
+        function redrawLineChart() {
+          if (!xRange || !inputData) {
+            return;
+          }
 
-        function redrawLineChart(input_data) {
           graphs.selectAll('*').remove();
 
-          var data = view.processedResults(input_data);
           var graphs_selection = graphs.selectAll("svg")
-            .data(data.results);
+            .data(inputData.results);
+
+          var range = xRange.safe().range;
+
+          xScale = d3.scale.linear()
+              .domain(xRange.safe().range)
+              .range([padding, svg.attr("width") - padding]);
+
+          yScale = d3.scale.linear()
+              .domain(inputData.y.invert().range)
+              .range([padding, svg.attr("height") - padding]);
+
 
           graphs_selection.exit().remove();
           graphs_selection
@@ -193,56 +209,54 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
               .select(function(d, i) {
                 this.appendChild($compile("<svg data-result-chart-data></svg>")({
                   data: d.data,
-                  display_data: data.display,
+                  display_data: inputData.display,
                   x_scale: xScale,
                   y_scale: yScale,
                   colour: d.colour
                 })[0]);
               });
 
-          xScale = d3.scale.linear()
-              .domain(data.x.range)
-              .range([padding, svg.attr("width") - padding]);
-
-          yScale = d3.scale.linear()
-              .domain([data.y.range[1], data.y.range[0]])
-              .range([padding, svg.attr("height") - padding]);
-
           xAxisGen = d3.svg.axis()
               .scale(xScale)
               .orient("bottom")
-              .ticks(data.y.tickCount())
-              .tickFormat(data.x.format);
+              .ticks(inputData.y.tickCount())
+              .tickFormat(inputData.x.format);
 
           yAxisGen = d3.svg.axis()
               .scale(yScale)
               .orient("left")
-              .ticks(data.y.tickCount())
-              .tickFormat(data.y.format);
+              .ticks(inputData.y.tickCount())
+              .tickFormat(inputData.y.format);
 
           svg.selectAll("g.x.axis").call(xAxisGen);
           svg.selectAll("g.y.axis").call(yAxisGen);
         }
 
-        var exp = $parse($attrs.chartData);
-        $scope.$watch(exp, function(newVal, oldVal){
-          inputData = newVal;
-          redrawLineChart(newVal != undefined ? newVal : []);
-        }, true);
+        $scope.$watch(
+          function(s) { return $scope.data(); },
+          function(newVal, oldVal){
+            inputData = newVal;
+            redrawLineChart();
+          },
+          true
+        );
 
-        var inputData = exp($scope);
-        inputData = inputData != undefined ? inputData : [];
-        redrawLineChart(inputData != undefined ? inputData : []);
+        $scope.$watch(
+          function(s) { return s.range() },
+          function(newVal, oldVal) {
+            xRange = newVal;
+            redrawLineChart();
+          },
+          true
+        );
 
         svg.append("svg:g")
           .attr("class", "x axis")
-          .attr("transform", "translate(0," + (svg.attr("height") - padding) + ")")
-          .call(xAxisGen);
+          .attr("transform", "translate(0," + (svg.attr("height") - padding) + ")");
 
         svg.append("svg:g")
           .attr("class", "y axis")
-          .attr("transform", "translate(" + padding + ",0)")
-          .call(yAxisGen);
+          .attr("transform", "translate(" + padding + ",0)");
       });
     }
   };
