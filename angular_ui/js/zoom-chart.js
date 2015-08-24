@@ -53,10 +53,8 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
 
         var selectors = svg.append("g");
 
-        var view = new ResultView();
-
         function redrawLineChart(range) {
-          if (!$scope.data()) {
+          if (!$scope.data().results) {
             return;
           }
 
@@ -70,7 +68,7 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
               .scale(xScale)
               .orient("bottom")
               .ticks(5)
-              .tickFormat($scope.data().x.format);
+              .tickFormat($scope.data().results.x.format);
 
           svg.selectAll("g.x.axis").call(xAxisGen);
 
@@ -130,7 +128,7 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
 
         $scope.$watch(
           function() {
-            var data = $scope.data();
+            var data = $scope.data() ? $scope.data().results : null;
             return data ? data.x.range : [0, 0];
           },
           function(newVal, oldVal) {

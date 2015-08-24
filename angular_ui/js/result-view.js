@@ -1,12 +1,14 @@
-var ResultView = function() {
+var Results = function() {
+  this.input = this.results = null;
   this._filter = function(set, result) { return true; };
   this._group = function(set, result) {
     //return new Date(result.starts[0] * 1000).getDay()
     return result.starts[0];
   };
-  this._set = function(set, result) {
-    return set;
-  };
+
+  for(this.set in Results.SetModes) break;
+  this.sets = Results.SetModes;
+
   this._sort = function(list) {
     list.sort(function(a, b) {
       return a.x - b.x;
@@ -23,6 +25,15 @@ var ResultView = function() {
   };
 };
 
+Results.SetModes = {
+  'data_sets': function(set, result) {
+    return set;
+  },
+  'none': function(set, result) {
+    return 0;
+  }
+};
+
 var ResultViewParams = function(results, x_range, y_range) {
   this.results = results;
   this.x = x_range;
@@ -34,11 +45,18 @@ var ResultViewParams = function(results, x_range, y_range) {
   };
 };
 
-ResultView.prototype.processedResults = function(input) {
+Results.prototype.reprocess = function(input) {
+  this.process(this.input);
+}
+
+Results.prototype.process = function(input) {
+  this.input = input;
   var x_range = new ResultRange();
   var y_range = new ResultRange();
 
   var results = { };
+
+  var set_fn = this.sets[this.set];
 
   for (var i in input.results) {
     var data_set = input.results[i];
@@ -48,7 +66,7 @@ ResultView.prototype.processedResults = function(input) {
         continue;
       }
 
-      var set = this._set(i, result);
+      var set = set_fn(i, result);
       var results_set = results[set];
       if (results_set == null) {
         results_set = { };
@@ -57,8 +75,8 @@ ResultView.prototype.processedResults = function(input) {
 
       var grp = this._group(r, result);
 
-      if (results.hasOwnProperty(grp)) {
-        results_set[grp] = Result.combine(results[grp], result);
+      if (results_set.hasOwnProperty(grp)) {
+        results_set[grp] = Result.combine(results_set[grp], result);
       }
       else {
         results_set[grp] = Result.clone(result);
@@ -97,5 +115,5 @@ ResultView.prototype.processedResults = function(input) {
     return result;
   };
 
-  return new ResultViewParams(result_list, x_range, y_range);
+  this.results = new ResultViewParams(result_list, x_range, y_range);
 }

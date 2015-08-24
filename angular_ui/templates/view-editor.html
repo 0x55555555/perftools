@@ -1,0 +1,5 @@
+<div>{{view.set}}
+  <select ng-model="view.set" ng-change="reprocess()">
+    <option ng-repeat='(key, value) in view.sets'>{{key}}</option>
+  </select>
+</div>

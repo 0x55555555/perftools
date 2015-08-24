@@ -56,7 +56,6 @@ app.directive("resultChartData", [ "d3Service", function(d3Service) {
     restrict: "A",
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
-        var InteractionCloseness = 80;
         var display_data = $scope.display_data;
         var colour = $scope.colour;
         var results = $scope.data;
@@ -251,7 +250,7 @@ app.directive("resultChart", [ "$parse", "$compile", "d3Service", function($pars
         }
 
         $scope.$watch(
-          function(s) { return $scope.data(); },
+          function(s) { return $scope.data() ? $scope.data().results : null; },
           function(newVal, oldVal){
             inputData = newVal;
             redrawLineChart();

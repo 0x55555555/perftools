@@ -12,13 +12,15 @@
     <script src="js/result-chart.js"></script>
     <script src="js/result-controller.js"></script>
     <script src="js/zoom-chart.js"></script>
+    <script src="js/view-editor.js"></script>
     <link rel="stylesheet" type="text/css" href="css/chart.css">
   </head>
   <body>
     {{ name }}
     <div ng-controller="ResultController">
-      <result-chart data="processed" range="range"></result-chart>
-      <zoom-chart data="processed" range="range"></zoom-chart>
+      <view-editor view="view"></view-editor>
+      <result-chart data="view" range="range"></result-chart>
+      <zoom-chart data="view" range="range"></zoom-chart>
     </div>
   </body>
 </html>
