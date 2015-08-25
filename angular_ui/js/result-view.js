@@ -6,14 +6,12 @@ var Results = function() {
     return result.starts[0];
   };
 
-  for(this.set in Results.SetModes) break;
   this.sets = Results.SetModes;
+  for(this.set in this.sets) break;
 
-  this._sort = function(list) {
-    list.sort(function(a, b) {
-      return a.x - b.x;
-    });
-  };
+  this.sorts = Results.SortModes;
+  for(this.sort in this.sorts) break;
+
   this._select = function(entry) {
     return {
       x: entry.starts[0],
@@ -32,6 +30,14 @@ Results.SetModes = {
   'none': function(set, result) {
     return 0;
   }
+};
+
+Results.SortModes = {
+  'x_increasing': function(list) {
+    list.sort(function(a, b) {
+      return a.x - b.x;
+    });
+  },
 };
 
 var ResultViewParams = function(results, x_range, y_range) {
@@ -57,6 +63,7 @@ Results.prototype.process = function(input) {
   var results = { };
 
   var set_fn = this.sets[this.set];
+  var sort_fn = this.sorts[this.sort];
 
   for (var i in input.results) {
     var data_set = input.results[i];
@@ -98,7 +105,7 @@ Results.prototype.process = function(input) {
       y_range.expand(sel.y_max);
     }
 
-    this._sort(set_list);
+    sort_fn(set_list);
   }
 
   x_range.format = function(d) {
