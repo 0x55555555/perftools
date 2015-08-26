@@ -7,6 +7,13 @@
   </p>
 
   <p>
+    group by:
+    <select ng-model="view.group" ng-change="reprocess()">
+      <option ng-repeat='(key, value) in view.groups'>{{key}}</option>
+    </select>
+  </p>
+
+  <p>
     sort by:
     <select ng-model="view.sort" ng-change="reprocess()">
       <option ng-repeat='(key, value) in view.sorts'>{{key}}</option>
