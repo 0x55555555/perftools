@@ -2,6 +2,9 @@ var Results = function() {
   this.input = this.results = null;
   this._filter = function(set, result) { return true; };
 
+  this.filters = Results.FilterModes;
+  for(this.filter in this.filters) break;
+
   this.groups = Results.GroupModes;
   for(this.group in this.groups) break;
 
@@ -22,13 +25,17 @@ var Results = function() {
   };
 };
 
+Results.FilterModes = {
+  'none': function(set, result) { return true; }
+};
+
 Results.GroupModes = {
   'start_second': function(set, result) {
     return result.starts[0];
   },
   'start_week': function(set, result) {
     var date = new Date(result.starts[0] * 1000);
-    return date.getFullYear() + "_" + (date.getDate()/7);
+    return date.getFullYear() + "_" + Math.floor(date.getDate()/7);
   },
   'start_month': function(set, result) {
     var date = new Date(result.starts[0] * 1000);
@@ -83,13 +90,14 @@ Results.prototype.process = function(input) {
 
   var set_fn = this.sets[this.set];
   var sort_fn = this.sorts[this.sort];
+  var filter_fn = this.filters[this.filter];
   var group_fn = this.groups[this.group];
 
   for (var i in input.results) {
     var data_set = input.results[i];
     for (var r in data_set.results) {
       var result = data_set.results[r];
-      if (!this._filter(r, result)) {
+      if (!filter_fn(r, result)) {
         continue;
       }
 
@@ -101,6 +109,7 @@ Results.prototype.process = function(input) {
       }
 
       var grp = group_fn(r, result);
+      console.log(grp)
 
       if (results_set.hasOwnProperty(grp)) {
         results_set[grp] = Result.combine(results_set[grp], result);
