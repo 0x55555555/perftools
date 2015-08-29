@@ -62,3 +62,23 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPP_FLAGS}")
+
+install (TARGETS perf
+         LIBRARY DESTINATION lib)
+install (FILES
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf.h
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_allocator.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_benchmark.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_config.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_context.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_event.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_global.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_identity.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_json_writer.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_meta_event.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_single_fire_event.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_string.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_time.hpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/perf_util.hpp
+         DESTINATION include)
