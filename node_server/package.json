@@ -3,7 +3,7 @@
   "description": "Adds performance data",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jorj1988/perfstack"
+    "url": "https://github.com/jorj1988/perftools"
   },
   "dependencies": {
     "express": "*",
