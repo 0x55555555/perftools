@@ -1,37 +1,3 @@
-var DragHandle = function(parent, data) {
-
-  var dragright = d3.behavior.drag()
-      .origin(Object)
-      .on("drag", rdragresize);
-
-  var sync = function() {
-    dragbarright.attr("x", function(d) { return data.value - data.width/2; });
-    dragbarright.attr("width", function(d) { return data.width; });
-  };
-
-  this.sync = sync;
-
-  function rdragresize(d) {
-    var min = data.min();
-    var max = data.max();
-    data.value = Math.max(min, Math.min(max, data.value + d3.event.dx));
-    sync();
-    data.changed();
-  }
-
-  var dragbarright = parent.append("rect")
-        .attr("x", function(d) { return data.value - data.width/2; })
-        .attr("y", function(d) { return 10; })
-        .attr("id", "dragright")
-        .attr("height", 30)
-        .attr("width", data.width)
-        .attr("fill", "gray")
-        .attr("stroke", "black")
-        .attr("stroke-width", 1.0)
-        .attr("cursor", "ew-resize")
-        .call(dragright);
-}
-
 app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse, $compile, d3Service) {
   return {
     restrict: "E",
@@ -39,30 +5,34 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
        data: "&",
        range: "="
     },
+    templateUrl: '/templates/zoom-chart.html',
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
 
-        var padding = 40;
+        var padding = 5, axis_padding = 20;
         var inputData, xScale, yScale, xAxisGen, yAxisGen;
 
-        var root = $elem[0];
-        var svg = d3.select(root)
-          .append("svg")
-            .attr("width", 850)
-            .attr("height", 50);
+        var svg = d3.select($elem[0])
+          .selectAll("svg");
 
-        var selectors = svg.append("g");
+        var content = svg.append("g");
 
-        function redrawLineChart(range) {
+        function redrawLineChart() {
           if (!$scope.data().results) {
             return;
           }
 
-          selectors.selectAll('*').remove();
+          var range = inputData.x.range;
+
+          content.selectAll('*').remove();
 
           xScale = d3.scale.linear()
               .domain(range)
               .range([padding, svg.attr("width") - padding]);
+
+          yScale = d3.scale.linear()
+              .domain(inputData.y.invert().range)
+              .range([padding, svg.attr("height") - axis_padding]);
 
           xAxisGen = d3.svg.axis()
               .scale(xScale)
@@ -72,75 +42,63 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
 
           svg.selectAll("g.x.axis").call(xAxisGen);
 
-          var min = xScale.range()[0];
-          var max = xScale.range()[1];
-          var current_min = {
-            value: min,
-            width: 7
-          };
-          var current_max = {
-            value: max,
-            width: 7
-          };
-          var centre = {
-            min: function() { return min; },
-            max: function() { return max; }
-          };
+          content
+            .selectAll("svg")
+            .data(inputData.results)
+              .enter()
+                .append("g")
+                .select(function(d, i) {
+                  this.appendChild($compile("<svg data-result-chart-data></svg>")({
+                    data: d.data,
+                    display_data: { "average": true, "simple": true },
+                    x_scale: xScale,
+                    y_scale: yScale,
+                    colour: d.colour,
+                    hover: false
+                  })[0]);
+                });
 
-          current_min.min = function() { return min; }
-          current_min.max = function() { return current_max.value - current_max.width; }
-          current_max.min = function() { return current_min.value + current_min.width; }
-          current_max.max = function() { return max; }
+          var height = svg.attr('height') - padding * 2;
+          //var arc = d3.svg.arc()
+          //    .outerRadius(height / 2)
+          //    .startAngle(0)
+          //    .endAngle(function(d, i) { return i ? -Math.PI : Math.PI; });
 
-          var update_centre = function(handles) {
-            centre.value = (current_max.value+current_min.value) / 2;
-            centre.width = (current_max.value-current_min.value) - (handles ? current_min.width : 0.0);
-          }
-          update_centre(true);
+          var brush = d3.svg.brush()
+              .x(xScale)
+              .extent(xScale.domain())
+              .on("brush", () => {
+                $scope.range.set(brush.extent());
+                $scope.$apply();
+              });
 
-          var update_scope = function(apply) {
-            $scope.range.setMin(xScale.invert(current_min.value));
-            $scope.range.setMax(xScale.invert(current_max.value));
-            if(apply) { $scope.$apply(); }
-          }
-          update_scope(false);
+          var brushg = content.append("g")
+            .attr("class", "window")
+            .attr("transform", "translate(0," + padding + ")")
+            .call(brush);
 
-          current_min.changed = current_max.changed = function() {
-            update_centre();
-            centre_handle.sync();
-            update_scope(true);
-          }
+          //brushg.selectAll(".resize").append("path")
+          //    .attr("transform", "translate(0," +  height / 2 + ")")
+          //    .attr("d", arc);
 
-          centre.changed = function() {
-            current_min.value = Math.max(current_min.min(), centre.value - centre.width / 2);
-            current_max.value = Math.min(current_max.max(), centre.value + centre.width / 2);
+          brushg.selectAll("rect")
+              .attr("height", height);
 
-            min_handle.sync();
-            max_handle.sync();
-            update_centre(false);
-            update_scope(true);
-          }
-
-          var centre_handle = new DragHandle(selectors, centre);
-          var min_handle = new DragHandle(selectors, current_min);
-          var max_handle = new DragHandle(selectors, current_max);
+          $scope.range.set(brush.extent());
         }
 
         $scope.$watch(
-          function() {
-            var data = $scope.data() ? $scope.data().results : null;
-            return data ? data.x.range : [0, 0];
-          },
+          function() { return $scope.data() ? $scope.data() : null; },
           function(newVal, oldVal) {
-            inputData = newVal;
-            redrawLineChart(newVal != undefined ? newVal : []);
+            inputData = newVal.results;
+            redrawLineChart(newVal.x ? newVal.x.range : undefined);
           },
           true
         );
 
         svg.append("svg:g")
           .attr("class", "x axis")
-          .attr("transform", "translate(0,25)");
+          .attr("transform", "translate(0," + (svg.attr('height') - axis_padding) + ")");
       });
     }
   };

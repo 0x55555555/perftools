@@ -15,7 +15,7 @@ angular
         var scriptTag = $document[0].createElement('script');
         scriptTag.type = 'text/javascript';
         scriptTag.async = true;
-        scriptTag.src = 'https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.js';
+        scriptTag.src = 'external/d3.js';
         scriptTag.charset = 'utf-8';
 
         scriptTag.onreadystatechange = function () {
