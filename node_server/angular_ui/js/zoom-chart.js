@@ -43,7 +43,7 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
       d3Service.d3().then(function(d3) {
 
         var padding = 40;
-        var xScale, yScale, xAxisGen, yAxisGen;
+        var inputData, xScale, yScale, xAxisGen, yAxisGen;
 
         var root = $elem[0];
         var svg = d3.select(root)

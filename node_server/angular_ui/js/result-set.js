@@ -1,5 +1,5 @@
 
-app.factory("ResultSet", function(ResultRange) {
+app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
   var ResultSet = null;
   ResultSet = function() {
     this.input = this.results = null;

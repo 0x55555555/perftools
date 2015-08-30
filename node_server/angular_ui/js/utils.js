@@ -1,6 +1,6 @@
 
 app.factory("utils", function() {
     return {
-        clone_array: (map) => arr.slice(0)
+        clone_array: (arr) => arr.slice(0)
     };
 });
