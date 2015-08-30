@@ -59,10 +59,6 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
                 });
 
           var height = svg.attr('height') - padding * 2;
-          //var arc = d3.svg.arc()
-          //    .outerRadius(height / 2)
-          //    .startAngle(0)
-          //    .endAngle(function(d, i) { return i ? -Math.PI : Math.PI; });
 
           var brush = d3.svg.brush()
               .x(xScale)
@@ -76,10 +72,6 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
             .attr("class", "window")
             .attr("transform", "translate(0," + padding + ")")
             .call(brush);
-
-          //brushg.selectAll(".resize").append("path")
-          //    .attr("transform", "translate(0," +  height / 2 + ")")
-          //    .attr("d", arc);
 
           brushg.selectAll("rect")
               .attr("height", height);
