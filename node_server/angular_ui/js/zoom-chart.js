@@ -1,4 +1,4 @@
-app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse, $compile, d3Service) {
+app.directive("zoomChart", function($parse, $compile, d3Service) {
   return {
     restrict: "E",
     scope: {
@@ -22,11 +22,11 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
         var content = svg.append("g");
 
         function redrawLineChart() {
-          if (!$scope.data().results) {
+          var range = inputData.x.range;
+          if (!$scope.data().results || !range[0] || !range[1]) {
             return;
           }
 
-          var range = inputData.x.range;
 
           content.selectAll('*').remove();
 
@@ -94,4 +94,4 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
       });
     }
   };
-}]);
+});

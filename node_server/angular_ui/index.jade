@@ -8,9 +8,12 @@ html(ng-app="myApp")
   body
     | {{ name }}
     div( ng-controller="ResultController" )
-      p
-        button( ng-click="show_settings = !show_settings" )
-          | settings
-        view-editor( view="view" ng-init="show_settings = false" ng-show="show_settings" )
-      result-chart( data="view" range="range" on-selected="console.log('selected' + arguments.toString())" )
-      zoom-chart( data="view" range="range" )
+      result-suite( data="data_sets" )
+      result-suite( data="data_sets" )
+      
+      //p
+      //  button( ng-click="show_settings = !show_settings" )
+      //    | settings
+      //  view-editor( view="view" ng-init="show_settings = false" ng-show="show_settings" )
+      //result-chart( data="view" range="range" on-selected="console.log('selected' + arguments.toString())" )
+      //zoom-chart( data="view" range="range" )

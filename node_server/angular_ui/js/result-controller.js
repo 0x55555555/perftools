@@ -1,10 +1,8 @@
 var ServerUrl = 'http://localhost:3000/';
 
-app.controller('ResultController', function($scope, $http, DataSet, Result, ResultRange, ResultSet) {
+app.controller('ResultController', function($scope, $http, DataSet, Result, ResultRange) {
   $scope.data_set_tree = { };
   $scope.data_sets = { results: { } };
-  $scope.range = new ResultRange();
-  $scope.view = new ResultSet();
 
   var add_to_data_set = function(path, data) {
     var parent = $scope.data_set_tree;
@@ -18,8 +16,6 @@ app.controller('ResultController', function($scope, $http, DataSet, Result, Resu
          var ds = new DataSet();
          parent[name] = ds;
          $scope.data_sets.results[result_path] = ds;
-
-         $scope.view.process($scope.data_sets);
        }
        parent[name].push(data);
      }
