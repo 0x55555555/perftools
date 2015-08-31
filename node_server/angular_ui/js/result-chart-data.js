@@ -18,16 +18,9 @@ app.directive("resultChartData", function(d3Service, HoverEffect) {
         var current_y_min = function(d, i) { return yScale(d.y_min); }
         var current_y_max = function(d, i) { return yScale(d.y_max); }
 
-        var graph = d3.select($elem[0]);
-
-        let hover = null;
-        if (display_data.hover) {
-          hover = { hide: () => {}, show: () => {} };
-          //hover = new HoverEffect(graph, xScale, yScale, current_x, current_y);
-        }
-        else {
-          hover = { hide: () => {}, show: () => {} };
-        }
+        let graph = d3.select($elem[0]);
+        let hover = new HoverEffect(graph, xScale, yScale, current_x, current_y);
+        let select = $scope.onSelect;
 
         // Add an area for the sd around the mean.
         if (display_data.range) {
@@ -88,16 +81,18 @@ app.directive("resultChartData", function(d3Service, HoverEffect) {
               .attr("r", 5)
               .style("fill", 'white')
               .style("fill-opacity", 0.8)
-              .on("mouseover", hover.show)
-              .on("mouseout", hover.hide)
+              .on("mouseover", (d) => { hover.show(d) })
+              .on("mouseout", (d) => { hover.hide(d) })
+              .on("mouseup", select);
           data_point
             .append("circle")
               .attr("cx", current_x)
               .attr("cy", current_y)
               .attr("r", 3)
               .style("fill", colour)
-              .on("mouseover", hover.show)
-              .on("mouseout", hover.hide);
+              .on("mouseover", (d) => { hover.show(d) })
+              .on("mouseout", (d) => { hover.hide(d) })
+              .on("mouseup", select);
         }
 
         var detail = {

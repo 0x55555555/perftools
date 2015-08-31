@@ -1,0 +1,30 @@
+div
+  p
+    | sets:
+    select( ng-model="view.set" ng-change="reprocess()" )
+      option( ng-repeat='(key, value) in view.sets')
+        | {{key}}
+
+  p
+    | filter by:
+    select( ng-model="view.filter" ng-change="reprocess()" )
+      option( ng-repeat='(key, value) in view.filters' )
+        | {{key}}
+
+  p
+    | group by:
+    select( ng-model="view.group" ng-change="reprocess()" )
+      option( ng-repeat='(key, value) in view.groups' )
+        | {{key}}
+
+  p
+    | select:
+    select( ng-model="view.select" ng-change="reprocess()" )
+      option( ng-repeat='(key, value) in view.selects' )
+        | {{key}}
+
+  p
+    | sort by:
+    select( ng-model="view.sort" ng-change="reprocess()" )
+      option( ng-repeat='(key, value) in view.sorts' )
+        | {{key}}

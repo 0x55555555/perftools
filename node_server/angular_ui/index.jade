@@ -1,0 +1,16 @@
+doctype html
+html(ng-app="myApp")
+  head
+    script( src="external/angular.js" )
+    script( src="external/d3.js" )
+    script( src="all.js" )
+    link( rel="stylesheet" type="text/css" href="css/chart.css" )
+  body
+    | {{ name }}
+    div( ng-controller="ResultController" )
+      p
+        button( ng-click="show_settings = !show_settings" )
+          | settings
+        view-editor( view="view" ng-init="show_settings = false" ng-show="show_settings" )
+      result-chart( data="view" range="range" on-selected="console.log('selected' + arguments.toString())" )
+      zoom-chart( data="view" range="range" )

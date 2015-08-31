@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("jsonp callback", true);
 
-var ui_path = "angular_ui/"
+var ui_path = "angular_ui/dist"
 var static_path = __dirname + "/" + ui_path;
 app.use(express.static(static_path));
 console.log("Serving site at " + static_path)

@@ -3,7 +3,8 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
     restrict: "E",
     scope: {
        data: "&",
-       range: "&"
+       range: "&",
+       onSelected: "&"
     },
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
@@ -67,7 +68,8 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
                   display_data: inputData.display,
                   x_scale: xScale,
                   y_scale: yScale,
-                  colour: d.colour
+                  colour: d.colour,
+                  onSelect: (d) => { console.log("select", d)}
                 })[0]);
               });
 

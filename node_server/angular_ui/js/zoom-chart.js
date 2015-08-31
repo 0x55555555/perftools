@@ -15,6 +15,10 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
         var svg = d3.select($elem[0])
           .selectAll("svg");
 
+        svg.append("svg:g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + (svg.attr('height') - axis_padding) + ")");
+
         var content = svg.append("g");
 
         function redrawLineChart() {
@@ -54,11 +58,11 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
                     x_scale: xScale,
                     y_scale: yScale,
                     colour: d.colour,
-                    hover: false
+                    onSelect: () => { }
                   })[0]);
                 });
 
-          var height = svg.attr('height') - padding * 2;
+          var height = svg.attr('height') - 4;
 
           var brush = d3.svg.brush()
               .x(xScale)
@@ -87,10 +91,6 @@ app.directive("zoomChart", [ "$parse", "$compile", "d3Service", function($parse,
           },
           true
         );
-
-        svg.append("svg:g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + (svg.attr('height') - axis_padding) + ")");
       });
     }
   };
