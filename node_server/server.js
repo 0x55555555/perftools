@@ -68,6 +68,17 @@ Step(
       });
     });
 
+    app.get('/results', function(req, res) {
+      collection.find(
+        { recipe: req.query.recipe },
+        { }
+      ).toArray(function(err, result) {
+        assert.equal(err, null);
+        res.jsonp(result);
+      });
+    });
+
+
     app.get('/result', function(req, res) {
       collection.find(
         { _id: ObjectId(req.query.id) }
