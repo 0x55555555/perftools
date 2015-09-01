@@ -1,79 +1,39 @@
 
 app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
   var ResultSet = null;
-  ResultSet = function() {
-    this.input = this.results = null;
-    this._filter = function(set, result) { return true; };
+  class ResultSet{
+    constructor() {
+      this.input = this.results = null;
+      this._filter = function(set, result) { return true; };
 
-    this.filters = ResultSet.FilterModes;
-    for(this.filter in this.filters) break;
+      this.filters = ResultSet.FilterModes;
+      for(this.filter in this.filters) break;
 
-    this.groups = ResultSet.GroupModes;
-    for(this.group in this.groups) break;
+      this.groups = ResultSet.GroupModes;
+      for(this.group in this.groups) break;
 
-    this.sets = ResultSet.SetModes;
-    for(this.set in this.sets) break;
+      this.sets = ResultSet.SetModes;
+      for(this.set in this.sets) break;
 
-    this.sorts = ResultSet.SortModes;
-    for(this.sort in this.sorts) break;
+      this.sorts = ResultSet.SortModes;
+      for(this.sort in this.sorts) break;
 
-    this._select = function(entry) {
-      return {
-        x: entry.starts[0],
-        y: entry.average(),
-        y_sd: entry.sd(),
-        y_min: entry.min,
-        y_max: entry.max
-      }
-    };
-  };
-
-  ResultSet.FilterModes = {
-    'none': function(set, result) { return true; }
-  };
-
-  ResultSet.GroupModes = {
-    'start_second': function(set, result) {
-      return result.starts[0];
-    },
-    'start_week': function(set, result) {
-      var date = new Date(result.starts[0] * 1000);
-      return date.getFullYear() + "_" + Math.floor(date.getDate()/7);
-    },
-    'start_month': function(set, result) {
-      var date = new Date(result.starts[0] * 1000);
-      return date.getFullYear() + "_" + date.getMonth();
-    },
-    'start_dow': function(set, result) {
-      return new Date(result.starts[0] * 1000).getDay();
-    },
-    'start_dom': function(set, result) {
-      return new Date(result.starts[0] * 1000).getDate();
+      this._select = function(entry) {
+        return {
+          x: entry.starts[0],
+          y: entry.average(),
+          y_sd: entry.sd(),
+          y_min: entry.min,
+          y_max: entry.max
+        }
+      };
     }
-  };
 
-  ResultSet.SetModes = {
-    'data_sets': function(set, result) {
-      return set;
-    },
-    'none': function(set, result) {
-      return 0;
+    reprocess(input) {
+      this.process(this.input);
     }
-  };
 
-  ResultSet.SortModes = {
-    'x_increasing': function(list) {
-      list.sort(function(a, b) {
-        return a.x - b.x;
-      });
-    },
-  };
-
-  ResultSet.prototype.reprocess = function(input) {
-    this.process(this.input);
-  }
-
-  ResultSet.prototype.process = function(input) {
+  process(input) {
     this.input = input;
     var x_range = new ResultRange();
     var y_range = new ResultRange();
@@ -144,6 +104,47 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
 
     this.results = new ResultViewParams(result_list, x_range, y_range);
   }
+
+  ResultSet.FilterModes = {
+    'none': function(set, result) { return true; }
+  };
+
+  ResultSet.GroupModes = {
+    'start_second': function(set, result) {
+      return result.starts[0];
+    },
+    'start_week': function(set, result) {
+      var date = new Date(result.starts[0] * 1000);
+      return date.getFullYear() + "_" + Math.floor(date.getDate()/7);
+    },
+    'start_month': function(set, result) {
+      var date = new Date(result.starts[0] * 1000);
+      return date.getFullYear() + "_" + date.getMonth();
+    },
+    'start_dow': function(set, result) {
+      return new Date(result.starts[0] * 1000).getDay();
+    },
+    'start_dom': function(set, result) {
+      return new Date(result.starts[0] * 1000).getDate();
+    }
+  };
+
+  ResultSet.SetModes = {
+    'data_sets': function(set, result) {
+      return set;
+    },
+    'none': function(set, result) {
+      return 0;
+    }
+  };
+
+  ResultSet.SortModes = {
+    'x_increasing': function(list) {
+      list.sort(function(a, b) {
+        return a.x - b.x;
+      });
+    },
+  };
 
   return ResultSet;
 });

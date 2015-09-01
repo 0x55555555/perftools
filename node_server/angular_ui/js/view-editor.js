@@ -1,5 +1,4 @@
 
-
 app.directive("viewEditor", [ "d3Service", function(d3Service) {
   return {
     restrict: "E",
