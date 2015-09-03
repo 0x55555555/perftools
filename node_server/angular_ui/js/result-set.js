@@ -1,5 +1,8 @@
-
 app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
+
+    class GroupType {
+      
+    }
 
     let FilterModes = {
       'none': function(set, result) { return true; }
