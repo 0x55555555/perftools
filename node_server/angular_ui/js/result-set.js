@@ -1,7 +1,9 @@
 app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
 
     class GroupType {
-      
+      constructor(find_group) {
+        this.find_group = find_group;
+      }
     }
 
     let FilterModes = {
@@ -9,23 +11,28 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
     };
 
     let GroupModes = {
-      'start_second': function(set, result) {
-        return result.starts[0];
-      },
-      'start_week': function(set, result) {
-        var date = new Date(result.starts[0] * 1000);
-        return date.getFullYear() + "_" + Math.floor(date.getDate()/7);
-      },
-      'start_month': function(set, result) {
-        var date = new Date(result.starts[0] * 1000);
-        return date.getFullYear() + "_" + date.getMonth();
-      },
-      'start_dow': function(set, result) {
-        return new Date(result.starts[0] * 1000).getDay();
-      },
-      'start_dom': function(set, result) {
-        return new Date(result.starts[0] * 1000).getDate();
-      }
+      'start_second': new GroupType((set, result) => {
+          return result.starts[0]
+        }
+      ),
+      'start_week': new GroupType((set, result) => {
+          var date = new Date(result.starts[0] * 1000);
+          return date.getFullYear() + "_" + Math.floor(date.getDate()/7);
+        }
+      ),
+      'start_month': new GroupType((set, result) => {
+          var date = new Date(result.starts[0] * 1000);
+          return date.getFullYear() + "_" + date.getMonth();
+        }
+      ),
+      'start_dow': new GroupType((set, result) => {
+          return new Date(result.starts[0] * 1000).getDay()
+        }
+      ),
+      'start_dom': new GroupType((set, result) => {
+          return new Date(result.starts[0] * 1000).getDate()
+        }
+      )
     };
 
     let SetModes = {
@@ -87,7 +94,7 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
       var set_fn = this.sets[this.set];
       var sort_fn = this.sorts[this.sort];
       var filter_fn = this.filters[this.filter];
-      var group_fn = this.groups[this.group];
+      var group = this.groups[this.group];
 
       for (var i in input.results) {
         var data_set = input.results[i];
@@ -104,7 +111,7 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
             results[set] = results_set;
           }
 
-          var grp = group_fn(r, result);
+          var grp = group.find_group(r, result);
 
           if (results_set.hasOwnProperty(grp)) {
             results_set[grp] = Result.combine(results_set[grp], result);
