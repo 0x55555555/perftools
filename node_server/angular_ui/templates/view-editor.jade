@@ -1,30 +1,30 @@
-div
+div(class="view-editor")  
   p
-    | sets:
-    select( ng-model="view.set" ng-change="reprocess()" )
+    label( for="set" ) Sets
+    select( name="set" ng-model="view.set" ng-change="reprocess()" )
       option( ng-repeat='(key, value) in view.sets')
         | {{key}}
 
   p
-    | filter by:
-    select( ng-model="view.filter" ng-change="reprocess()" )
+    label( for="filter" ) Filter by
+    select( name="filter" ng-model="view.filter" ng-change="reprocess()" )
       option( ng-repeat='(key, value) in view.filters' )
         | {{key}}
 
   p
-    | group by:
-    select( ng-model="view.group" ng-change="reprocess()" )
+    label( for="group" ) Group by
+    select( name="group" ng-model="view.group" ng-change="reprocess()" )
       option( ng-repeat='(key, value) in view.groups' )
         | {{key}}
 
   p
-    | select:
+    label( for="select" ) Select
     select( ng-model="view.select" ng-change="reprocess()" )
       option( ng-repeat='(key, value) in view.selects' )
         | {{key}}
 
   p
-    | sort by:
-    select( ng-model="view.sort" ng-change="reprocess()" )
+    label( for="sort" ) Sort by
+    select( name="sort" ng-model="view.sort" ng-change="reprocess()" )
       option( ng-repeat='(key, value) in view.sorts' )
         | {{key}}

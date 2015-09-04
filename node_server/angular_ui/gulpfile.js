@@ -43,6 +43,7 @@ gulp.task('external', function() {
 gulp.task('default', ['external', 'css', 'babel', 'jade']);
 
 gulp.task("watch", function(){
-    gulp.watch('js/**/*.js', ['babel'])
-    gulp.watch('**/*.jade', ['jade'])
+    gulp.watch('css/**/*.css', ['css']);
+    gulp.watch('js/**/*.js', ['babel']);
+    gulp.watch('**/*.jade', ['jade']);
 });

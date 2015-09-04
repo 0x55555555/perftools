@@ -5,15 +5,9 @@ html(ng-app="myApp")
     script( src="external/d3.js" )
     script( src="all.js" )
     link( rel="stylesheet" type="text/css" href="css/chart.css" )
+    link( rel="stylesheet" type="text/css" href="css/view-editor.css" )
   body
     | {{ name }}
     div( ng-controller="ResultController" )
       result-suite( data="data_sets" )
       result-suite( data="data_sets" )
-      
-      //p
-      //  button( ng-click="show_settings = !show_settings" )
-      //    | settings
-      //  view-editor( view="view" ng-init="show_settings = false" ng-show="show_settings" )
-      //result-chart( data="view" range="range" on-selected="console.log('selected' + arguments.toString())" )
-      //zoom-chart( data="view" range="range" )
