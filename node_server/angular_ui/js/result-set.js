@@ -1,56 +1,123 @@
 app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
 
-    class GroupType {
-      constructor(find_group) {
-        this.find_group = find_group;
+    let get_date = function(d) {
+      return new Date(d * 1000);
+    }
+
+    class Formatter {
+      constructor(format, count) {
+        this.format = format;
+        this.tick_count = count;
       }
     }
 
-    let FilterModes = {
-      'none': function(set, result) { return true; }
-    };
+    let format_date = new Formatter(function(d, range) {
+      var date = get_date(d);
+      var yyyy = date.getFullYear().toString();
+      var mm = (date.getMonth()+1).toString(); // getMonth() is zero-based
+      var dd  = date.getDate().toString();
 
-    let GroupModes = {
-      'start_second': new GroupType((set, result) => {
-          return result.starts[0]
-        }
-      ),
-      'start_week': new GroupType((set, result) => {
-          var date = new Date(result.starts[0] * 1000);
-          return date.getFullYear() + "_" + Math.floor(date.getDate()/7);
-        }
-      ),
-      'start_month': new GroupType((set, result) => {
-          var date = new Date(result.starts[0] * 1000);
-          return date.getFullYear() + "_" + date.getMonth();
-        }
-      ),
-      'start_dow': new GroupType((set, result) => {
-          return new Date(result.starts[0] * 1000).getDay()
-        }
-      ),
-      'start_dom': new GroupType((set, result) => {
-          return new Date(result.starts[0] * 1000).getDate()
-        }
-      )
-    };
-
-    let SetModes = {
-      'data_sets': function(set, result) {
-        return set;
-      },
-      'none': function(set, result) {
-        return 0;
+      var result = dd + "/" + mm + "/" + yyyy;
+      if ((range[1] - range[0]) < 60*60*24*2) {
+        result = date.getHours() + ":" + date.getMinutes() + " " + result;
       }
+
+      return result;
+    }, 5);
+
+    let format_month = function(d) {
+      var date = get_date(d);
+      return date.getFullYear() + "/" + date.getMonth();
     };
 
-    let SortModes = {
-      'x_increasing': function(list) {
+    let format_week = function(d) {
+      var date = get_date(d);
+      return Math.floor(date.getDate()/7) + "/" + date.getFullYear();
+    };
+
+    let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    let format_day = function(d) {
+      var date = get_date(d);
+      return days[date.getDay()];
+    }
+
+    class OptionType {
+      constructor(name, process) {
+        this.name = name;
+        this.process = process;
+      }
+    }
+
+    class GroupType extends OptionType {
+      constructor(name, x, process, format) {
+        super(name, process);
+        this.x = x;
+        this.format_group = format;
+      }
+    }
+
+    let FilterModes = [
+      new OptionType("None", function(set, result) { return true; })
+    ];
+
+    let GroupModes = [
+      new GroupType("Start Second",
+        function(entry) {
+          return entry.starts[0];
+        },
+        function(set, result) {
+          return result.starts[0]
+        },
+        format_date
+      ),
+      new GroupType("Start Week",
+        function(entry) {
+          return entry.starts[0];
+        },
+        (set, result) => format_week(result.starts[0]),
+        new Formatter(format_week, 10)
+      ),
+      new GroupType("Start Month",
+        function(entry) {
+          return entry.starts[0];
+        },
+        (set, result) => format_month(result.starts[0]),
+        new Formatter(format_month, 31)
+      ),
+      new GroupType("Start Day Of Week",
+        function(entry) {
+          var date = get_date(entry.starts[0]);
+          return date.getDay();
+        },
+        (set, result) => format_day(result.starts[0]),
+        new Formatter(format_day, 7)
+      ),
+      new GroupType("Start Day Of Month",
+        function(entry) {
+          return entry.starts[0];
+        },
+        (set, result) =>  get_date(result.starts[0]).getDate(),
+        new Formatter((d) => get_date(d).getDate(), 31)
+      )
+    ];
+
+    let SetModes = [
+      new OptionType("Data Sets", function(set, result) {
+        return set;
+      }),
+      new OptionType("None", function(set, result) {
+        return 0;
+      })
+    ];
+
+    let SortModes = [
+      new OptionType("X Increasing", function(list) {
         list.sort(function(a, b) {
           return a.x - b.x;
         });
-      },
-    };
+      }),
+    ];
 
   class ResultSet {
     constructor() {
@@ -58,20 +125,17 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
       this._filter = function(set, result) { return true; };
 
       this.filters = FilterModes;
-      for(this.filter in this.filters) break;
-
       this.groups = GroupModes;
-      for(this.group in this.groups) break;
-
       this.sets = SetModes;
-      for(this.set in this.sets) break;
-
       this.sorts = SortModes;
-      for(this.sort in this.sorts) break;
+      this.filter = this.filters[0];
+      this.group = this.groups[0];
+      this.set = this.sets[0];
+      this.sort = this.sorts[0];
 
       this._select = function(entry) {
         return {
-          x: entry.starts[0],
+          x: this.group.x(entry),
           y: entry.average(),
           y_sd: entry.sd(),
           y_min: entry.min,
@@ -91,27 +155,22 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
 
       var results = { };
 
-      var set_fn = this.sets[this.set];
-      var sort_fn = this.sorts[this.sort];
-      var filter_fn = this.filters[this.filter];
-      var group = this.groups[this.group];
-
       for (var i in input.results) {
         var data_set = input.results[i];
         for (var r in data_set.results) {
           var result = data_set.results[r];
-          if (!filter_fn(r, result)) {
+          if (!this.filter.process(r, result)) {
             continue;
           }
 
-          var set = set_fn(i, result);
+          var set = this.set.process(i, result);
           var results_set = results[set];
           if (results_set == null) {
             results_set = { };
             results[set] = results_set;
           }
 
-          var grp = group.find_group(r, result);
+          var grp = this.group.process(r, result);
 
           if (results_set.hasOwnProperty(grp)) {
             results_set[grp] = Result.combine(results_set[grp], result);
@@ -136,22 +195,11 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
           y_range.expand(sel.y_max);
         }
 
-        sort_fn(set_list);
+        this.sort.process(set_list);
       }
 
-      x_range.format = function(d) {
-        var date = new Date(d * 1000);
-        var yyyy = date.getFullYear().toString();
-        var mm = (date.getMonth()+1).toString(); // getMonth() is zero-based
-        var dd  = date.getDate().toString();
-
-        var result = dd + "/" + mm + "/" + yyyy;
-        if ((x_range.range[1] - x_range.range[0]) < 60*60*24*2) {
-          result = date.getHours() + ":" + date.getMinutes() + " " + result;
-        }
-
-        return result;
-      };
+      x_range.format = this.group.format_group;
+      y_range.format = new Formatter((d) => d);
 
       this.results = new ResultViewParams(result_list, x_range, y_range);
     }

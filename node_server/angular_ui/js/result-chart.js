@@ -76,14 +76,14 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
           xAxisGen = d3.svg.axis()
               .scale(xScale)
               .orient("bottom")
-              .ticks(inputData.y.tickCount())
-              .tickFormat(inputData.x.format);
+              .ticks(inputData.x.format.tick_count)
+              .tickFormat((d) => inputData.x.format.format(d, xScale.domain()));
 
           yAxisGen = d3.svg.axis()
               .scale(yScale)
               .orient("left")
-              .ticks(inputData.y.tickCount())
-              .tickFormat(inputData.y.format);
+              .ticks(inputData.y.format.tick_count)
+              .tickFormat((d) => inputData.y.format.format(d, xScale.domain()));
 
           svg.selectAll("g.x.axis").call(xAxisGen);
           svg.selectAll("g.y.axis").call(yAxisGen);

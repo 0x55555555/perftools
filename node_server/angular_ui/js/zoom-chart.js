@@ -41,8 +41,8 @@ app.directive("zoomChart", function($parse, $compile, d3Service) {
           xAxisGen = d3.svg.axis()
               .scale(xScale)
               .orient("bottom")
-              .ticks(5)
-              .tickFormat($scope.data().results.x.format);
+              .ticks($scope.data().results.x.format.tick_count)
+              .tickFormat((d) => $scope.data().results.x.format.format(d, xScale.domain()));
 
           svg.selectAll("g.x.axis").call(xAxisGen);
 
