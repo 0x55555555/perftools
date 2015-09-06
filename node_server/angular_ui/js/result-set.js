@@ -91,14 +91,15 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
           return date.getDay();
         },
         (set, result) => format_day(result.starts[0]),
-        new Formatter(format_day, 7)
+        new Formatter((d) => days[d], 7)
       ),
       new GroupType("Start Day Of Month",
         function(entry) {
-          return entry.starts[0];
+          var date = get_date(entry.starts[0]);
+          return date.getDate();
         },
-        (set, result) =>  get_date(result.starts[0]).getDate(),
-        new Formatter((d) => get_date(d).getDate(), 31)
+        (set, result) => get_date(result.starts[0]).getDate(),
+        new Formatter((d) => d.toString(), 31)
       )
     ];
 

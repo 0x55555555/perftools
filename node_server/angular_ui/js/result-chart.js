@@ -92,21 +92,13 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
         $scope.$watch(
           function(s) { return $scope.data() ? $scope.data().results : null; },
           function(newVal, oldVal){
+            xRange = newVal.x;
             inputData = newVal;
             redrawLineChart();
           },
           true
         );
-
-        $scope.$watch(
-          function(s) { return s.range() },
-          function(newVal, oldVal) {
-            xRange = newVal;
-            redrawLineChart();
-          },
-          true
-        );
-
+        
         svg.append("svg:g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + (svg.attr("height") - padding) + ")");
