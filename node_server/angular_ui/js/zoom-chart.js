@@ -9,34 +9,35 @@ app.directive("zoomChart", function($parse, $compile, d3Service) {
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
 
-        var padding = 5, axis_padding = 20;
-        var inputData, xScale, yScale, xAxisGen, yAxisGen;
+        let padding = 5, axis_padding = 20;
+        let inputData, xScale, yScale, xAxisGen, yAxisGen;
 
         var svg = d3.select($elem[0])
-          .selectAll("svg");
+          .selectAll("#zoom-svg");
 
         svg.append("svg:g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + (svg.attr('height') - axis_padding) + ")");
+          .attr("class", "x axis");
 
         var content = svg.append("g");
 
         function redrawLineChart() {
           var range = inputData.x.range;
-          if (!$scope.data().results || !range[0] || !range[1]) {
+          if (!$scope.data().results || !isFinite(range[0]) || !isFinite(range[1])) {
             return;
           }
 
+          let width = svg.node().getBoundingClientRect().width;
+          let height = 75;
 
           content.selectAll('*').remove();
 
           xScale = d3.scale.linear()
               .domain(range)
-              .range([padding, svg.attr("width") - padding]);
+              .range([padding, width - padding]);
 
           yScale = d3.scale.linear()
               .domain(inputData.y.invert().range)
-              .range([padding, svg.attr("height") - axis_padding]);
+              .range([padding, height - axis_padding]);
 
           xAxisGen = d3.svg.axis()
               .scale(xScale)
@@ -44,7 +45,9 @@ app.directive("zoomChart", function($parse, $compile, d3Service) {
               .ticks($scope.data().results.x.format.tick_count)
               .tickFormat((d) => $scope.data().results.x.format.format(d, xScale.domain()));
 
-          svg.selectAll("g.x.axis").call(xAxisGen);
+          svg.selectAll("g.x.axis")
+            .call(xAxisGen)
+            .attr("transform", "translate(0," + (height - axis_padding) + ")");;
 
           content
             .selectAll("svg")
@@ -62,7 +65,7 @@ app.directive("zoomChart", function($parse, $compile, d3Service) {
                   })[0]);
                 });
 
-          var height = svg.attr('height') - 4;
+          var selector_height = height - 6;
 
           var brush = d3.svg.brush()
               .x(xScale)
@@ -78,9 +81,9 @@ app.directive("zoomChart", function($parse, $compile, d3Service) {
             .call(brush);
 
           brushg.selectAll("rect")
-              .attr("height", height);
+              .attr("height", selector_height);
 
-          $scope.range.set(brush.extent());
+          $scope.range.set(xScale.domain());
         }
 
         $scope.$watch(
@@ -91,7 +94,10 @@ app.directive("zoomChart", function($parse, $compile, d3Service) {
           },
           true
         );
+
+        window.addEventListener('resize', redrawLineChart);
       });
+
     }
   };
 });

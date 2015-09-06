@@ -14,9 +14,9 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
 
         var root = $elem[0];
         var svg = d3.select(root)
-          .append("svg")
-            .attr("width", 850)
-            .attr("height", 400);
+          .append("svg");
+
+        svg.classed("result-chart", true);
 
         var clip = svg.append("defs")
           .append("clipPath")
@@ -44,6 +44,9 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
 
           graphs.selectAll('*').remove();
 
+          let width = svg.node().getBoundingClientRect().width;
+          let height = 400;
+
           var graphs_selection = graphs.selectAll("svg")
             .data(inputData.results);
 
@@ -51,11 +54,11 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
 
           xScale = d3.scale.linear()
               .domain(xRange.safe().range)
-              .range([padding, svg.attr("width") - padding]);
+              .range([padding, width - padding]);
 
           yScale = d3.scale.linear()
               .domain(inputData.y.invert().range)
-              .range([padding, svg.attr("height") - padding]);
+              .range([padding, height - padding]);
           refreshClip();
 
 
@@ -85,23 +88,34 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
               .ticks(inputData.y.format.tick_count)
               .tickFormat((d) => inputData.y.format.format(d, xScale.domain()));
 
-          svg.selectAll("g.x.axis").call(xAxisGen);
+          svg.selectAll("g.x.axis")
+            .call(xAxisGen)
+            .attr("transform", "translate(0," + (height - padding) + ")");;
           svg.selectAll("g.y.axis").call(yAxisGen);
         }
 
         $scope.$watch(
           function(s) { return $scope.data() ? $scope.data().results : null; },
           function(newVal, oldVal){
-            xRange = newVal.x;
             inputData = newVal;
             redrawLineChart();
           },
           true
         );
-        
+
+        $scope.$watch(
+          function(s) { return s.range() },
+          function(newVal, oldVal) {
+            xRange = newVal;
+            redrawLineChart();
+          },
+          true
+        );
+
+        window.addEventListener('resize', redrawLineChart);
+
         svg.append("svg:g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + (svg.attr("height") - padding) + ")");
+          .attr("class", "x axis");
 
         svg.append("svg:g")
           .attr("class", "y axis")

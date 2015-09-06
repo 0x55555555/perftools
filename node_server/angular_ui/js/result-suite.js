@@ -7,6 +7,8 @@ app.directive("resultSuite", function($parse, $compile, ResultRange, ResultSet) 
     templateUrl: '/templates/result-suite.html',
     link: function($scope, $elem, $attrs) {
 
+      $elem.addClass("result-suite")
+
       $scope.range = new ResultRange();
       $scope.view = new ResultSet(0, 0);
 
