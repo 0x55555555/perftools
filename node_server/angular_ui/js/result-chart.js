@@ -4,7 +4,7 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
     scope: {
        data: "&",
        range: "&",
-       onSelected: "&"
+       selected: "&"
     },
     link: function($scope, $elem, $attrs) {
       d3Service.d3().then(function(d3) {
@@ -12,11 +12,12 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
         var padding = 40;
         var xScale, yScale, xAxisGen, yAxisGen, inputData, xRange;
 
-        var root = $elem[0];
-        var svg = d3.select(root)
+        var root = d3.select($elem[0]);
+        var svg = root
           .append("svg");
 
-        svg.classed("result-chart", true);
+        root.classed("result-chart", true);
+        svg.classed("result-chart-svg", true);
 
         var clip = svg.append("defs")
           .append("clipPath")
@@ -72,7 +73,9 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
                   x_scale: xScale,
                   y_scale: yScale,
                   colour: d.colour,
-                  onSelect: (d) => { console.log("select", d)}
+                  onSelect: (d) => {
+                    $scope.selected({ arg1: d.results });
+                  }
                 })[0]);
               });
 
@@ -112,6 +115,7 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
           true
         );
 
+        $scope.$on('layout-graph', redrawLineChart);
         window.addEventListener('resize', redrawLineChart);
 
         svg.append("svg:g")

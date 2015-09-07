@@ -140,7 +140,8 @@ app.factory("ResultSet", function(Result, ResultRange, ResultViewParams) {
           y: entry.average(),
           y_sd: entry.sd(),
           y_min: entry.min,
-          y_max: entry.max
+          y_max: entry.max,
+          results: entry
         }
       };
     }

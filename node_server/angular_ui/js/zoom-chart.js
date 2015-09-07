@@ -13,7 +13,7 @@ app.directive("zoomChart", function($parse, $compile, d3Service) {
         let inputData, xScale, yScale, xAxisGen, yAxisGen;
 
         var svg = d3.select($elem[0])
-          .selectAll("#zoom-svg");
+          .selectAll(".zoom-chart");
 
         svg.append("svg:g")
           .attr("class", "x axis");

@@ -11,6 +11,17 @@ app.directive("resultSuite", function($parse, $compile, ResultRange, ResultSet) 
 
       $scope.range = new ResultRange();
       $scope.view = new ResultSet(0, 0);
+      $scope.show_details = false;
+
+      let show_details = function(d) {
+        $scope.show_details = d;
+        $scope.$apply();
+        setTimeout(() => $scope.$broadcast('layout-graph'), 5);
+      }
+
+      $scope.someCallback = function(x) {
+        show_details(true);
+      }
 
       $scope.$watch(
         function() { return $scope.data ? $scope.data : null; },
