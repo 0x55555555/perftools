@@ -14,14 +14,18 @@ app.directive("resultSuite", function($parse, $compile, ResultRange, ResultSet) 
       $scope.show_details = false;
 
       let show_details = function(d) {
-        $scope.show_details = d;
-        $scope.$apply();
-        setTimeout(() => $scope.$broadcast('layout-graph'), 5);
+        if ($scope.show_details != d) {
+          $scope.show_details = d;
+          setTimeout(() => $scope.$broadcast('layout-graph'), 5);
+        }
       }
 
       $scope.someCallback = function(x) {
         show_details(true);
+        $scope.$apply();
       }
+
+      $scope.$on('close-details', () => show_details(false))
 
       $scope.$watch(
         function() { return $scope.data ? $scope.data : null; },

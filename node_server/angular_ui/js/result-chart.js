@@ -25,6 +25,7 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
           .append("rect");
 
         var graphs = svg.append("g");
+
         var refreshClip = function() {
           var x = xScale.range();
           var y = yScale.range();
