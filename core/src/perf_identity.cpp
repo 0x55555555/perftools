@@ -78,6 +78,28 @@ void cpuid(unsigned int i, unsigned int *out)
   }
 #endif
 
+std::uint64_t cpu_hz()
+	{
+	using namespace std::chrono;
+	auto rdtsc = []()
+		{
+    std::uint64_t x;
+    __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
+    return x;
+    };
+
+  auto cycles_start = rdtsc();
+  auto start = steady_clock::now();
+
+  std::this_thread::sleep_for(microseconds(25000));
+
+  auto cycles_end = rdtsc();
+  auto end = steady_clock::now();
+
+  auto duration = duration_cast<microseconds>(end - start);
+  return ((cycles_end - cycles_start) / duration.count()) * 1000000;
+	}
+
 }
 
 namespace perf
@@ -90,6 +112,8 @@ identity identity::this_machine(perf::config *config, const char *binding)
 
   check(binding);
   append(id.m_binding, binding);
+
+	id.m_cpu_hz = cpu_hz();
 
   // todo: tidy up,this is a bit messy, and not really the good information?
 #if defined(_WIN32)
@@ -106,17 +130,6 @@ identity identity::this_machine(perf::config *config, const char *binding)
   statex.dwLength = sizeof (statex);
   GlobalMemoryStatusEx(&statex);
   id.m_memory_bytes = statex.ullTotalPhys;
-
-  id.m_cpu_hz = 0;
-  /*std::vector<PROCESSOR_POWER_INFORMATION> power_information(sysInfo.dwNumberOfProcessors);
-  if (CallNtPowerInformation(ProcessorInformation,
-	  NULL,
-	  0,
-	  power_information.data(),
-	  sizeof(PROCESSOR_POWER_INFORMATION) * power_information.size()) == 0)
-    {
-
-    }*/
 
 #elif defined(__APPLE__)
   id.m_cpu_hz = get_64_bit_int("hw.cpufrequency");
