@@ -8,14 +8,22 @@
 }
 
 .result-row {
-  display: table;
   width: 100%;
   height: 400px;
+  position: relative;
 }
 
 .result-chart {
-  display: table-cell;
+  display: inline-block;
   height: 100%;
+  position: absolute;
+  width: 100%;
+  top:  0px;
+  left: 0px;
+}
+
+.result-chart-minimised {
+    width: 60%;
 }
 
 .result-chart-svg {
@@ -24,10 +32,28 @@
 }
 
 .details {
-  display: table-cell;
-  width: 400px;
+  display: inline-block;
+  position: relative;
+  left: 60%;
+  width: 40%;
   height: 100%;
   background-color: gray;
+  /* padding: 0px; */
+  /* margin: 0px; */
+  border:  1px solid black;
+}
+
+.details #detail-container {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+}
+
+.details #close {
+  float: right;
 }
 
 .zoom-chart {
@@ -52,7 +78,7 @@
   border: 2px solid gray;
   border-radius: 4px;
   box-shadow: 0px 10px 30px #888888;
-  padding: 10px;
+  padding: 5px;
   position: absolute;
   top: 10px;
   left: 50px;

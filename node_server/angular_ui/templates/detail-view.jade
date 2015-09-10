@@ -1,2 +1,10 @@
-div PORK
-  button(ng-click="$emit('close-details')") Close
+div(id="detail-container")
+  button(id="close" ng-click="$emit('close-details')") Close
+  div
+    p starts:
+    p {{data().starts}}
+  div
+    p identities
+    p {{data().machine_identities}}
+    
+  pre {{ data() }}

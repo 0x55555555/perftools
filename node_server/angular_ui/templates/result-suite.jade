@@ -1,8 +1,8 @@
-p(class="view-editor-container")
-  button( ng-init="show_settings = false" ng-click="show_settings = !show_settings" ) Settings
-  
-  view-editor( view="view" ng-show="show_settings" )
+div(class="view-editor-container")
+  button( ng-init="show_settings = false" ng-click="show_settings = !show_settings" ) Settings  
   div(class="result-row")
-    result-chart( data="view" range="range" selected="someCallback(arg1)" )
-    detail-view(class="details" ng-show="show_details")
+    result-chart( id="results" data="view" range="range" selected="show_details(arg1)" )
+    detail-view( class="details" data="details" ng-show="details != null" )
+
+  view-editor( view="view" ng-show="show_settings" )
 zoom-chart( data="view" range="range" )

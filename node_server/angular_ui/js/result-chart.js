@@ -46,7 +46,7 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
 
           graphs.selectAll('*').remove();
 
-          let width = svg.node().getBoundingClientRect().width;
+          let width = Math.max(100, svg.node().getBoundingClientRect().width);
           let height = 400;
 
           var graphs_selection = graphs.selectAll("svg")

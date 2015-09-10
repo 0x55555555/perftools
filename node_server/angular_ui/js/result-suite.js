@@ -7,25 +7,32 @@ app.directive("resultSuite", function($parse, $compile, ResultRange, ResultSet) 
     templateUrl: '/templates/result-suite.html',
     link: function($scope, $elem, $attrs) {
 
-      $elem.addClass("result-suite")
+      $elem.addClass("result-suite");
+      let results = $elem.find("#results");
 
       $scope.range = new ResultRange();
       $scope.view = new ResultSet(0, 0);
       $scope.show_details = false;
 
       let show_details = function(d) {
-        if ($scope.show_details != d) {
-          $scope.show_details = d;
+        if ($scope.details != d) {
+          $scope.details = d;
           setTimeout(() => $scope.$broadcast('layout-graph'), 5);
+        }
+        if (d != null) {
+          results.addClass("result-chart-minimised");
+        }
+        else {
+          results.removeClass("result-chart-minimised");
         }
       }
 
-      $scope.someCallback = function(x) {
-        show_details(true);
+      $scope.show_details = function(x) {
+        show_details(x);
         $scope.$apply();
       }
 
-      $scope.$on('close-details', () => show_details(false))
+      $scope.$on('close-details', () => show_details(null))
 
       $scope.$watch(
         function() { return $scope.data ? $scope.data : null; },
