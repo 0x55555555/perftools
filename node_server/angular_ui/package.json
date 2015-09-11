@@ -6,11 +6,12 @@
     "url": "https://github.com/jorj1988/perftools"
   },
   "dependencies": {
+    "babelify": "*",
     "gulp": "*",
     "gulp-babel": "*",
     "gulp-concat": "*",
-    "gulp-sourcemaps": "*",
-    "gulp-jade": "*"
+    "gulp-jade": "*",
+    "gulp-sourcemaps": "*"
   },
   "license": "MIT"
 }

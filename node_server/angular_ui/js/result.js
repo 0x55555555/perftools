@@ -20,6 +20,7 @@ app.factory("Result", function(utils) {
         this.min = min;
         this.max = max;
         this.count = count;
+        this.combined_count = 1;
       }
 
       average() {
@@ -54,6 +55,7 @@ app.factory("Result", function(utils) {
         cloned.min = Math.min(cloned.min, b.min);
         cloned.max = Math.max(cloned.max, b.max);
         cloned.count += b.count;
+        cloned.combined_count = a.combined_count + b.combined_count;
 
         return cloned;
       }

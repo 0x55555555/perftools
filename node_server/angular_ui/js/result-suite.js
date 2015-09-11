@@ -12,7 +12,6 @@ app.directive("resultSuite", function($parse, $compile, ResultRange, ResultSet) 
 
       $scope.range = new ResultRange();
       $scope.view = new ResultSet(0, 0);
-      $scope.show_details = false;
 
       let show_details = function(d) {
         if ($scope.details != d) {

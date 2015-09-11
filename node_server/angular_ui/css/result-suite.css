@@ -23,7 +23,7 @@
 }
 
 .result-chart-minimised {
-    width: 60%;
+  width: 60%;
 }
 
 .result-chart-svg {
@@ -38,9 +38,7 @@
   width: 40%;
   height: 100%;
   background-color: gray;
-  /* padding: 0px; */
-  /* margin: 0px; */
-  border:  1px solid black;
+  border: 1px solid black;
 }
 
 .details #detail-container {

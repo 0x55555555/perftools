@@ -1,10 +1,9 @@
 div(id="detail-container")
   button(id="close" ng-click="$emit('close-details')") Close
-  div
-    p starts:
-    p {{data().starts}}
+  p Combination of {{ data().combined_count }} results.
+  p Recorded {{ date_range() }}
   div
     p identities
-    p {{data().machine_identities}}
+    p {{ identity_data() }}
     
   pre {{ data() }}

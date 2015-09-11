@@ -22,12 +22,12 @@ gulp.task('jade', function() {
     }))
     .pipe(gulp.dest('./dist/templates'))
 
-    gulp.src('./*.jade')
-      .pipe(jade({
-        locals: YOUR_LOCALS,
-        pretty: true
-      }))
-      .pipe(gulp.dest('./dist/'))
+  gulp.src('./*.jade')
+    .pipe(jade({
+      locals: YOUR_LOCALS,
+      pretty: true
+    }))
+    .pipe(gulp.dest('./dist/'))
 });
 
 gulp.task('css', function() {
