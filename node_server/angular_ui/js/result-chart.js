@@ -19,9 +19,10 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
         root.classed("result-chart", true);
         svg.classed("result-chart-svg", true);
 
+        let clip_name = "graphClip" + $scope.$id;
         var clip = svg.append("defs")
           .append("clipPath")
-          .attr("id","graphClip")
+          .attr("id",clip_name)
           .append("rect");
 
         var graphs = svg.append("g");
@@ -35,11 +36,13 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
             .attr("width", x[1]-x[0])
             .attr("height", y[1]-y[0]);
 
-          graphs.attr("clip-path","url(#graphClip)");
+            console.log();
+
+          graphs.attr("clip-path","url(#" + clip_name + ")");
         }
 
 
-        function redrawLineChart() {
+        var redrawLineChart = function() {
           if (!xRange || !inputData) {
             return;
           }
