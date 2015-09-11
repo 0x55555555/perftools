@@ -28,7 +28,7 @@ app.directive("resultSuite", function($parse, $compile, ResultRange, ResultSet) 
 
       $scope.show_details = function(x) {
         show_details(x);
-        $scope.$apply();
+        $scope.$digest();
       }
 
       $scope.$on('close-details', () => show_details(null))

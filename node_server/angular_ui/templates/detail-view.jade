@@ -3,7 +3,9 @@ div(id="detail-container")
   p Combination of {{ data().combined_count }} results.
   p Recorded {{ date_range() }}
   div
-    p identities
-    p {{ identity_data() }}
+    
+    div( ng-repeat="(key, value) in identity_data")
+      | {{key}}
+      | {{value}}
     
   pre {{ data() }}

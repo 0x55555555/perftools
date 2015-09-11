@@ -40,23 +40,26 @@ app.directive("detailView", function($parse, $compile, ResultRange, ResultSet, d
         }
 
         $scope.identity_data = function() {
-          if (!$scope.data()) {
-            return { };
-          }
+          return {};
+        }
+      });
 
-          let d = $scope.data().machine_identities
-          let groups = { };
+      $scope.identity_data = { };
+      $scope.$watch(
+        function(s) { return !$scope.data() ? {} : $scope.data().machine_identities },
+        function(newVal, oldVal) {
+          $scope.identity_data = { };
 
-          for (let r_idx in d) {
-            let result = d[r_idx];
+          for (let r_idx in newVal) {
+            let result = newVal[r_idx];
             for (let t_key in result) {
               let group = null;
-              if (groups[t_key] == undefined) {
+              if ($scope.identity_data[t_key] == undefined) {
                 group = { };
-                groups[t_key] = group;
+                $scope.identity_data[t_key] = group;
               }
               else {
-                group = groups[t_key];
+                group = $scope.identity_data[t_key];
               }
 
               let value = result[t_key];
@@ -68,10 +71,9 @@ app.directive("detailView", function($parse, $compile, ResultRange, ResultSet, d
               }
             }
           }
-
-          return groups;
-        }
-      });
+        },
+        true
+      );
     }
   }
 });
