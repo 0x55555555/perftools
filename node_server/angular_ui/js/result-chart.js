@@ -22,7 +22,7 @@ app.directive("resultChart", function($parse, $compile, d3Service) {
         let clip_name = "graphClip" + $scope.$id;
         var clip = svg.append("defs")
           .append("clipPath")
-          .attr("id",clip_name)
+          .attr("id", clip_name)
           .append("rect");
 
         var graphs = svg.append("g");
