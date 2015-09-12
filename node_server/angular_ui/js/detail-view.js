@@ -44,6 +44,22 @@ app.directive("detailView", function($parse, $compile, ResultRange, ResultSet, d
         }
       });
 
+      let names = {
+        "arch": "Architecture",
+        "os": "OS",
+        "cpu": "CPU Type",
+        "cpu_count": "CPU Count",
+        "thread_count": "Thread Count",
+        "cpu_speed": "CPU Hz",
+        "extra": "Extra",
+        "memory_bytes": "Memory Bytes",
+        "binding": "Binding"
+      }
+      $scope.identity_name = function(id) {
+        let val = names[id];
+        return val ? val : id;
+      }
+
       $scope.identity_data = { };
       $scope.$watch(
         function(s) { return !$scope.data() ? {} : $scope.data().machine_identities },

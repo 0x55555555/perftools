@@ -1,5 +1,7 @@
 .result-suite {
-  background-color: lightgray;
+  border: 2px solid lightgray;
+  background-color: white;
+  border-radius: 15px;
   display: block;
   position:  relative;
   width:  80%;
@@ -37,7 +39,7 @@
   left: 60%;
   width: 40%;
   height: 100%;
-  background-color: gray;
+  background-color: white;
   border: 1px solid black;
 }
 
@@ -48,6 +50,10 @@
   width: 100%;
   padding: 0px;
   margin: 0px;
+}
+
+.details #detail-container-contents {
+  padding: 5px;
 }
 
 .details #close {
