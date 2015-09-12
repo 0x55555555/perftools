@@ -53,12 +53,13 @@ app.directive("resultChartData", function(d3Service, HoverEffect) {
             });
         }
 
-        // Setup members for per point ren
+        // Setup members for per point rendering
         var data_point = graph
-          .selectAll("g")
+          .selectAll("g").filter(".graph_point")
             .data(results)
               .enter()
                 .append("g");
+        data_point.attr("class", "graph_point");
 
         // Add min and max lines through points
         if (display_data.minmax) {
