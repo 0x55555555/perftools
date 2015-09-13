@@ -3,11 +3,11 @@ div(id="detail-container")
     button(id="close" ng-click="$emit('close-details')") Close
     p Combination of {{ data().combined_count }} results.
     p Recorded {{ date_range() }}
+    
     div
-      
-      div( ng-repeat="(key, value) in identity_data" )
-        | {{identity_name(key)}}
-        | {{value}}
-        percentage-bar( data="value" )
+      div( ng-repeat="(key, value) in identity_data" class="identity_row" )
+        p( class="identity_name" ) 
+          | {{identity_name(key)}}
+        percentage-bar( data="value" class="identity_value" )
       
     pre {{ data() }}
