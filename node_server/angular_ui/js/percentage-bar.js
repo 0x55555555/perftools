@@ -48,9 +48,7 @@ app.directive("percentageBar", function($parse, $compile, d3Service) {
             .style("left", (d) => prior_sum(d) + "%")
             .style("width", (d) => count(d) + "%")
             .style("background-color", (d) => {
-              let x = random_colour();
-              console.log(x);
-              return x;
+              return random_colour();
             })
             .text((d) => d.name);
         },
