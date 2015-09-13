@@ -4,9 +4,8 @@ app.directive("percentageBar", function($parse, $compile, d3Service) {
     scope: {
       data: "&"
     },
-    templateUrl: '/templates/percentage-bar.html',
     link: function($scope, $elem, $attrs) {
-      let root = d3.select($elem[0]).select("svg");
+      let root = d3.select($elem[0]);
 
       $scope.$watch(
         (s) => {
@@ -24,11 +23,10 @@ app.directive("percentageBar", function($parse, $compile, d3Service) {
             total_count += data_map[key];
           }
 
-          root.selectAll('g').remove();
-          let grps = root.selectAll("g")
+          root.selectAll('div').remove();
+          let grps = root.selectAll("div")
             .data(data)
-              .enter()
-                .append("g");
+              .enter();
 
           let to_percent = function(names) {
             return (d) => (100 * d[names] / total_count);
@@ -36,20 +34,25 @@ app.directive("percentageBar", function($parse, $compile, d3Service) {
           let prior_sum = to_percent("prior_count_sum");
           let count = to_percent("count");
 
-          let rect = grps.append("rect")
-            .attr("x", (d) => prior_sum(d) + "%")
-            .attr("y", "0%")
-            .attr("width", (d) => count(d) + "%")
-            .attr("height", "100%")
-            .attr("fill", "#"+((1<<24)*Math.random()|0).toString(16));
+          let random_num = () => Math.floor(Math.random() * 255) + 1;
+          let random_colour = () => {
+            return "rgba("
+              + random_num() + ","
+              + random_num() + ","
+              + random_num() + ","
+              + "0.5)";
+          };
 
-          grps.append("text")
-            .attr("x", (d) => {
-              return prior_sum(d) + (count(d) * 0.5) + "%"
+          grps.append("div")
+            .attr("class", "percentage-item")
+            .style("left", (d) => prior_sum(d) + "%")
+            .style("width", (d) => count(d) + "%")
+            .style("background-color", (d) => {
+              let x = random_colour();
+              console.log(x);
+              return x;
             })
-            .attr("y", "13px")
-            .text((d) => d.name)
-            .classed("percentage-item", true);
+            .text((d) => d.name);
         },
         true
       );

@@ -33,10 +33,10 @@ app.directive("detailView", function($parse, $compile, ResultRange, ResultSet, d
           let e = $scope.end();
 
           if (s == e) {
-            return "on " + s;
+            return s;
           }
 
-          return "between " + s + " - " + e;
+          return s + " - " + e;
         }
 
         $scope.identity_data = function() {

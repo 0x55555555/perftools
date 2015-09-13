@@ -1,13 +1,29 @@
 div(id="detail-container")
   div(id="detail-container-contents")
     button(id="close" ng-click="$emit('close-details')") Close
-    p Combination of {{ data().combined_count }} results.
-    p Recorded {{ date_range() }}
+    div( class="data_section" )
+      div( class="data_value" )
+        div( class="label" ) {{ data().combined_count }} results
+      div( class="data_value" )
+        div( class="label" ) Recorded
+        div( class="value" ) {{ date_range() }}
+      div( class="data_value" )
+        div( class="label" ) Min
+        div( class="value" ) {{ data().min }}
+      div( class="data_value" )
+        div( class="label" ) Max
+        div( class="value" ) {{ data().max }}
+      div( class="data_value" )
+        div( class="label" ) Count
+        div( class="value" ) {{ data().count }}
+      div( class="data_value" )
+        div( class="label" ) Average
+        div( class="value" ) {{ data().average() }}
+      div( class="data_value" )
+        div( class="label" ) SD
+        div( class="value" ) {{ data().sd() | number }}
     
     div
       div( ng-repeat="(key, value) in identity_data" class="identity_row" )
-        p( class="identity_name" ) 
-          | {{identity_name(key)}}
+        div( class="identity_name label" ) {{identity_name(key)}}
         percentage-bar( data="value" class="identity_value" )
-      
-    pre {{ data() }}
