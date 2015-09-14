@@ -62,13 +62,11 @@ app.directive("detailView", function($parse, $compile, ResultRange, ResultSet, d
 
       $scope.identity_data = { };
       $scope.$watch(
-        function(s) { return !$scope.data() ? {} : $scope.data().machine_identities },
+        function(s) { return !$scope.data() ? {} : $scope.data() },
         function(newVal, oldVal) {
           $scope.identity_data = { };
 
-          for (let r_idx in newVal) {
-            let result = newVal[r_idx];
-            for (let t_key in result) {
+          let insert_item = function(t_key, value) {
               let group = null;
               if ($scope.identity_data[t_key] == undefined) {
                 group = { };
@@ -78,15 +76,27 @@ app.directive("detailView", function($parse, $compile, ResultRange, ResultSet, d
                 group = $scope.identity_data[t_key];
               }
 
-              let value = result[t_key];
               if (group[value] == undefined) {
                 group[value] = 1;
               }
               else {
                 ++group[value];
               }
-            }
           }
+
+          let add_items = function(obj) {
+              for (let r_idx in obj) {
+                let result = obj[r_idx];
+                for (let t_key in result) {
+                  let value = result[t_key];
+                  insert_item(t_key, value);
+                }
+              }
+          }
+
+          add_items(newVal.machine_identities);
+          add_items(newVal.vcs);
+          add_items(newVal.recipes);
         },
         true
       );

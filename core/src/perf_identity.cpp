@@ -82,11 +82,15 @@ std::uint64_t cpu_hz()
 	{
 	using namespace std::chrono;
 	auto rdtsc = []()
-		{
-    std::uint64_t x;
-    __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
-    return x;
-    };
+	  {
+#ifdef _WIN32
+      return __rdtsc();
+#else
+      std::uint64_t x;
+      __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
+      return x;
+#endif
+      };
 
   auto cycles_start = rdtsc();
   auto start = steady_clock::now();

@@ -27,3 +27,5 @@ div(id="detail-container")
       div( ng-repeat="(key, value) in identity_data" class="identity_row" )
         div( class="identity_name label" ) {{identity_name(key)}}
         percentage-bar( data="value" class="identity_value" )
+
+    pre {{ data() }}

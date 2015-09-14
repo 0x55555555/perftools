@@ -30,6 +30,11 @@ app.controller('ResultController', function($scope, $http, DataSet, Result, Resu
   }
 
   var get_result = function(result, data) {
+    let recipe_data = { 
+      recipe: data.recipe,
+      recipe_description: data.recipeDescription
+    };
+    
     for (var ctx_name in data.contexts) {
       var ctx = data.contexts[ctx_name];
 
@@ -58,6 +63,8 @@ app.controller('ResultController', function($scope, $http, DataSet, Result, Resu
           add_to_data_set(path.concat("duration"), new Result(
             ctx.start,
             ctx.machine_identity,
+            recipe_data,
+            data.vcs,
             results.total_time,
             results.total_time_sq,
             results.min_time,
@@ -70,6 +77,8 @@ app.controller('ResultController', function($scope, $http, DataSet, Result, Resu
           add_to_data_set(path.concat("offset"), new Result(
             ctx.start,
             ctx.machine_identity,
+            recipe_data,
+            data.vcs,
             results.total_offset_time,
             results.total_offset_time_sq,
             results.min_offset_time,

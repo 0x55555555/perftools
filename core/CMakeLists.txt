@@ -64,7 +64,9 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPP_FLAGS}")
 
 install (TARGETS perf
-         LIBRARY DESTINATION lib)
+         LIBRARY DESTINATION lib
+         ARCHIVE DESTINATION lib)
+
 install (FILES
          ${CMAKE_CURRENT_SOURCE_DIR}/perf.h
          ${CMAKE_CURRENT_SOURCE_DIR}/perf.hpp

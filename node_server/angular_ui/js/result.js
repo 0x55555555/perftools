@@ -1,13 +1,29 @@
 
 app.factory("Result", function(utils) {
-    class Result {
-      constructor(start, identity, total, total_sq, min, max, count) {
-        if (start instanceof Array) {
-          this.starts = start;
+    let to_array = function(i) {
+        if (i instanceof Array) {
+          return i;
         }
         else {
-          this.starts = [ start ];
+          return [ i ];
         }
+    }
+
+    class Result {
+      constructor(
+          start,
+          identity,
+          recipe_data,
+          vcs,
+          total,
+          total_sq,
+          min,
+          max,
+          count)
+      {
+        this.starts = to_array(start);
+        this.vcs = to_array(vcs);
+        this.recipes = to_array(recipe_data);
 
         if (identity instanceof Array) {
           this.machine_identities = identity;
@@ -37,6 +53,8 @@ app.factory("Result", function(utils) {
         return new Result(
           utils.clone_array(a.starts),
           utils.clone_array(a.machine_identities),
+          utils.clone_array(a.recipes),
+          utils.clone_array(a.vcs),
           a.total,
           a.total_sq,
           a.min,
@@ -50,6 +68,8 @@ app.factory("Result", function(utils) {
 
         cloned.starts = cloned.starts.concat(b.starts);
         cloned.machine_identities = cloned.machine_identities.concat(b.machine_identities);
+        cloned.recipes = cloned.recipes.concat(b.recipes);
+        cloned.vcs = cloned.vcs.concat(b.vcs);
         cloned.total += b.total;
         cloned.total_sq += b.total_sq;
         cloned.min = Math.min(cloned.min, b.min);
