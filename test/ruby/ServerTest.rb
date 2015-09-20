@@ -180,15 +180,4 @@ class TestServer < Test::Unit::TestCase
       assert_equal "test_recipe", output[1]["_id"]
     end
   end
-
-  def test_performance_tracking
-=begin
-  * 20-50 different values streams from ~10 json objects
-  * some appearing some leaving
-  * slightly varying in timing (and larger dips)
-  * creating and destroying branches regularly, some longer than others
-  * some recursive sections
-  * commits rev vary each value.
-=end
-  end
 end
