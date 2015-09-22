@@ -8,7 +8,8 @@ class Stream
   def initialize()
   end
 
-  def change
+  def change()
+  end
 end
 
 class Test
@@ -18,7 +19,6 @@ class Test
   end
 
   def generate(start, length)
-    @streams.each
   end
 end
 
