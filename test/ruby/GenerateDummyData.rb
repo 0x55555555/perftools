@@ -2,13 +2,17 @@ require_relative '../../bindings/ruby/lib/perf.rb'
 
 class Stream
   StreamAverageRange = 0.4..54
+  StreamVariance = 0..20
   StreamRegularity = (60 * 60)..(24 * 60 * 60)
   StreamChangeFrequency = (15 * 24 * 60 * 60)..(60 * 24 * 60 * 60)
 
   def initialize()
+    @value = rand(StreamAverageRange)
+    @variance = rand(StreamVariance)
   end
 
   def change()
+    @value += rand(-@variance..@variance)
   end
 end
 
