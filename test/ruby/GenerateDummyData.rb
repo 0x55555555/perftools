@@ -3,16 +3,53 @@ require_relative '../../bindings/ruby/lib/perf.rb'
 class Stream
   StreamAverageRange = 0.4..54
   StreamVariance = 0..20
-  StreamRegularity = (60 * 60)..(24 * 60 * 60)
   StreamChangeFrequency = (15 * 24 * 60 * 60)..(60 * 24 * 60 * 60)
 
+  NameInputs = [
+    :Puff,
+    :Pudding,
+    :Pie,
+    :Battery,
+    :Staple,
+    :Cheese
+  ]
+  NameExtras = [
+    :Faster,
+    :Better,
+    :Slower,
+    :Slicker,
+    :Shiny,
+    :Old,
+    :New,
+    ""
+  ]
+
   def initialize()
-    @value = rand(StreamAverageRange)
-    @variance = rand(StreamVariance)
+    change()
+    @name = [ NameExtras.sample ].concat((0..rand(1..2)).map{ NameInputs.sample }).join(" ").strip()
+  end
+
+  def name()
+    return @name
   end
 
   def change()
-    @value += rand(-@variance..@variance)
+    @value = rand(StreamAverageRange)
+    @variance = rand(StreamVariance)
+    @change_frequency = rand(StreamChangeFrequency)
+    @unchanged_time = 0
+  end
+
+  def add_time(time)
+    @unchanged_time += time
+
+    if (@unchanged_time > @change_frequency)
+      change()
+    end
+  end
+
+  def sample()
+    return @value + rand(-@variance..@variance)
   end
 end
 
@@ -20,9 +57,15 @@ class Test
   TestFrequency = (7 * 24 * 60 * 60)..(30 * 24 * 60 * 60)
   def initialize(stream_count)
     @streams = rand(stream_count).times.collect { Stream.new() }
+    @frequency = rand(TestFrequency)
   end
 
   def generate(start, length)
+    (length/@frequency).times do |i|
+      @streams.each { |s| s.add_time(@frequency) }
+
+      puts Hash[@streams.map { |s| [s.name, s.sample()] }]
+    end
   end
 end
 
