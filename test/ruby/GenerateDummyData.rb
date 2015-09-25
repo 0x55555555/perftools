@@ -63,8 +63,9 @@ class Test
   def generate(start, length)
     (length/@frequency).times do |i|
       @streams.each { |s| s.add_time(@frequency) }
+      sampled_values = Hash[@streams.map { |s| [s.name, s.sample()] }]
 
-      puts Hash[@streams.map { |s| [s.name, s.sample()] }]
+      return sampled_values
     end
   end
 end
