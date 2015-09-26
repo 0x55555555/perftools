@@ -1,18 +1,23 @@
 require_relative '../../bindings/ruby/lib/perf.rb'
 
+NameInputs = [
+  :Puff,
+  :Pudding,
+  :Pie,
+  :Battery,
+  :Staple,
+  :Cheese
+]
+
+def random_name()
+  return (0..rand(1..2)).map{ NameInputs.sample }.join(" ")
+end
+
 class Stream
   StreamAverageRange = 0.4..54
   StreamVariance = 0..20
   StreamChangeFrequency = (15 * 24 * 60 * 60)..(60 * 24 * 60 * 60)
 
-  NameInputs = [
-    :Puff,
-    :Pudding,
-    :Pie,
-    :Battery,
-    :Staple,
-    :Cheese
-  ]
   NameExtras = [
     :Faster,
     :Better,
@@ -26,7 +31,7 @@ class Stream
 
   def initialize()
     change()
-    @name = [ NameExtras.sample ].concat((0..rand(1..2)).map{ NameInputs.sample }).join(" ").strip()
+    @name = [ NameExtras.sample, random_name()].join(" ").strip()
   end
 
   def name()
@@ -56,8 +61,13 @@ end
 class Test
   TestFrequency = (7 * 24 * 60 * 60)..(30 * 24 * 60 * 60)
   def initialize(stream_count)
+    @name = random_name()
     @streams = rand(stream_count).times.collect { Stream.new() }
     @frequency = rand(TestFrequency)
+  end
+  
+  def name()
+    return @name
   end
 
   def generate(start, length)
@@ -103,7 +113,10 @@ def test_performance_tracking(
       stream_count_per_test: stream_count_per_test)
 
     length = rand(creation_event_time)
-    tests.each { |t| t.generate(time_now, length) }
+    tests.each do |t|
+      puts t.name
+      puts t.generate(time_now, length)
+    end
   end
 =begin
 * 20-50 different values streams from ~10 json objects
