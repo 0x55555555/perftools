@@ -65,7 +65,7 @@ class Test
     @streams = rand(stream_count).times.collect { Stream.new() }
     @frequency = rand(TestFrequency)
   end
-  
+
   def name()
     return @name
   end
@@ -77,6 +77,7 @@ class Test
 
       return sampled_values
     end
+    return {}
   end
 end
 
@@ -114,8 +115,8 @@ def test_performance_tracking(
 
     length = rand(creation_event_time)
     tests.each do |t|
-      puts t.name
-      puts t.generate(time_now, length)
+      gen = t.generate(time_now, length)
+      puts "#{t.name} #{gen}"
     end
   end
 =begin
