@@ -71,13 +71,14 @@ class Test
   end
 
   def generate(start, length)
-    (length/@frequency).times do |i|
+    output = []
+    [(length/@frequency), 1].min.times do |i|
       @streams.each { |s| s.add_time(@frequency) }
       sampled_values = Hash[@streams.map { |s| [s.name, s.sample()] }]
 
-      return sampled_values
+      output << sampled_values
     end
-    return {}
+    return output
   end
 end
 
