@@ -15,7 +15,7 @@ end
 
 class Stream
   StreamAverageRange = 0.4..54
-  StreamVariance = 0..20
+  StreamVariance = 0.0..20.0
   StreamChangeFrequency = (15 * 24 * 60 * 60)..(60 * 24 * 60 * 60)
 
   NameExtras = [
@@ -54,12 +54,13 @@ class Stream
   end
 
   def sample()
+    vary = rand(-@variance..@variance)
     return @value + rand(-@variance..@variance)
   end
 end
 
 class Test
-  TestFrequency = (7 * 24 * 60 * 60)..(30 * 24 * 60 * 60)
+  TestFrequency = (1 * 24 * 60 * 60)..(30 * 24 * 60 * 60)
   def initialize(stream_count)
     @name = random_name()
     @streams = rand(stream_count).times.collect { Stream.new() }
@@ -72,7 +73,7 @@ class Test
 
   def generate(start, length)
     output = []
-    [(length/@frequency), 1].min.times do |i|
+    [(length/@frequency), 1].max.times do |i|
       @streams.each { |s| s.add_time(@frequency) }
       sampled_values = Hash[@streams.map { |s| [s.name, s.sample()] }]
 
@@ -96,9 +97,9 @@ def generate_tests(
 end
 
 def test_performance_tracking(
-    add_per_iteration: 0..4,
-    remove_per_iteration: 0..2,
-    creation_sections: 100,
+    add_per_iteration: 0..1,
+    remove_per_iteration: 0..0,
+    creation_sections: 3,
     creation_event_time: (7 * 24 * 60 * 60)..(30 * 24 * 60 * 60),
     stream_count_per_test: 1..4)
 
@@ -117,7 +118,10 @@ def test_performance_tracking(
     length = rand(creation_event_time)
     tests.each do |t|
       gen = t.generate(time_now, length)
-      puts "#{t.name} #{gen}"
+      puts t.name
+      gen.each do |e|
+        puts "  #{e}"
+      end
     end
   end
 =begin
