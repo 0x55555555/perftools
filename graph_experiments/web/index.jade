@@ -23,10 +23,19 @@ html(ng-app="graphexp" lang="")
           input(type="checkbox" ng-model="keys[key].show")
           | {{key}}
         p
-          input(type="date" ng-model="x_range[0]")
-          input(type="time" ng-model="x_range[0]")
+          a(editable-bsdate="x_range[0]" e-datepicker-popup="dd-MMMM-yyyy")
+            | {{ (x_range[0] | date:"dd/MM/yyyy") || 'empty' }}
+          &nbsp;
+          a(editable-bstime="x_range[0]" e-show-meridian="false" e-minute-step="10")
+            | {{ (x_range[0] | date:"HH:mm") || 'empty' }}
+          
           br
-          input(type="date" ng-model="x_range[1]")
-          input(type="time" ng-model="x_range[1]")
+          
+          a(editable-bsdate="x_range[1]" e-datepicker-popup="dd-MMMM-yyyy")
+            | {{ (x_range[1] | date:"dd/MM/yyyy") || 'empty' }}
+          &nbsp;
+          a(editable-bstime="x_range[1]" e-show-meridian="false" e-minute-step="10")
+            | {{ (x_range[1] | date:"HH:mm") || 'empty' }}
+          
           br
-          input(type="button" value="Reset Zoom" ng-click="reset_x()")
+          input(id="reset_zoom" type="button" value="Reset Zoom" ng-click="reset_x()")

@@ -58,7 +58,7 @@ app.run(function (editableOptions, $rootScope, $location) {
 
 var draw = function(container, entries, data, x_range, observer) {
   var margin = {top: 20, right: 20, bottom: 30, left: 50},
-      width = 960 - margin.left - margin.right,
+      width = 1035 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
   var formatPercent = d3.format(".0%");
@@ -141,10 +141,12 @@ var draw = function(container, entries, data, x_range, observer) {
 
   var line = svg.append("line")
     .attr("class", "pointer_location")
+    .attr("clip-path", "url(#graph-clip)")
     .attr('y1', y.range()[0])
     .attr('y2', y.range()[1]);
 
   var selection = svg.append("rect")
+    .attr("clip-path", "url(#graph-clip)")
     .attr("class", "pointer_selection")
     .attr("stroke", "black")
     .attr('y', y.range()[1])
