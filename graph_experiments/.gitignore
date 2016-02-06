@@ -1,0 +1,6 @@
+# sub projects
+bower_components/
+node_modules/
+
+# build output
+dist/

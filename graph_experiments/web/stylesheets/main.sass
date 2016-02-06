@@ -1,0 +1,112 @@
+$font-stack:    Helvetica, sans-serif
+$primary-color: #333
+
+body
+  font: 100% $font-stack
+  color: $primary-color
+
+
+.editable:hover
+  background-color: #DDD
+
+/* temporary workaround for display editable-bstime in bs3 - up/down symbols not shown */
+.editable-bstime .editable-input i.icon-chevron-up:before
+  content: '\e113'
+
+.editable-bstime .editable-input i.icon-chevron-down:before
+  content: '\e114'
+
+.editable-bstime .editable-input i.icon-chevron-up,
+.editable-bstime .editable-input i.icon-chevron-down
+  position: relative
+  top: 1px
+  display: inline-block
+  font-family: 'Glyphicons Halflings'
+  -webkit-font-smoothing: antialiased
+  font-style: normal
+  font-weight: normal
+  line-height: 1
+
+body
+  font: 10px sans-serif
+
+.noselect
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE/Edge */
+  user-select: none;           /* non-prefixed version, currently not supported by any browser */
+
+.axis path,
+.axis line
+  fill: none
+  stroke: #000
+  shape-rendering: crispEdges
+
+.pointer_location
+  stroke-width: 2
+  stroke: black
+
+
+.pointer_selection
+  fill: rgba(0, 0, 0, 0.2)
+  stroke: transparent
+
+.browser text
+  text-anchor: end
+
+.graph
+  position:relative
+  left: 5%
+  width: 90%
+  border: 1px lightgray solid
+  border-radius: 3px
+  overflow: hidden
+  display: inline-block
+  padding: 10px
+  padding-left: 0px
+
+.graph .title
+  font-weight: bold
+  font-size: x-large
+  padding-left: 50px
+  padding-bottom: 5px
+  margin-right: 5px
+  margin-bottom: 5px
+  border-bottom: 1px solid gray
+
+.graph .title_shown
+  box-shadow: 0px 20px 30px -15px black
+
+.legend
+  float: right
+  margin-top: -6px
+  border: 1px solid gray
+  padding: 5px
+  border-radius: 0px 3px 3px 3px
+  background-color: white
+  box-shadow: 0px 10px 30px -10px darkgray
+  opacity: 1
+  height: 200px
+  overflow:hidden
+
+.legend.ng-hide-add, .legend.ng-hide-remove
+  transition: all linear 0.1s
+
+.legend.ng-hide
+  height: 0
+  overflow:hidden
+
+.legend_item
+  border-radius: 3px
+  margin-bottom: 2px
+
+#svg_container
+  float: left
+
+#svg_container.ng-hide
+  opacity: 0
+
+#svg_container.ng-hide-add, #svg_container.ng-hide-remove
+  transition: all linear 0.1s

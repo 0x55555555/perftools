@@ -1,0 +1,32 @@
+html(ng-app="graphexp" lang="")
+  head
+    title Graph Experiment
+    script(src = "lib/jquery/dist/jquery.js")
+    script(src = "lib/angular/angular.js")
+    script(src = "lib/angular-animate/angular-animate.js")
+    script(src = "lib/angular-route/angular-route.js")
+    script(src = "lib/angular-xeditable/dist/js/xeditable.js")
+    script(src = "lib/d3/d3.js")
+    script(src = "//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.6.0/ui-bootstrap-tpls.min.js")
+    script(src = "scripts/all.min.js")
+    link(rel = "stylesheet", type = "text/css", href="stylesheets/main.css")
+    link(rel = "stylesheet", type = "text/css", href="lib/bootstrap/dist/css/bootstrap.css")
+    link(rel = "stylesheet", type = "text/css", href="lib/angular-xeditable/dist/css/xeditable.css")
+  body
+    div(ng-view)
+
+    div(id="graph" class="graph noselect" ng-controller="testCtrl")
+      div(class="title" ng-click="expanded = !expanded" ng-class="{'title_shown': expanded}") Browser Usage
+      div(id="svg_container" ng-show="expanded")
+      div(class="legend" ng-show="expanded")
+        div(class="legend_item" ng-repeat="(key, value) in keys" style="background-color: {{keys[key].colour}}")
+          input(type="checkbox" ng-model="keys[key].show")
+          | {{key}}
+        p
+          input(type="date" ng-model="x_range[0]")
+          input(type="time" ng-model="x_range[0]")
+          br
+          input(type="date" ng-model="x_range[1]")
+          input(type="time" ng-model="x_range[1]")
+          br
+          input(type="button" value="Reset Zoom" ng-click="reset_x()")

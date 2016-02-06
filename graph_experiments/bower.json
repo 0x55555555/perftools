@@ -1,0 +1,15 @@
+{
+  "name": "graphexp",
+  "version": "0.0.1",
+  "homepage": "",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.5.0",
+    "jquery": "~2.2.0",
+    "bootstrap": "~3.3.6",
+    "angular-route": "~1.5.0",
+    "angular-animate": "~1.5.0",
+    "angular-xeditable": "~0.1.9",
+    "d3": "~3.5.14"
+  }
+}

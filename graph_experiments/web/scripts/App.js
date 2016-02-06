@@ -1,132 +1,60 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<head>
-<style>
+/* jshint -W097 */
+"use strict";
 
-body {
-  font: 10px sans-serif;
-}
+var app = angular.module("graphexp", [
+  'ngRoute',
+  'ngAnimate',
+  'xeditable',
+  'ui.bootstrap'
+]);
 
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none;   /* Chrome/Safari/Opera */
-  -khtml-user-select: none;    /* Konqueror */
-  -moz-user-select: none;      /* Firefox */
-  -ms-user-select: none;       /* IE/Edge */
-  user-select: none;           /* non-prefixed version, currently
-                                  not supported by any browser */
-}
+app.directive("contenteditable", function() {
+  return {
+    require: "ngModel",
+    link: function(scope, element, attrs, ngModel) {
+      function read() {
+        const value = element.text().replace("\n", "");
+        ngModel.$setViewValue(value);
+      }
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
+      ngModel.$render = function() {
+        element.html(ngModel.$viewValue || "");
+      };
 
-.pointer_location {
-  stroke-width: 2;
-  stroke: black;
-}
+      element.bind("blur keyup change", function() {
+        scope.$apply(read);
+      });
+    }
+  };
+});
 
-.pointer_selection {
-  fill: rgba(0, 0, 0, 0.2);
-  stroke: transparent;
-}
+app.controller('main', function($scope) {
 
-.browser text {
-  text-anchor: end;
-}
+});
 
-.graph {
-  position:relative;
-  left: 5%;
-  width: 90%;
-  border: 1px lightgray solid;
-  border-radius: 3px;
-  overflow: hidden;
-  display: inline-block;
-  padding: 10px;
-  padding-left: 0px;
-}
+app.config(['$routeProvider',
+  function($routeProvider) {
+    $routeProvider.
+      otherwise({
+        templateUrl: 'partials/main.html',
+        controller: 'main'
+      });
+  }]);
 
-.graph .title {
-  font-weight: bold;
-  font-size: x-large;
-  padding-left: 50px;
-  padding-bottom: 5px;
-  margin-right: 5px;
-  margin-bottom: 5px;
-  border-bottom: 1px solid gray;
-}
+app.run(function (editableOptions, $rootScope, $location) {
+  editableOptions.theme = 'bs3';
+  var history = [];
 
-.graph .title_shown {
-  box-shadow: 0px 20px 30px -15px black;
-}
+  $rootScope.$on('$routeChangeSuccess', function() {
+    history.push($location.$$path);
+  });
 
-.legend {
-  float: right;
-  margin-top: -6px;
-  border: 1px solid gray;
-  padding: 5px;
-  border-radius: 0px 3px 3px 3px;
-  background-color: white;
-  box-shadow: 0px 10px 30px -10px darkgray;
-  opacity: 1;
-  height: 200px;
-  overflow:hidden;
-}
+  $rootScope.back = function () {
+    var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
+    $location.path(prevUrl);
+  };
+});
 
-.legend.ng-hide-add, .legend.ng-hide-remove {
-  transition: all linear 0.1s;
-}
-
-.legend.ng-hide {
-  height: 0;
-  overflow:hidden;
-}
-
-.legend_item {
-  border-radius: 3px;
-  margin-bottom: 2px;
-}
-
-#svg_container {
-  float: left
-}
-
-#svg_container.ng-hide {
-  opacity: 0
-}
-
-#svg_container.ng-hide-add, #svg_container.ng-hide-remove {
-  transition: all linear 0.1s;
-}
-
-
-</style>
-</head>
-<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
-<body ng-app="myApp">
-
-  <div id="graph" class="graph" ng-controller="testCtrl">
-    <div class="title noselect" ng-click="expanded = !expanded" ng-class="{'title_shown': expanded}">Browser Usage</div>
-    <div id="svg_container" ng-show="expanded"></div>
-    <div class="legend" ng-show="expanded">
-      <div class="legend_item" ng-repeat="(key, value) in keys" style="background-color: {{keys[key].colour}}"><input type="checkbox" ng-model="keys[key].show"> {{key}}</div>
-      <p>
-        <input type="date" ng-model="x_range[0]">
-        <input type="time" ng-model="x_range[0]"><br>
-        <input type="date" ng-model="x_range[1]">
-        <input type="time" ng-model="x_range[1]"><br>
-        <input type="button" value="Reset Zoom" ng-click="reset_x()">
-      </p>
-    </div>
-  </div>
-
-<script src="d3.v3.min.js"></script>
-<script>
 
 var draw = function(container, entries, data, x_range, observer) {
   var margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -263,21 +191,20 @@ var draw = function(container, entries, data, x_range, observer) {
     observer.change_x_range(x.invert(select_origin), x.invert(select_end));
     select_origin = 0;
   });
-}
+};
 
-var app = angular.module('myApp', ['ngAnimate']);
 app.controller('testCtrl', function($scope) {
     $scope.keys = {};
     $scope.x_range = [];
     $scope.expanded = true;
 
 
-    d3.tsv("data.tsv", function(error, data) {
+    d3.tsv("source/data.tsv", function(error, data) {
       if (error) throw error;
 
       $scope.reset_x = function() {
         $scope.x_range = d3.extent(data, function(d) { return d.date; });
-      }
+      };
 
       var parseDate = d3.time.format("%y-%b-%d").parse;
       data.forEach(function(d) {
@@ -287,7 +214,7 @@ app.controller('testCtrl', function($scope) {
 
       var colour = d3.scale.category20c();
       var keys = Object.keys(data[0]).slice(1);
-      for (i in keys) {
+      for (let i in keys) {
         $scope.keys[keys[i]] = {
           show: true,
           colour: colour(i)
@@ -297,7 +224,7 @@ app.controller('testCtrl', function($scope) {
 
       var entries = {
         domain: function() {
-          return d3.keys($scope.keys).filter(function(key) { return $scope.keys[key].show === true; })
+          return d3.keys($scope.keys).filter(function(key) { return $scope.keys[key].show === true; });
         },
         color: function(i) {
           return $scope.keys[i].colour;
@@ -324,5 +251,3 @@ app.controller('testCtrl', function($scope) {
       $scope.$apply();
     });
 });
-
-</script>

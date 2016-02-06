@@ -1,0 +1,26 @@
+{
+  "name": "graphexp",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jorjpimm@gmail.com",
+  "dependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "bower": "^1.7.2",
+    "express": "^4.13.3",
+    "gulp": "^3.9.0",
+    "gulp-bower-files": "0.2.7",
+    "gulp-concat": "^2.6.0",
+    "gulp-jade": "^1.1.0",
+    "gulp-livereload": "^3.8.1",
+    "gulp-sass": "^2.1.1",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-util": "^3.0.7",
+    "livereload": "^0.4.0",
+    "path": "^0.12.7",
+    "tiny-lr": "^0.2.1"
+  }
+}
