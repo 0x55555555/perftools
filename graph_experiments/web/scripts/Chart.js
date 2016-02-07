@@ -3,7 +3,7 @@ app.service("Chart", function() {
 
   return class Chart
   {
-    constructor(container, width, height, x_range)
+    constructor(container, width, height, x_range, y_format)
     {
       var margin = {top: 20, right: 20, bottom: 30, left: 50};
       this.width = width - margin.left - margin.right,
@@ -20,11 +20,10 @@ app.service("Chart", function() {
           .scale(this.x)
           .orient("bottom");
 
-      var formatPercent = d3.format(".0%");
       var yAxis = d3.svg.axis()
           .scale(this.y)
           .orient("left")
-          .tickFormat(formatPercent);
+          .tickFormat(y_format);
 
       container.selectAll("*").remove();
       this.root_svg = container.append("svg")

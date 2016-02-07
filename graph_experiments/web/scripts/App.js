@@ -28,19 +28,6 @@ app.directive("contenteditable", function() {
   };
 });
 
-app.controller('main', function($scope) {
-
-});
-
-app.config(['$routeProvider',
-  function($routeProvider) {
-    $routeProvider.
-      otherwise({
-        templateUrl: 'partials/main.html',
-        controller: 'main'
-      });
-  }]);
-
 app.run(function (editableOptions, $rootScope, $location) {
   editableOptions.theme = 'bs3';
   var history = [];
@@ -55,7 +42,7 @@ app.run(function (editableOptions, $rootScope, $location) {
   };
 });
 
-app.controller('testCtrl', function($scope, Chart, StackedData, MouseInteraction) {
+app.controller('mainController', function($scope, Chart, StackedData, LineData, MouseInteraction) {
     $scope.keys = {};
     $scope.x_range = [];
     $scope.expanded = true;
@@ -94,7 +81,7 @@ app.controller('testCtrl', function($scope, Chart, StackedData, MouseInteraction
       var container = d3.select("body").select('#graph').select('#svg_container');
 
       var draw = function() {
-        let chart = new Chart(container, 1035, 500, $scope.x_range);
+        let chart = new Chart(container, 1035, 500, $scope.x_range, d3.format(".0%"));
 
         let mapped_entries = entries.domain().map(function(name) {
           return {
@@ -107,6 +94,7 @@ app.controller('testCtrl', function($scope, Chart, StackedData, MouseInteraction
         });
 
         let stack = new StackedData(chart, 'browser', mapped_entries);
+        let line = new LineData(chart, 'browser_test', mapped_entries);
         let mouse_interaction = new MouseInteraction(chart, {
           change_x_range: function(x1, x2) {
             $scope.x_range = [x1, x2];
