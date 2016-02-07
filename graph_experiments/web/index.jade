@@ -5,13 +5,9 @@ html(ng-app="graphexp" lang="")
     script(src = "lib/angular/angular.js")
     script(src = "lib/angular-animate/angular-animate.js")
     script(src = "lib/angular-route/angular-route.js")
-    script(src = "lib/angular-xeditable/dist/js/xeditable.js")
     script(src = "lib/d3/d3.js")
-    script(src = "//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.6.0/ui-bootstrap-tpls.min.js")
     script(src = "scripts/all.min.js")
-    script(src = "lib/bootstrap/dist/js/bootstrap.js")
     link(rel = "stylesheet", type = "text/css", href="stylesheets/main.css")
-    link(rel = "stylesheet", type = "text/css", href="lib/angular-xeditable/dist/css/xeditable.css")
     link(href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css')
   body(ng-controller="mainController")
 
@@ -20,27 +16,5 @@ html(ng-app="graphexp" lang="")
           div(class="main_title") Graphs!
           div(class="description") Generated on XXX
 
-        div(id="graph" class="graph noselect" )
-          div(class="title" ng-click="expanded = !expanded" ng-class="{'title_shown': expanded}") Browser Usage
-          div(id="svg_container" ng-show="expanded")
-          div(class="legend" ng-show="expanded")
-            div(class="legend_item" ng-repeat="(key, value) in keys" style="background-color: {{keys[key].colour}}")
-              input(type="checkbox" ng-model="keys[key].show")
-              | {{key}}
-            p
-              a(editable-bsdate="x_range[0]" e-datepicker-popup="dd-MMMM-yyyy")
-                | {{ (x_range[0] | date:"dd/MM/yyyy") || 'empty' }}
-              &nbsp;
-              a(editable-bstime="x_range[0]" e-show-meridian="false" e-minute-step="10")
-                | {{ (x_range[0] | date:"HH:mm") || 'empty' }}
-
-              br
-
-              a(editable-bsdate="x_range[1]" e-datepicker-popup="dd-MMMM-yyyy")
-                | {{ (x_range[1] | date:"dd/MM/yyyy") || 'empty' }}
-              &nbsp;
-              a(editable-bstime="x_range[1]" e-show-meridian="false" e-minute-step="10")
-                | {{ (x_range[1] | date:"HH:mm") || 'empty' }}
-
-              br
-              input(id="reset_zoom" type="button" value="Reset Zoom" ng-click="reset_x()")
+        div(ng-repeat="val in graphs")
+          graph(title="val.title", data="val.data", type="val.type", xrange="view_range", xrangemax="max_view_range")

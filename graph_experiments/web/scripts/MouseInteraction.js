@@ -56,7 +56,9 @@ app.service("MouseInteraction", function() {
       chart.root_svg.on('mouseup', function () {
         select();
         var select_end = d3.mouse(this)[0];
-        observer.change_x_range(chart.x.invert(select_origin), chart.x.invert(select_end));
+        if (select_origin != select_end) {
+          observer.change_x_range(chart.x.invert(select_origin), chart.x.invert(select_end));
+        }
         select_origin = 0;
       });
     }

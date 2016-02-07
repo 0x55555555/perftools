@@ -40,6 +40,14 @@ app.service("Chart", function() {
             .attr("width", this.x.range()[1])
             .attr("height", this.y.range()[0]);
 
+      this.root_svg
+        .append("rect")
+          .attr("x", this.x.range()[0])
+          .attr("y", this.y.range()[1])
+          .attr("width", this.x.range()[1])
+          .attr("height", this.y.range()[0])
+          .style('fill', 'white');
+
       this.root_svg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + this.height + ")")

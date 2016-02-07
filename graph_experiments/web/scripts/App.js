@@ -3,9 +3,7 @@
 
 var app = angular.module("graphexp", [
   'ngRoute',
-  'ngAnimate',
-  'xeditable',
-  'ui.bootstrap'
+  'ngAnimate'
 ]);
 
 app.directive("contenteditable", function() {
@@ -28,37 +26,70 @@ app.directive("contenteditable", function() {
   };
 });
 
-app.run(function (editableOptions, $rootScope, $location) {
-  editableOptions.theme = 'bs3';
-  var history = [];
+app.controller("mainController", function($scope) {
+  $scope.graphs = [];
+  $scope.view_range = [];
 
-  $rootScope.$on('$routeChangeSuccess', function() {
-    history.push($location.$$path);
+  d3.tsv("source/data.tsv", function(error, data) {
+    if (error) throw error;
+
+    var parseDate = d3.time.format("%y-%b-%d").parse;
+    $.each(data, function(i, d) {
+      d.date = parseDate(d.date);
+    });
+
+    let range = d3.extent(data, function(d) { return d.date; });
+    $scope.max_view_range = {};
+    $scope.max_view_range.min = range[0];
+    $scope.max_view_range.max = range[1];
+    $scope.view_range = {};
+    $scope.view_range.min = range[0];
+    $scope.view_range.max = range[1];
+
+    $scope.graphs = [
+      {
+        'title': "TEST",
+        'data': $.extend(true, [], data),
+        'type': 'stack'
+      },
+      {
+        'title': "TEST2",
+        'data': $.extend(true, [], data),
+        'type': 'line'
+      }
+    ];
+    $scope.$apply();
   });
-
-  $rootScope.back = function () {
-    var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
-    $location.path(prevUrl);
-  };
 });
 
-app.controller('mainController', function($scope, Chart, StackedData, LineData, MouseInteraction) {
-    $scope.keys = {};
-    $scope.x_range = [];
-    $scope.expanded = true;
+app.directive('graph', function($timeout, Chart, StackedData, LineData, MouseInteraction) {
+  return {
+    restrict: 'RE',
+    templateUrl: 'partials/graph.html',
+    scope: {
+      title: '=title',
+      data: '=data',
+      type: '=type',
+      xrange: '=xrange',
+      xrangemax: '=xrangemax'
+    },
+    link: function($scope, $element, $attrs) {
+      let data = $scope.data;
+      $scope.keys = {};
+      $scope.expanded = true;
 
-    d3.tsv("source/data.tsv", function(error, data) {
-      if (error) throw error;
+      $scope.change_x_range = function(x1, x2) {
+        $scope.xrange.min = x1;
+        $scope.xrange.max = x2;
+
+        $timeout(function() {
+          $scope.$apply();
+        });
+      }
 
       $scope.reset_x = function() {
-        $scope.x_range = d3.extent(data, function(d) { return d.date; });
+        $scope.change_x_range($scope.xrangemax.min, $scope.xrangemax.max);
       };
-
-      var parseDate = d3.time.format("%y-%b-%d").parse;
-      data.forEach(function(d) {
-        d.date = parseDate(d.date);
-      });
-      $scope.reset_x();
 
       var colour = d3.scale.category20c();
       var keys = Object.keys(data[0]).slice(1);
@@ -78,33 +109,35 @@ app.controller('mainController', function($scope, Chart, StackedData, LineData, 
         }
       };
 
-      var container = d3.select("body").select('#graph').select('#svg_container');
+      var container = d3.select($element[0]).select('#svg_container');
 
       var draw = function() {
-        let chart = new Chart(container, 1035, 500, $scope.x_range, d3.format(".0%"));
+        let chart = new Chart(container, 1035, 500, [ $scope.xrange.min, $scope.xrange.max ], d3.format(".0%"));
 
         let mapped_entries = entries.domain().map(function(name) {
           return {
             name: name,
-            values: data.map(function(d) {
+            values: $.map(data, function(d) {
               return {date: d.date, y: d[name] / 100};
             }),
             colour: entries.colour(name)
           };
         });
 
-        let stack = new StackedData(chart, 'browser', mapped_entries);
-        let line = new LineData(chart, 'browser_test', mapped_entries);
+        if ($scope.type == 'stack') {
+          let stack = new StackedData(chart, 'browser', mapped_entries);
+        }
+        else if ($scope.type == 'line') {
+          let line = new LineData(chart, 'browser_test', mapped_entries);
+        }
+
         let mouse_interaction = new MouseInteraction(chart, {
-          change_x_range: function(x1, x2) {
-            $scope.x_range = [x1, x2];
-            $scope.$apply();
-          }
+          'change_x_range': $scope.change_x_range
         });
       };
 
       $scope.$watch("keys", draw, true);
-      $scope.$watch("x_range", draw, true);
-      $scope.$apply();
-    });
+      $scope.$watch("xrange", draw, true);
+    }
+  };
 });
