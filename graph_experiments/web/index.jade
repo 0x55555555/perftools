@@ -9,8 +9,8 @@ html(ng-app="graphexp" lang="")
     script(src = "lib/d3/d3.js")
     script(src = "//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.6.0/ui-bootstrap-tpls.min.js")
     script(src = "scripts/all.min.js")
+    script(src = "lib/bootstrap/dist/js/bootstrap.js")
     link(rel = "stylesheet", type = "text/css", href="stylesheets/main.css")
-    link(rel = "stylesheet", type = "text/css", href="lib/bootstrap/dist/css/bootstrap.css")
     link(rel = "stylesheet", type = "text/css", href="lib/angular-xeditable/dist/css/xeditable.css")
   body
     div(ng-view)
@@ -28,14 +28,14 @@ html(ng-app="graphexp" lang="")
           &nbsp;
           a(editable-bstime="x_range[0]" e-show-meridian="false" e-minute-step="10")
             | {{ (x_range[0] | date:"HH:mm") || 'empty' }}
-          
+
           br
-          
+
           a(editable-bsdate="x_range[1]" e-datepicker-popup="dd-MMMM-yyyy")
             | {{ (x_range[1] | date:"dd/MM/yyyy") || 'empty' }}
           &nbsp;
           a(editable-bstime="x_range[1]" e-show-meridian="false" e-minute-step="10")
             | {{ (x_range[1] | date:"HH:mm") || 'empty' }}
-          
+
           br
           input(id="reset_zoom" type="button" value="Reset Zoom" ng-click="reset_x()")
