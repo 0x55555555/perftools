@@ -1,21 +1,21 @@
 /* jshint -W097 */
 "use strict";
 
-var app = angular.module("graphexp", [
+const app = angular.module("graphexp", [
   'ngRoute',
-  'ngAnimate'
+  'ngAnimate',
 ]);
 
 app.controller("mainController", function($scope) {
   $scope.graphs = [];
   $scope.view_range = [];
-  $scope.data_source = "Generated on XXX";
+  $scope.data_source = "XXX";
   $scope.title = "Graphs!";
 
   d3.tsv("source/data.tsv", function(error, data) {
     if (error) throw error;
 
-    var parseDate = d3.time.format("%y-%b-%d").parse;
+    let parseDate = d3.time.format("%y-%b-%d").parse;
     $.each(data, function(i, d) {
       d.date = parseDate(d.date);
     });
@@ -30,17 +30,17 @@ app.controller("mainController", function($scope) {
 
     $scope.graphs = [
       {
-        'title': "TEST",
-        'data': $.extend(true, [], data),
-        'type': 'stack',
-        'yformat': '%'
+        title: "TEST",
+        data: $.extend(true, [], data),
+        type: 'stack',
+        yformat: '%',
       },
       {
-        'title': "TEST2",
-        'data': $.extend(true, [], data),
-        'type': 'line',
-        'yformat': ".2f"
-      }
+        title: "TEST2",
+        data: $.extend(true, [], data),
+        type: 'line',
+        yformat: ".2f",
+      },
     ];
     $scope.$apply();
   });

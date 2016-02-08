@@ -55,7 +55,7 @@ body
   fill: rgba(0, 0, 0, 0.2)
   stroke: transparent
 
-.browser text
+.line_label
   text-anchor: end
 
 #header
@@ -77,6 +77,13 @@ body
   padding-right: 20px
   padding-top: 5px
 
+#header .time_range
+  float: right
+  clear: both
+  font-size: small
+  padding-right: 20px
+  padding-bottom: 20px
+
 .centre_line
   position: relative
   left: 50%
@@ -86,12 +93,17 @@ body
   left: -600px
   width: 1200px
   border: 1px rgba(0, 0, 0, 0.05) solid
-  box-shadow: 0px 10px 0px -5px rgba(0, 0, 0, 0.1)
+  box-shadow: 0px 10px 0px -5px rgba(86, 52, 17, 0.15)
   background-color: white
   border-radius: 2px
   overflow: hidden
   padding-left: 0px
   margin-bottom: 15px
+  transition: all 0.2s cubic-bezier(1.000, 0.000, 0.000, 1.000)
+  height: 560px
+
+.graph_collapsed
+  height: 43px
 
 .graph .title
   font-weight: bold
@@ -100,9 +112,7 @@ body
   padding-bottom: 10px
   padding-left: 50px
   margin-right: 5px
-  width: 1000px
-
-.graph .title_shown
+  width: 1100px
   border-bottom: 5px solid rgba(0, 0, 0, 0.1)
   box-shadow: 0px 20px 30px -15px lightgray
   padding-bottom: 5px
@@ -124,22 +134,9 @@ body
 .legend #reset_zoom
   width: 100%
 
-.legend.ng-hide-add, .legend.ng-hide-remove
-  transition: all linear 0.1s
-
-.legend.ng-hide
-  opacity: 0
-  overflow:hidden
-
 .legend_item
   border-radius: 3px
   margin-bottom: 2px
 
 #svg_container
   float: left
-
-#svg_container.ng-hide
-  opacity: 0
-
-#svg_container.ng-hide-add, #svg_container.ng-hide-remove
-  transition: all linear 0.1s

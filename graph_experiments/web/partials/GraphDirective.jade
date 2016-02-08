@@ -1,13 +1,10 @@
-div(class="graph noselect")
+div(class="graph noselect" ng-class="{'graph_collapsed': !expanded}")
   div(class="title" ng-click="expanded = !expanded" ng-class="{'title_shown': expanded}") {{title}}
-  div(id="svg_container" ng-show="expanded")
-  div(class="legend" ng-show="expanded")
+  div(id="svg_container")
+  div(class="legend")
     div(class="legend_item" ng-repeat="(key, value) in keys" style="background-color: {{keys[key].colour}}")
       input(type="checkbox" ng-model="keys[key].show")
       | {{key}}
-    p
-      p From {{ xrange.min | date:"dd/MM/yyyy HH:mm" }}
-      p To {{ xrange.max | date:"dd/MM/yyyy HH:mm" }}
 
     p
       input(id="reset_zoom" type="button" value="Reset Zoom" ng-click="reset_x()")

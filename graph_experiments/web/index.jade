@@ -14,7 +14,8 @@ html(ng-app="graphexp" lang="")
     div(class="centre_line")
         div(id="header")
           div(class="main_title") {{title}}
-          div(class="description") {{data_source}}
+          div(class="description") Generated from {{data_source}}
+          div(class="time_range") Displaying {{ view_range.min | date:"dd/MM/yyyy HH:mm" }} to {{ view_range.max | date:"dd/MM/yyyy HH:mm" }}
 
         div(ng-repeat="val in graphs")
           graph(title="val.title", data="val.data", type="val.type", xrange="view_range", xrangemax="max_view_range", yformat="val.yformat")

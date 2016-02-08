@@ -3,15 +3,25 @@ app.service("MouseInteraction", function() {
 
   return class MouseInteraction
   {
-    constructor(chart, observer)
+    constructor(observer)
     {
-      var line = chart.root_svg.append("line")
+      this.observer = observer;
+    }
+
+    y_range()
+    {
+      return [Infinity, -Infinity];
+    }
+
+    build(chart)
+    {
+      const line = chart.root_svg.append("line")
         .attr("class", "pointer_location")
         .attr('y1', chart.y.range()[0])
         .attr('y2', chart.y.range()[1]);
       chart.add_graph_clip(line);
 
-      var selection = chart.root_svg.append("rect")
+      const selection = chart.root_svg.append("rect")
         .attr("class", "pointer_selection")
         .attr("stroke", "black")
         .attr('y', chart.y.range()[1])
@@ -30,14 +40,14 @@ app.service("MouseInteraction", function() {
       }
       select(null, null);
 
-      var select_origin = null;
+      let select_origin = null;
 
       chart.root_svg.on('mouseleave', function() {
         line.attr("display", "none");
       });
 
       chart.root_svg.on('mousemove', function () {
-         var x = d3.mouse(this)[0];
+         const x = d3.mouse(this)[0];
          line.attr("stroke-width", 2);
          line.attr('x1', x);
          line.attr('x2', x);
@@ -48,16 +58,17 @@ app.service("MouseInteraction", function() {
          }
       });
 
-      chart.root_svg.on('mousedown', function () {
-         var x = d3.mouse(this)[0];
+      chart.root_svg.on('mousedown', function() {
+         const x = d3.mouse(this)[0];
          select_origin = x;
       });
 
-      chart.root_svg.on('mouseup', function () {
+      let that = this;
+      chart.root_svg.on('mouseup', function() {
         select();
-        var select_end = d3.mouse(this)[0];
+        const select_end = d3.mouse(this)[0];
         if (select_origin != select_end) {
-          observer.change_x_range(chart.x.invert(select_origin), chart.x.invert(select_end));
+          that.observer.change_x_range(chart.x.invert(select_origin), chart.x.invert(select_end));
         }
         select_origin = 0;
       });
