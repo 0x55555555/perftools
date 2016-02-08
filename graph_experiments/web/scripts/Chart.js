@@ -3,7 +3,7 @@ app.service("Chart", function() {
 
   return class Chart
   {
-    constructor(container, width, height, x_range, y_format)
+    constructor(container, width, height, x_range, y_range, y_format)
     {
       var margin = {top: 20, right: 20, bottom: 30, left: 50};
       this.width = width - margin.left - margin.right,
@@ -15,6 +15,7 @@ app.service("Chart", function() {
 
       this.y = d3.scale.linear()
           .range([this.height, 0]);
+      this.y.domain(y_range);
 
       var xAxis = d3.svg.axis()
           .scale(this.x)
