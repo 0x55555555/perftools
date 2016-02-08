@@ -1,0 +1,9 @@
+div(class="selector_root" ng-class="{'selector_root_hidden': shouldhide}")
+  div(class="selector" ng-class="{'selector_hidden': shouldhide}")
+    h1 Available sessions
+    
+    ul
+      li(ng-repeat="(key, val) in sessions") 
+        a(ng-click="set_session(key)" ng-class="{'current_session': currentsession.title == val.title}") {{val.title}}
+    
+    div(class="selector_handle" ng-click="shouldhide = !shouldhide")

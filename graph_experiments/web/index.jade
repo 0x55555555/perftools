@@ -8,14 +8,17 @@ html(ng-app="graphexp" lang="")
     script(src = "lib/d3/d3.js")
     script(src = "scripts/all.min.js")
     link(rel = "stylesheet", type = "text/css", href="stylesheets/main.css")
+    link(rel = "stylesheet", type = "text/css", href="stylesheets/graph.css")
+    link(rel = "stylesheet", type = "text/css", href="stylesheets/selector.css")
     link(href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css')
   body(ng-controller="mainController")
-
     div(class="centre_line")
         div(id="header")
-          div(class="main_title") {{title}}
-          div(class="description") Generated from {{data_source}}
+          div(class="main_title") {{session.title}}
+          div(class="description") Generated from {{session.source}}
           div(class="time_range") Displaying {{ view_range.min | date:"dd/MM/yyyy HH:mm" }} to {{ view_range.max | date:"dd/MM/yyyy HH:mm" }}
 
-        div(ng-repeat="val in graphs")
+        div(ng-repeat="val in session.graphs")
           graph(title="val.title", data="val.data", type="val.type", xrange="view_range", xrangemax="max_view_range", yformat="val.yformat")
+
+    selector(sessions="sessions", currentsession="session", shouldhide="selector_hidden")

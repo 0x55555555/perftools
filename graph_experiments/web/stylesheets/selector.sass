@@ -1,0 +1,45 @@
+.selector_root
+  position: absolute
+  top: 50%
+  left: 50%
+  transition: all 0.3s cubic-bezier(0.895, 0.030, 0.685, 0.220)
+
+.selector_root_hidden
+  top: -185px
+
+.selector
+  position: relative
+  top: -220px
+  left: -200px
+  width: 360px
+  height: 400px
+  padding: 20px
+  background-color: white
+
+  border: 1px rgba(0, 0, 0, 0.05) solid
+  box-shadow: 0px 50px 0px -30px rgba(86, 52, 17, 0.15)
+
+  transition: all 0.4s cubic-bezier(0.895, 0.030, 0.685, 0.220)
+
+.selector_hidden
+  box-shadow: 0px 15px 0px -10px rgba(86, 52, 17, 0.15)
+
+
+.selector ul
+  padding-left: 10px
+
+.selector li
+  font-size: large
+  list-style-type: none
+
+.current_session
+  font-weight: bold
+
+.selector_handle
+  position: absolute
+  top: 413px
+  left: 150px
+  width: 100px
+  height: 15px
+  border-top: 2px solid rgba(86, 52, 17, 0.15)
+  border-bottom: 2px solid rgba(86, 52, 17, 0.15)

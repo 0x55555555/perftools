@@ -14,7 +14,7 @@ app.directive('graph', function($timeout, Chart, StackedData, LineData, MouseInt
     link: function($scope, $element, _$attrs) {
       let data = $scope.data;
       $scope.keys = {};
-      $scope.expanded = true;
+      $scope.expanded = false;
 
       $scope.change_x_range = function(x1, x2) {
         $scope.xrange.min = x1;
