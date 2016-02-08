@@ -86,6 +86,7 @@ app.controller("mainController", function($scope, $rootScope, $location, $timeou
       },
     };
     $scope.session = $scope.sessions[$location.path().slice(1)];
+    reset_view_range();
     $scope.selector_hidden = true;
 
     $rootScope.$on('$locationChangeSuccess', function () {
