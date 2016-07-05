@@ -17,8 +17,8 @@ html(ng-app="graphexp" lang="")
           div(class="main_title") {{session.title}}
           div(class="description") Generated from {{session.source}}
           div(class="time_range") Displaying {{ view_range.min | date:"dd/MM/yyyy HH:mm" }} to {{ view_range.max | date:"dd/MM/yyyy HH:mm" }}
-
+        
         div(ng-repeat="val in session.graphs")
-          graph(title="val.title", data="val.data", type="val.type", xrange="view_range", xrangemax="max_view_range", yformat="val.yformat")
+          graph(title="val.title", data="val.rows", type="val.type", xrange="view_range", xrangemax="max_view_range", yformat="val.yformat")
 
     selector(sessions="sessions", currentsession="session", shouldhide="selector_hidden")

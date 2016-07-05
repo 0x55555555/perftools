@@ -6,9 +6,45 @@ const app = angular.module("graphexp", [
   'ngAnimate',
 ]);
 
-app.controller("mainController", function($scope, $rootScope, $location, $timeout) {
+app.controller("mainController", function($scope, $rootScope, $location, $timeout, sessions) {
   $scope.graphs = [];
   $scope.view_range = [];
+
+  $scope.sessions = [];
+  sessions.sessions().then(function(sess)
+  {
+    $scope.sessions = sess;
+  });
+
+  $scope.sessions = [];
+  sessions.sessions().then(function(sess)
+  {
+    $scope.sessions = sess;
+  });
+
+  $scope.set_session = function(session_name)
+  {
+    sessions.session(session_name).then((session) =>
+    {
+      $scope.session = session;
+
+      $scope.selector_hidden = true;
+
+      //reset_view_range();
+
+      $timeout(function() {
+        $scope.$apply();
+      });
+    });
+  };
+
+  $rootScope.$on('$locationChangeSuccess', function () {
+    const session_name = $location.path().slice(1);
+    $scope.set_session(session_name);
+  });
+
+  $scope.set_session($location.path().slice(1));
+  $scope.selector_hidden = true;
 
   d3.tsv("source/data.tsv", function(error, data) {
     if (error) throw error;
@@ -28,8 +64,11 @@ app.controller("mainController", function($scope, $rootScope, $location, $timeou
       $scope.view_range.min = range[0];
       $scope.view_range.max = range[1];
     }
+    reset_view_range();
 
-    $scope.sessions = {
+
+
+    /*{
       a: {
         title: 'session-a',
         source: "XXX",
@@ -84,20 +123,6 @@ app.controller("mainController", function($scope, $rootScope, $location, $timeou
           },
         ],
       },
-    };
-    $scope.session = $scope.sessions[$location.path().slice(1)];
-    reset_view_range();
-    $scope.selector_hidden = true;
-
-    $rootScope.$on('$locationChangeSuccess', function () {
-      $scope.session = $scope.sessions[$location.path().slice(1)];
-      $scope.selector_hidden = true;
-
-      reset_view_range();
-
-      $timeout(function() {
-        $scope.$apply();
-      });
-    });
+    };*/
   });
 });
