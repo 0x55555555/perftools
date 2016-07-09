@@ -17,6 +17,7 @@ app.get('/sessions', function (req, res) {
 });
 
 app.get('/session/*', function (req, res) {
+  const session_name = req.params[0];
 
   var dateNow = new Date();
 
@@ -27,7 +28,7 @@ app.get('/session/*', function (req, res) {
     {'date': new Date(dateNow.getTime() - 50 *1000), 'x': 1, 'y': 1},
   ];
   let session = {
-    title: 'session-a',
+    title: session_name,
     source: "XXX",
     graphs: [
       {
